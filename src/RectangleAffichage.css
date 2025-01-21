@@ -1,0 +1,37 @@
+.rectangle {
+    width: 90vw;
+    min-height: 12vh; /* Hauteur minimale de 12% de la hauteur de la fenêtre */
+    height: auto; /* Hauteur s'adapte au contenu */
+    margin: 11px auto;
+    border-radius: 20px;
+    color: #1A237E;
+    padding: 3% 8%;
+    box-sizing: border-box;
+    text-align: left;
+    display: flex;
+    flex-direction: row; /* Changer la direction du flex pour aligner la case et le texte */
+    align-items: center; /* Aligner verticalement la case à cocher et le texte */
+  }
+  
+  .checkbox {
+    margin-right: 10%; /* Espacement entre la case à cocher et le texte */
+    transform: scale(1.5); /* Agrandir la taille de la case à cocher */
+}
+  
+  .text-content {
+    display: flex;
+    flex-direction: column; /* Aligner le titre et le texte verticalement */
+    justify-content: center;
+  }
+  
+  .rectangle h2 {
+    font-weight: bold;
+    margin: 0;
+    font-size: 100%;
+  }
+  
+  .rectangle p {
+    font-size: 80%;
+    margin: 5px 0;
+  }
+  

@@ -1,0 +1,12 @@
+.menu {
+    position: fixed; /* Positionne le menu en bas de l'écran */
+    bottom: 0; /* Place le menu tout en bas */
+    width: 100%; /* Occupe toute la largeur de l'écran */
+    height: 12vh; /* 12% de la hauteur de la fenêtre */
+    display: flex; /* Utilise Flexbox pour aligner les boutons horizontalement */
+    justify-content: space-evenly; /* Espacement égal entre les boutons */
+    align-items: center; /* Centre les boutons verticalement */
+    background-color: #ffffff;
+  }
+
+  

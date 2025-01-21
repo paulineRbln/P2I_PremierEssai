@@ -1,0 +1,14 @@
+.page-accueil {
+    background-color: white;
+    min-height: 100vh;
+    margin-bottom: 12vh;
+}
+
+.page-accueil h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 8vh 8vw 5vh 8vw;
+    color: #1A237E;
+    text-align: left; /* Assure que le texte est aligné à gauche */
+}
+
