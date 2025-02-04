@@ -1,0 +1,6 @@
+@tktech_bdd_HostAddress = http://localhost:5222
+
+GET {{tktech_bdd_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
