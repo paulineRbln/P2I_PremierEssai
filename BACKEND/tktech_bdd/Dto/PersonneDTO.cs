@@ -3,10 +3,12 @@ namespace tktech_bdd.Dto
 {
     public class PersonneDTO
     {
+        public int Id {get;set;}
         public string Nom { get; set; } = null!;
         public string Prenom { get; set; } = null!;
         public string Pseudo { get; set; } = null!;
         public string PhotoProfil { get; set; } = null!;
+
 
 
         public PersonneDTO(){}

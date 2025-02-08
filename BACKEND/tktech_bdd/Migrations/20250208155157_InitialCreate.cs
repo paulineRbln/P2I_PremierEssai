@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace tktech_bdd.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialMigration : Migration
+    public partial class InitialCreate : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,8 +20,7 @@ namespace tktech_bdd.Migrations
                     Nom = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    Discriminator = table.Column<string>(type: "TEXT", maxLength: 8, nullable: false),
-                    EstFait = table.Column<bool>(type: "INTEGER", nullable: true)
+                    EstFait = table.Column<bool>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -72,12 +71,10 @@ namespace tktech_bdd.Migrations
                 {
                     Id = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
-                    Nom = table.Column<string>(type: "TEXT", nullable: false),
                     PersonneId = table.Column<int>(type: "INTEGER", nullable: false),
                     ElementId = table.Column<int>(type: "INTEGER", nullable: false),
                     Date = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    TacheId = table.Column<int>(type: "INTEGER", nullable: true)
+                    Type = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -89,38 +86,7 @@ namespace tktech_bdd.Migrations
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_Associations_Elements_TacheId",
-                        column: x => x.TacheId,
-                        principalTable: "Elements",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Associations_Personnes_PersonneId",
-                        column: x => x.PersonneId,
-                        principalTable: "Personnes",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "EnvoisNotif",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "INTEGER", nullable: false)
-                        .Annotation("Sqlite:Autoincrement", true),
-                    NotifId = table.Column<int>(type: "INTEGER", nullable: false),
-                    PersonneId = table.Column<int>(type: "INTEGER", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_EnvoisNotif", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_EnvoisNotif_Elements_NotifId",
-                        column: x => x.NotifId,
-                        principalTable: "Elements",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_EnvoisNotif_Personnes_PersonneId",
                         column: x => x.PersonneId,
                         principalTable: "Personnes",
                         principalColumn: "Id",
@@ -138,21 +104,6 @@ namespace tktech_bdd.Migrations
                 column: "PersonneId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Associations_TacheId",
-                table: "Associations",
-                column: "TacheId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EnvoisNotif_NotifId",
-                table: "EnvoisNotif",
-                column: "NotifId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_EnvoisNotif_PersonneId",
-                table: "EnvoisNotif",
-                column: "PersonneId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Recurrences_ElementId",
                 table: "Recurrences",
                 column: "ElementId");
@@ -163,9 +114,6 @@ namespace tktech_bdd.Migrations
         {
             migrationBuilder.DropTable(
                 name: "Associations");
-
-            migrationBuilder.DropTable(
-                name: "EnvoisNotif");
 
             migrationBuilder.DropTable(
                 name: "Recurrences");

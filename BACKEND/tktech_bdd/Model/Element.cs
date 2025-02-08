@@ -1,4 +1,5 @@
 using System.Text.RegularExpressions;
+using tktech_bdd.Dto;
 public enum TypeElement
 {
     Event,
@@ -17,31 +18,31 @@ namespace tktech_bdd.Model
         public string Description { get; set; } = null!;
         public TypeElement Type {get;set;}
         public List<Recurrence> JoursRecurrence {get;set;}=null!;
-    }
-
-    public class Associable : Element
-    {
-        public List<Association>? ListeAssociations { get; set; } 
-    }
-
-    // Classe Notif qui hérite de Element
-    public class Notif : Element
-    {
-        public List<EnvoiNotif> ListeDestinataires { get; set; } =null!;
-
-        public Notif()
-        {
-            this.Type = TypeElement.Notif;  // Type spécifique à Notif
-        }
-    }
-
-    public class Tache : Associable
-    {
+        public List<Association>? ListeAssociations { get; set; }
         public bool EstFait { get; set; }
+    
 
-        public Tache()
+        public Element (){}
+        public Element(ElementDTO elementDTO)
         {
-            this.Type = TypeElement.Task;  // Type spécifique à Tache
+            Id = elementDTO.Id;
+            Nom = elementDTO.Nom;
+            Description = elementDTO.Description;
+
+            // Conversion inverse de string en TypeElement
+            if (Enum.TryParse(elementDTO.Type, out TypeElement typeElement))
+            {
+                Type = typeElement;  // On assigne le TypeElement après conversion
+            }
+            else
+            {
+                Type = TypeElement.Notif; // Valeur par défaut si la conversion échoue
+            }
+
+            EstFait = elementDTO.EstFait;
         }
-    }
+        }
 }
+
+
+    

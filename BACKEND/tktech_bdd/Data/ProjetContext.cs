@@ -7,9 +7,6 @@ public class ProjetContext : DbContext
     public DbSet<Personne> Personnes { get; set; } = null!;
     public DbSet<Recurrence> Recurrences { get; set; } = null!;
     public DbSet<Element> Elements { get; set; } = null!;
-    public DbSet<Notif> Notifications { get; set; } = null!;
-    public DbSet<Tache> Taches { get; set; } = null!;
-    public DbSet<EnvoiNotif> EnvoisNotif { get; set; } = null!;
     public DbSet<Association> Associations { get; set; } = null!;
     public string DbPath { get; private set; }
 

@@ -1,0 +1,148 @@
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using tktech_bdd.Model;
+using tktech_bdd.Dto;
+using Swashbuckle.AspNetCore.Annotations;
+
+namespace tktech_bdd.Controllers
+{
+    [ApiController]
+    [Route("api/association")]
+    public class AssociationController : ControllerBase
+    {
+        private readonly ProjetContext _context;
+
+        public AssociationController(ProjetContext context)
+        {
+            _context = context;
+        }
+
+        // GET: api/association
+        [SwaggerOperation(
+            Summary = "Liste des associations",
+            Description = "Retourne la liste de toutes les associations"
+        )]
+        [SwaggerResponse(StatusCodes.Status200OK, "Liste des associations trouvée", typeof(IEnumerable<AssociationDTO>))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Aucune association trouvée")]
+        [HttpGet]
+        public async Task<ActionResult<IEnumerable<AssociationDTO>>> GetAssociations()
+        {
+            var associationsDTO = await _context.Associations
+                .Include(a => a.Personne)  // Inclure les entités associées (Personne et Element)
+                .Include(a => a.Element)
+                .Select(a => new AssociationDTO(a))  // Convertir en DTO
+                .ToListAsync();
+
+            return associationsDTO;
+        }
+
+        // GET: api/association/{id}
+        [SwaggerOperation(
+            Summary = "Association grâce à identifiant",
+            Description = "Retourne une association à partir de son identifiant"
+        )]
+        [SwaggerResponse(StatusCodes.Status200OK, "Association trouvée", typeof(AssociationDTO))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Association non trouvée")]
+        [HttpGet("{id}")]
+        public async Task<ActionResult<AssociationDTO>> GetAssociationById(
+            [FromRoute, SwaggerParameter(Description = "Identifiant de l'association (doit être un entier)")]
+                int id
+        )
+        {
+            var associationDTO = await _context
+                .Associations
+                .Include(a => a.Personne)  // Inclure les entités associées
+                .Include(a => a.Element)
+                .Where(a => a.Id == id)
+                .Select(a => new AssociationDTO(a))
+                .SingleOrDefaultAsync();
+
+            if (associationDTO == null)
+                return NotFound();
+
+            return associationDTO;
+        }
+
+        // POST: api/association
+        [SwaggerOperation(
+            Summary = "Ajout d'une nouvelle association",
+            Description = "Ajoute une nouvelle association à la base de données"
+        )]
+        [SwaggerResponse(StatusCodes.Status200OK, "Association ajoutée", typeof(AssociationDTO))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Association non ajoutée")]
+        [HttpPost]
+        public async Task<ActionResult<AssociationDTO>> PostAssociation(AssociationDTO associationDTO)
+        {
+            // Créer une nouvelle instance d'Association en utilisant le DTO
+            Association association = new Association(associationDTO);
+            _context.Associations.Add(association);
+            await _context.SaveChangesAsync();
+
+            return CreatedAtAction(
+                nameof(GetAssociationById),
+                new { id = association.Id },
+                new AssociationDTO(association)
+            );
+        }
+
+        // PUT: api/association/{id}
+        [SwaggerOperation(
+            Summary = "Modifier une association",
+            Description = "Modifie une association à partir de son identifiant"
+        )]
+        [SwaggerResponse(StatusCodes.Status200OK, "Association modifiée", typeof(AssociationDTO))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Association non modifiée")]
+        [HttpPut("{id}")]
+        public async Task<IActionResult> PutAssociation(
+            [FromRoute, SwaggerParameter(Description = "Identifiant de l'association (doit être un entier)")]
+                int id,
+            AssociationDTO associationDTO
+        )
+        {
+            if (id != associationDTO.Id)
+                return BadRequest();
+
+            // Mettre à jour l'association
+            Association association = new Association(associationDTO);
+            _context.Entry(association).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!_context.Associations.Any(a => a.Id == id))
+                    return NotFound();
+                else
+                    throw;
+            }
+
+            return Ok(associationDTO);
+        }
+
+        // DELETE: api/association/{id}
+        [SwaggerOperation(
+            Summary = "Supprimer une association",
+            Description = "Supprime une association définitivement"
+        )]
+        [SwaggerResponse(StatusCodes.Status200OK, "Association supprimée", typeof(AssociationDTO))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Association non supprimée")]
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteAssociation(
+            [FromRoute, SwaggerParameter(Description = "Identifiant de l'association (doit être un entier)")]
+                int id
+        )
+        {
+            var association = await _context.Associations.FindAsync(id);
+
+            if (association == null)
+                return NotFound();
+
+            _context.Associations.Remove(association);
+            await _context.SaveChangesAsync();
+
+            return Ok();
+        }
+    }
+}

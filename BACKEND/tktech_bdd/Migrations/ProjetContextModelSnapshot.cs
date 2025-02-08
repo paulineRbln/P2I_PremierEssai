@@ -28,14 +28,7 @@ namespace tktech_bdd.Migrations
                     b.Property<int>("ElementId")
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("Nom")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("PersonneId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int?>("TacheId")
                         .HasColumnType("INTEGER");
 
                     b.Property<int>("Type")
@@ -46,8 +39,6 @@ namespace tktech_bdd.Migrations
                     b.HasIndex("ElementId");
 
                     b.HasIndex("PersonneId");
-
-                    b.HasIndex("TacheId");
 
                     b.ToTable("Associations");
                 });
@@ -62,10 +53,8 @@ namespace tktech_bdd.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<string>("Discriminator")
-                        .IsRequired()
-                        .HasMaxLength(8)
-                        .HasColumnType("TEXT");
+                    b.Property<bool>("EstFait")
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Nom")
                         .IsRequired()
@@ -77,31 +66,6 @@ namespace tktech_bdd.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Elements");
-
-                    b.HasDiscriminator<string>("Discriminator").HasValue("Element");
-
-                    b.UseTphMappingStrategy();
-                });
-
-            modelBuilder.Entity("tktech_bdd.Model.EnvoiNotif", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("NotifId")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("PersonneId")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("NotifId");
-
-                    b.HasIndex("PersonneId");
-
-                    b.ToTable("EnvoisNotif");
                 });
 
             modelBuilder.Entity("tktech_bdd.Model.Personne", b =>
@@ -157,27 +121,10 @@ namespace tktech_bdd.Migrations
                     b.ToTable("Recurrences");
                 });
 
-            modelBuilder.Entity("tktech_bdd.Model.Notif", b =>
-                {
-                    b.HasBaseType("tktech_bdd.Model.Element");
-
-                    b.HasDiscriminator().HasValue("Notif");
-                });
-
-            modelBuilder.Entity("tktech_bdd.Model.Tache", b =>
-                {
-                    b.HasBaseType("tktech_bdd.Model.Element");
-
-                    b.Property<bool>("EstFait")
-                        .HasColumnType("INTEGER");
-
-                    b.HasDiscriminator().HasValue("Tache");
-                });
-
             modelBuilder.Entity("tktech_bdd.Model.Association", b =>
                 {
                     b.HasOne("tktech_bdd.Model.Element", "Element")
-                        .WithMany()
+                        .WithMany("ListeAssociations")
                         .HasForeignKey("ElementId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -188,32 +135,9 @@ namespace tktech_bdd.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("tktech_bdd.Model.Tache", null)
-                        .WithMany("ListeAssociations")
-                        .HasForeignKey("TacheId");
-
                     b.Navigation("Element");
 
                     b.Navigation("Personne");
-                });
-
-            modelBuilder.Entity("tktech_bdd.Model.EnvoiNotif", b =>
-                {
-                    b.HasOne("tktech_bdd.Model.Notif", "Notif")
-                        .WithMany("ListeDestinataires")
-                        .HasForeignKey("NotifId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("tktech_bdd.Model.Personne", "Destinataire")
-                        .WithMany()
-                        .HasForeignKey("PersonneId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Destinataire");
-
-                    b.Navigation("Notif");
                 });
 
             modelBuilder.Entity("tktech_bdd.Model.Recurrence", b =>
@@ -230,15 +154,7 @@ namespace tktech_bdd.Migrations
             modelBuilder.Entity("tktech_bdd.Model.Element", b =>
                 {
                     b.Navigation("JoursRecurrence");
-                });
 
-            modelBuilder.Entity("tktech_bdd.Model.Notif", b =>
-                {
-                    b.Navigation("ListeDestinataires");
-                });
-
-            modelBuilder.Entity("tktech_bdd.Model.Tache", b =>
-                {
                     b.Navigation("ListeAssociations");
                 });
 #pragma warning restore 612, 618
