@@ -16,6 +16,7 @@ namespace tktech_bdd.Dto
         // Constructeur qui initialise les propriétés à partir de l'entité Personne
         public PersonneDTO(Personne personne)
         {
+            Id = personne.Id;
             Nom = personne.Nom;
             Prenom = personne.Prenom;
             Pseudo = personne.Pseudo;

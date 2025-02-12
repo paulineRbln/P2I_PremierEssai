@@ -8,7 +8,6 @@ public enum TypeElement
     Objet,
 };
 
-
 namespace tktech_bdd.Model
 {
     public class Element
@@ -16,13 +15,14 @@ namespace tktech_bdd.Model
         public int Id { get; set; }
         public string Nom { get; set; } = null!;
         public string Description { get; set; } = null!;
-        public TypeElement Type {get;set;}
-        public List<Recurrence> JoursRecurrence {get;set;}=null!;
+        public TypeElement Type { get; set; }
+        public List<Recurrence> JoursRecurrence { get; set; } = null!;
         public List<Association>? ListeAssociations { get; set; }
         public bool EstFait { get; set; }
-    
+        public DateTime? Date { get; set; } // DateTime? pour la rendre nullable
 
-        public Element (){}
+        public Element() { }
+
         public Element(ElementDTO elementDTO)
         {
             Id = elementDTO.Id;
@@ -40,9 +40,16 @@ namespace tktech_bdd.Model
             }
 
             EstFait = elementDTO.EstFait;
+
+            // Si la date est non nulle et non vide, on la convertit, sinon on laisse null
+            if (!string.IsNullOrEmpty(elementDTO.Date))
+            {
+                Date = DateTime.ParseExact(elementDTO.Date, "yyyy-MM-dd", null); // Conversion de string vers DateTime
+            }
+            else
+            {
+                Date = null; // On assigne null si la date est vide ou nulle
+            }
         }
-        }
+    }
 }
-
-
-    

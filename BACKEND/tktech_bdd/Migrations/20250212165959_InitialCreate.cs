@@ -20,7 +20,8 @@ namespace tktech_bdd.Migrations
                     Nom = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
-                    EstFait = table.Column<bool>(type: "INTEGER", nullable: false)
+                    EstFait = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -73,8 +74,8 @@ namespace tktech_bdd.Migrations
                         .Annotation("Sqlite:Autoincrement", true),
                     PersonneId = table.Column<int>(type: "INTEGER", nullable: false),
                     ElementId = table.Column<int>(type: "INTEGER", nullable: false),
-                    Date = table.Column<DateTime>(type: "TEXT", nullable: false),
-                    Type = table.Column<int>(type: "INTEGER", nullable: false)
+                    Type = table.Column<int>(type: "INTEGER", nullable: false),
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {

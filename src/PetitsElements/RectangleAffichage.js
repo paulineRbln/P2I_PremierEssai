@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './RectangleAffichage.css'; // Importer le fichier CSS
 
-const RectangleAffichage = ({ textGras, textPetit, couleur, task }) => {
+const RectangleAffichage = ({ textGras, textPetit, couleur, task, date }) => {
   // État pour gérer la case à cocher (lue ou non)
   const [checked, setChecked] = useState(false);
 
@@ -21,8 +21,9 @@ const RectangleAffichage = ({ textGras, textPetit, couleur, task }) => {
         />
       )}
       <div className="text-content">
+        {date && <p className="date_rect">{date}</p>}
         <h2>{textGras}</h2>
-        <p>{textPetit}</p>
+        <p className="petit_text">{textPetit}</p>
       </div>
     </div>
   );

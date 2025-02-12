@@ -21,8 +21,6 @@ namespace tktech_bdd.Dto
         {
             Id = recurrence.Id;
             ElementId = recurrence.ElementId;
-            // Conversion de DateTime en chaîne de caractères (format souhaité, ici ISO 8601)
-            Date = recurrence.Date.ToString("yyyy-MM-ddTHH:mm:ss");
         }
     }
 }

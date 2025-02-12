@@ -1,21 +1,27 @@
-
-ProjetContext context = new ProjetContext();
+using tktech_bdd.Data;
 
 var builder = WebApplication.CreateBuilder(args);
-
-// Add services to the container.
-// The aim of this is to add API controllers to the application
+// Ajouter les services nécessaires à l'application
 builder.Services.AddControllers();
-
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-// You as a developer can use Swagger to interact with the API through a web interface
+// Ajouter Swagger (optionnel)
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// Add the database context to the application
-// This will allow the application to interact with the database
+// Ajouter le contexte de la base de données
 builder.Services.AddDbContext<ProjetContext>();
 
+// Ajouter la configuration de CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowReactApp", policy =>
+    {
+        policy.WithOrigins("http://localhost:3000") // Autoriser les requêtes venant de ton frontend React
+              .AllowAnyMethod()  // Autoriser toutes les méthodes HTTP (GET, POST, etc.)
+              .AllowAnyHeader(); // Autoriser tous les en-têtes
+    });
+});
+
+// Configurer Swagger
 builder.Services.AddSwaggerGen(c =>
 {
     c.EnableAnnotations();
@@ -23,7 +29,9 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Appliquer la politique CORS
+app.UseCors("AllowReactApp");
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -32,4 +40,7 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.MapControllers();
+
+SeedData.Initialize();  // Lancer la méthode d'initialisation des données ici
+
 app.Run();

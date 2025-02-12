@@ -29,6 +29,7 @@ namespace tktech_bdd.Model
         // Constructeur qui prend un PersonneDTO
         public Personne(PersonneDTO personneDTO)
         {
+            Id = personneDTO.Id;
             Nom = personneDTO.Nom;
             Prenom = personneDTO.Prenom;
             Pseudo = personneDTO.Pseudo;

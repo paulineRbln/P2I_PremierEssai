@@ -30,8 +30,12 @@
     font-size: 100%;
   }
   
-  .rectangle p {
+  .petit_text{
     font-size: 80%;
     margin: 5px 0;
   }
-  
+
+  .date_rect{
+    font-size: 70%;
+    margin-bottom: 10px;
+  }

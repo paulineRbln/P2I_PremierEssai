@@ -8,6 +8,7 @@ namespace tktech_bdd.Dto
         public string Description { get; set; } = null!;
         public string Type { get; set; }=null!;
         public bool EstFait { get; set; }
+        public string ?Date {get;set;}
 
         public ElementDTO(){}
         
@@ -18,17 +19,21 @@ namespace tktech_bdd.Dto
             Nom = element.Nom;
             Description = element.Description;
 
-            // Si Type est un string et tu veux le convertir en TypeElement
+            // Convertir Type de string en Enum
             if (Enum.TryParse(element.Type.ToString(), out TypeElement typeElement))
             {
-                Type = typeElement.ToString();  // Ici on retourne un string représentant le TypeElement
+                Type = typeElement.ToString();
             }
             else
             {
-                Type = TypeElement.Notif.ToString();  // Valeur par défaut si la conversion échoue
+                Type = TypeElement.Notif.ToString();
             }
 
             EstFait = element.EstFait;
+
+            // Vérifier si Date est null avant d'utiliser ToString()
+            Date = element.Date?.ToString("yyyy-MM-dd") ?? string.Empty;  // Utilise une valeur par défaut si Date est null
         }
+
     }
 }

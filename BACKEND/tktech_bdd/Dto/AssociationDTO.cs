@@ -6,7 +6,9 @@ namespace tktech_bdd.Dto
     {
         public int Id { get; set; }
         public int PersonneId { get; set; }
+        public string PersonneName { get; set; }=null!;
         public int ElementId { get; set; }
+        public string ElementName { get; set; }=null!;
         public string Type { get; set; } = null!;
         public string Date { get; set; } = null!;
 
@@ -18,12 +20,12 @@ namespace tktech_bdd.Dto
             Id = association.Id;
             PersonneId = association.PersonneId;
             ElementId = association.ElementId;
+            PersonneName = association.Personne.Prenom;
+            ElementName = association.Element.Nom;
 
             // Conversion de TypeAssociation en string
             Type = association.Type.ToString();
-
-            // Conversion de DateTime en string (format 'yyyy-MM-dd')
-            Date = association.Date.ToString("yyyy-MM-dd");
+            Date = association.Date?.ToString("yyyy-MM-dd") ?? string.Empty;  // Utilise une valeur par défaut si Date est null
         }
     }
 }
