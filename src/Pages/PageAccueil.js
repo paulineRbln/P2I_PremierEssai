@@ -1,47 +1,65 @@
 import React, { useState, useEffect } from 'react';
-import { Notif, NotifNews } from '../GrosElements/Notif'; // Composant générique pour afficher les notifications
+import { Notif, NotifNews } from '../GrosElements/Notif';
 import './PageAccueil.css'; // Importer le fichier CSS
+import {jwtDecode} from 'jwt-decode';
 
 function PageAccueil() {
   const [tachesAFaire, setTachesAFaire] = useState([]);
   const [evenements, setEvenements] = useState([]);
   const [news, setNews] = useState([]);
+  const [personneId, setPersonneId] = useState(null);
 
-  console.log(localStorage.getItem("token"));
-  
-  // Récupérer les tâches à faire depuis l'API
   useEffect(() => {
-    fetch('http://localhost:5222/api/element')
-      .then(response => response.json())
-      .then(data => {
-        const tachesFiltrees = data.filter(item => item.type === 'Task' && !item.estFait);
-        setTachesAFaire(tachesFiltrees);
-      })
-      .catch(error => console.error('Erreur lors de la récupération des tâches:', error));
+    const token = localStorage.getItem("token");
+    if (token) {
+      try {
+        const decodedToken = jwtDecode(token);
+        console.log("Token décodé:", decodedToken); // Affiche tout le contenu du token
+        // Récupérer l'ID de la personne avec la clé correcte
+        const personneId = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
+        console.log("ID de la personne:", personneId); // Affiche l'ID
+        setPersonneId(personneId);
+      } catch (error) {
+        console.error("Erreur lors du décodage du token", error);
+      }
+    }
   }, []);
+
+  // Récupérer les tâches à faire de la personne
+  useEffect(() => {
+    if (personneId) {
+      fetch(`http://localhost:5222/api/element/personne/${personneId}`)
+        .then(response => response.json())
+        .then(data => {
+          const tachesFiltrees = data.filter(item => item.type === 'Task' && !item.estFait);
+          setTachesAFaire(tachesFiltrees);
+        })
+        .catch(error => console.error('Erreur lors de la récupération des tâches:', error));
+    }
+  }, [personneId]);
 
   // Récupérer les événements depuis l'API
   useEffect(() => {
-    fetch('http://localhost:5222/api/element')
+    fetch(`http://localhost:5222/api/element/personne/${personneId}`)
       .then(response => response.json())
       .then(data => {
         const evenementsFiltrees = data.filter(item => item.type === 'Event');
         setEvenements(evenementsFiltrees);
       })
       .catch(error => console.error('Erreur lors de la récupération des événements:', error));
-  }, []);
+  }, [personneId]);
 
   // Récupérer les inscriptions et les réservations depuis l'API
   useEffect(() => {
-    fetch('http://localhost:5222/api/association')
-      .then(response => response.json())
-      .then(data => {
-        const newsFiltrees = data.filter(item => item.type === 'Inscription' || item.type === 'Reservation');
-        console.log("Données filtrées pour les notifications :", newsFiltrees); // Ajoute un log ici pour voir les données
-        setNews(newsFiltrees);
-      })
-      .catch(error => console.error('Erreur lors de la récupération des inscriptions et réservations:', error));
-  }, []);
+    if (personneId) {
+      fetch(`http://localhost:5222/api/association/news/${personneId}`)
+        .then(response => response.json())
+        .then(data => {
+          setNews(data);  // Mettre à jour l'état avec les données des notifications
+        })
+        .catch(error => console.error('Erreur lors de la récupération des news:', error));
+    }
+  }, [personneId]);
 
   const handleLogout = () => {
     // Supprimer le token du localStorage
@@ -68,7 +86,7 @@ function PageAccueil() {
 
       {/* Affichage des événements */}
       <Notif
-        titre="Evénements à venir"
+        titre="Vos événements à venir"
         notifications={evenements}
         couleur="#CFEFEC"
       />

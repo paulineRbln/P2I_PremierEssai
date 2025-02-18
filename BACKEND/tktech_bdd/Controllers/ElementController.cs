@@ -28,7 +28,11 @@ public class ElementController : ControllerBase
     public async Task<ActionResult<IEnumerable<ElementDTO>>> GetElements()
     {
         var elementsDTO = await _context.Elements.Select(x => new ElementDTO(x)).ToListAsync();
-        return elementsDTO;
+        if (elementsDTO == null || !elementsDTO.Any())
+        {
+            return Ok(new List<ElementDTO>()); // Retourne un tableau vide si aucun élément n'est trouvé
+        }
+        return Ok(elementsDTO);
     }
 
     // GET: api/element/{id}
@@ -50,9 +54,11 @@ public class ElementController : ControllerBase
             .SingleOrDefaultAsync();
 
         if (elementDTO == null)
-            return NotFound();
+        {
+            return Ok(new ElementDTO()); // Retourne un objet vide si l'élément n'est pas trouvé
+        }
 
-        return elementDTO;
+        return Ok(elementDTO);
     }
 
     // POST: api/element
@@ -103,7 +109,7 @@ public class ElementController : ControllerBase
         catch (DbUpdateConcurrencyException)
         {
             if (!_context.Elements.Any(e => e.Id == id))
-                return NotFound();
+                return Ok(new ElementDTO()); // Retourne un objet vide si l'élément n'existe pas
             else
                 throw;
         }
@@ -127,11 +133,38 @@ public class ElementController : ControllerBase
         var element = await _context.Elements.FindAsync(id);
 
         if (element == null)
-            return NotFound();
+            return Ok(new ElementDTO()); // Retourne un objet vide si l'élément n'est pas trouvé
 
         _context.Elements.Remove(element);
         await _context.SaveChangesAsync();
 
         return Ok();
+    }
+
+    // GET: api/element/personne/{personneId}
+    [SwaggerOperation(
+        Summary = "Liste des éléments associés à une personne",
+        Description = "Retourne la liste des éléments qui sont associés à une personne via les associations"
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Liste des éléments trouvée", typeof(IEnumerable<ElementDTO>))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Aucun élément trouvé pour cette personne")]
+    [HttpGet("personne/{personneId}")]
+    public async Task<ActionResult<IEnumerable<ElementDTO>>> GetElementsByPersonneId(
+        [FromRoute] int personneId
+    )
+    {
+        // Filtrer les éléments associés à la personne via l'entité Association
+        var elementsDTO = await _context.Associations
+            .Where(a => a.PersonneId == personneId) // Filtrer par l'ID de la personne
+            .Include(a => a.Element) // Inclure l'élément associé
+            .Select(a => new ElementDTO(a.Element)) // Convertir l'élément en DTO
+            .ToListAsync();
+
+        if (elementsDTO == null || elementsDTO.Count == 0)
+        {
+            return Ok(new List<ElementDTO>()); // Retourner un tableau vide si aucun élément n'est trouvé
+        }
+
+        return Ok(elementsDTO); // Retourner la liste des éléments sous forme de DTO
     }
 }

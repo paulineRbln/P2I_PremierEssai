@@ -33,7 +33,7 @@ namespace tktech_bdd.Controllers
                 .Select(a => new AssociationDTO(a))  // Convertir en DTO
                 .ToListAsync();
 
-            return associationsDTO;
+            return Ok(associationsDTO.Any() ? associationsDTO : new List<AssociationDTO>()); // Retourner un tableau vide si aucune association n'est trouvée
         }
 
         // GET: api/association/{id}
@@ -57,13 +57,8 @@ namespace tktech_bdd.Controllers
                 .Select(a => new AssociationDTO(a))
                 .SingleOrDefaultAsync();
 
-            if (associationDTO == null)
-                return NotFound();
-
-            return associationDTO;
+            return Ok(associationDTO ?? new AssociationDTO()); // Retourner un objet vide si l'association n'est pas trouvée
         }
-
-
 
         // POST: api/association
         [SwaggerOperation(
@@ -115,7 +110,7 @@ namespace tktech_bdd.Controllers
             catch (DbUpdateConcurrencyException)
             {
                 if (!_context.Associations.Any(a => a.Id == id))
-                    return NotFound();
+                    return Ok(new AssociationDTO()); // Retourner un objet vide si l'association n'existe pas
                 else
                     throw;
             }
@@ -139,12 +134,42 @@ namespace tktech_bdd.Controllers
             var association = await _context.Associations.FindAsync(id);
 
             if (association == null)
-                return NotFound();
+                return Ok(new AssociationDTO()); // Retourner un objet vide si l'association n'est pas trouvée
 
             _context.Associations.Remove(association);
             await _context.SaveChangesAsync();
 
             return Ok();
+        }
+
+        // GET: api/association/news/{personneId}
+        [HttpGet("news/{personneId}")]
+        public async Task<ActionResult<IEnumerable<NewsDTO>>> GetNews(int personneId)
+        {
+            // Récupérer les événements auxquels la personne est inscrite
+            var evenementsPersonne = await _context.Associations
+                .Where(a => a.PersonneId == personneId && a.Type == TypeAssociation.Inscription)  // Filtrer les inscriptions
+                .Select(a => a.ElementId)  // On récupère les éléments (événements) où cette personne est inscrite
+                .Distinct()
+                .ToListAsync();
+
+            if (evenementsPersonne == null || !evenementsPersonne.Any())
+            {
+                return Ok(new List<NewsDTO>()); // Retourner un tableau vide si aucune news n'est trouvée
+            }
+
+            // Récupérer toutes les inscriptions et réservations pour ces événements, mais exclure ceux où la personne est inscrite
+            var news = await _context.Associations
+                .Where(a => (evenementsPersonne.Contains(a.ElementId) && a.Type == TypeAssociation.Inscription && a.PersonneId != personneId) // Exclure les événements où la personne est inscrite
+                            || (a.Type == TypeAssociation.Reservation && a.PersonneId != personneId)) // Exclure les réservations faites par la personne elle-même
+                .Include(a => a.Personne)  // Inclure les informations de la personne
+                .Include(a => a.Element)   // Inclure les informations de l'élément (événement)
+                .ToListAsync();
+
+            // Mapper les résultats en NewsDTO
+            var newsDTO = news.Select(a => new NewsDTO(a)).ToList();
+
+            return Ok(newsDTO);
         }
     }
 }
