@@ -22,13 +22,10 @@ export function Notif({ titre, notifications, couleur, task }) {
 }
 
 export function NotifNews({ titre, notifications, couleur }) {
-  console.log("Notifications dans NotifNews:", notifications);  // Ajoute ce log
-
   return (
     <div className="notif">
       <h3>{titre}</h3>
       {notifications.map((notif, index) => {
-        console.log("Notification en cours dans map :", notif);  // Ajoute ce log dans la boucle map
           return (
             <RectangleAffichage
               key={index}

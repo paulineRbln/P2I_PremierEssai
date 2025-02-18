@@ -14,7 +14,6 @@ namespace tktech_bdd.Model
         // Constructeur qui initialise les propriétés à partir de RecurrenceDTO
         public Recurrence(RecurrenceDTO recurrenceDTO)
         {
-            Id = recurrenceDTO.Id;
             ElementId = recurrenceDTO.ElementId;
             Date = DateTime.Parse(recurrenceDTO.Date); // Conversion de string en DateTime
         }

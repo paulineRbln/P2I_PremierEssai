@@ -1,44 +1,35 @@
 import React, { useState } from "react";
-import './Connexion.css'; // Importer les styles CSS
+import { useNavigate } from "react-router-dom";
+import "./Connexion.css"; // Importation du style
 
 function Connexion() {
-  const [pseudo, setPseudo] = useState(""); // État pour le pseudo
-  const [motDePasse, setMotDePasse] = useState(""); // État pour le mot de passe
-  const [erreur, setErreur] = useState(""); // État pour gérer l'erreur
+  const [pseudo, setPseudo] = useState("");
+  const [motDePasse, setMotDePasse] = useState("");
+  const [erreur, setErreur] = useState("");
+  const navigate = useNavigate();
 
-  // Gérer l'envoi du formulaire
+console.log(localStorage.getItem("token"));
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    const credentials = {
-      pseudo: pseudo,
-      motDePasse: motDePasse,
-    };
+    const credentials = { pseudo, motDePasse };
 
     try {
       const response = await fetch("http://localhost:5222/api/personne/login", {
-        method: "POST", // Requête POST pour l'authentification
-        headers: {
-          "Content-Type": "application/json",
-        },
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
       });
 
-      if (!response.ok) {
-        throw new Error("Identifiants incorrects.");
-      }
+      if (!response.ok) throw new Error("Identifiants incorrects.");
 
       const data = await response.json();
+      localStorage.setItem("token", data.token);
+      window.location.href = "/";// Redirection vers l'accueil après connexion
 
-      // Si la connexion réussie, stocker le token JWT dans localStorage
-      if (data.token) {
-        localStorage.setItem("token", data.token);
-        console.log("Connexion réussie !");
-        // Rediriger vers une autre page (par exemple, un dashboard)
-        window.location.href = "/"; // Change en fonction de ta logique de redirection
-      }
     } catch (error) {
-      setErreur(error.message); // Afficher un message d'erreur
+      setErreur(error.message);
     }
   };
 
@@ -47,34 +38,108 @@ function Connexion() {
       <h1>Connexion</h1>
       <form onSubmit={handleSubmit}>
         <div>
-          <label htmlFor="pseudo">Pseudo :</label>
+          <h3>Pseudo</h3>
           <input
             type="text"
-            id="pseudo"
-            name="pseudo"
+            className="encadre"
             value={pseudo}
             onChange={(e) => setPseudo(e.target.value)}
             required
           />
         </div>
         <div>
-          <label htmlFor="motDePasse">Mot de passe :</label>
+          <h3>Mot de passe</h3>
           <input
             type="password"
-            id="motDePasse"
-            name="motDePasse"
+            className="encadre"
             value={motDePasse}
             onChange={(e) => setMotDePasse(e.target.value)}
             required
           />
         </div>
         {erreur && <p className="error-message">{erreur}</p>}
-        <div>
-          <button type="submit">Se connecter</button>
-        </div>
+        <button className="connecter" type="submit">Se connecter</button>
+        <p className="lien-inscription" onClick={() => navigate("/inscription")}>
+          Pas encore de compte ? Inscrivez-vous
+        </p>
       </form>
     </div>
   );
 }
 
-export default Connexion;
+function Inscription() {
+  const [nom, setNom] = useState("");
+  const [prenom, setPrenom] = useState("");
+  const [pseudo, setPseudo] = useState("");
+  const [photoProfil, setPhotoProfil] = useState("");
+  const [motDePasse, setMotDePasse] = useState("");
+  const [estProprio, setEstProprio] = useState(false);
+  const [erreur, setErreur] = useState("");
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (motDePasse.length < 8) {
+      setErreur("Le mot de passe doit contenir au moins 8 caractères.");
+      return;
+    }
+
+    const nouvellePersonne = { id: 0, nom, prenom, pseudo, photoProfil, motDePasse, estProprio };
+
+    try {
+      const response = await fetch("http://localhost:5222/api/personne", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nouvellePersonne),
+      });
+
+      if (!response.ok) throw new Error("Erreur lors de l'inscription.");
+
+      navigate("/connexion"); // Rediriger vers la connexion après inscription
+    } catch (error) {
+      setErreur(error.message);
+    }
+  };
+
+  return (
+    <div className="connexion-container">
+      <h1>Inscription</h1>
+      <form onSubmit={handleSubmit}>
+        <div>
+          <h3>Nom</h3>
+          <input type="text" className="encadre" value={nom} onChange={(e) => setNom(e.target.value)} required />
+        </div>
+        <div>
+          <h3>Prénom</h3>
+          <input type="text" className="encadre" value={prenom} onChange={(e) => setPrenom(e.target.value)} required />
+        </div>
+        <div>
+          <h3>Pseudo</h3>
+          <input type="text" className="encadre" value={pseudo} onChange={(e) => setPseudo(e.target.value)} required />
+        </div>
+        <div>
+          <h3>Photo de profil (URL)</h3>
+          <input type="text" className="encadre" value={photoProfil} onChange={(e) => setPhotoProfil(e.target.value)} />
+        </div>
+        <div>
+          <h3>Mot de passe</h3>
+          <input type="password" className="encadre" value={motDePasse} onChange={(e) => setMotDePasse(e.target.value)} required />
+        </div>
+        <div>
+          <label>
+            <input type="checkbox" checked={estProprio} onChange={(e) => setEstProprio(e.target.checked)} />
+            Je suis propriétaire
+          </label>
+        </div>
+        {erreur && <p className="error-message">{erreur}</p>}
+        <button className="connecter" type="submit">S'inscrire</button>
+        <p className="lien-inscription" onClick={() => navigate("/connexion")}>
+          Déjà un compte ? Connectez-vous
+        </p>
+      </form>
+    </div>
+  );
+}
+
+export { Connexion, Inscription };

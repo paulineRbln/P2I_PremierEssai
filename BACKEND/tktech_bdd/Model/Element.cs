@@ -25,7 +25,6 @@ namespace tktech_bdd.Model
 
         public Element(ElementDTO elementDTO)
         {
-            Id = elementDTO.Id;
             Nom = elementDTO.Nom;
             Description = elementDTO.Description;
 

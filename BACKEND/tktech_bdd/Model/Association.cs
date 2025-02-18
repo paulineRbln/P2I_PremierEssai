@@ -26,7 +26,6 @@ namespace tktech_bdd.Model
         // Constructeur qui prend un AssociationDTO et initialise les propriétés
         public Association(AssociationDTO associationDTO)
         {
-            Id = associationDTO.Id;
             PersonneId = associationDTO.PersonneId;
             ElementId = associationDTO.ElementId;
             Type = Enum.Parse<TypeAssociation>(associationDTO.Type); // Conversion de string vers TypeAssociation
