@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
-import {Notif, NotifNews} from '../GrosElements/Notif'; // Composant générique pour afficher les notifications
+import { Notif, NotifNews } from '../GrosElements/Notif'; // Composant générique pour afficher les notifications
 import './PageAccueil.css'; // Importer le fichier CSS
 import { useNavigate } from 'react-router-dom'; // pour rediriger l'utilisateur
 
-function PageAccueil() {
-  // États pour les différentes catégories de notifications
+function PageAccueil({ setAuth }) {
   const [tachesAFaire, setTachesAFaire] = useState([]);
   const [evenements, setEvenements] = useState([]);
   const [news, setNews] = useState([]);
   const navigate = useNavigate();
-  
+
   // Récupérer les tâches à faire depuis l'API
   useEffect(() => {
     fetch('http://localhost:5222/api/element')
@@ -48,8 +47,11 @@ function PageAccueil() {
     // Supprimer le token du localStorage
     localStorage.removeItem('token');
     
+    // Mettre à jour l'état d'authentification
+    setAuth(false);
+    
     // Rediriger vers la page de connexion
-    navigate('/connexion'); // Remplace '/connexion' par le chemin vers ta page de connexion
+    navigate('/connexion');
   };
 
   return (

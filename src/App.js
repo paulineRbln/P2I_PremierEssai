@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom'; // Importer React Router
 import './App.css';
 import PageAccueil from './Pages/PageAccueil'; // Page d'accueil
@@ -9,11 +9,13 @@ import Menu from './GrosElements/Menu'; // Menu de navigation
 import Connexion from './Pages/Connexion'; // Composant de connexion
 
 function App() {
-  // Fonction pour vérifier la présence du token dans localStorage
-  const isAuthenticated = () => {
+  const [auth, setAuth] = useState(localStorage.getItem("token") !== null); // Gérer l'état d'authentification
+
+  // Mettre à jour l'état d'authentification lorsque le token change
+  useEffect(() => {
     const token = localStorage.getItem("token");
-    return token !== null; // Si un token est présent, l'utilisateur est authentifié
-  };
+    setAuth(token !== null); // Si un token est présent, l'utilisateur est authentifié
+  }, []); // Lancer à l'initialisation
 
   return (
     <Router>
@@ -23,13 +25,14 @@ function App() {
           <Route path="/connexion" element={<Connexion />} />
 
           {/* Routes protégées : si l'utilisateur n'est pas authentifié, redirection vers /connexion */}
-          <Route path="/" element={isAuthenticated() ? <PageAccueil /> : <Navigate to="/connexion" />} />
-          <Route path="/calendrier" element={isAuthenticated() ? <Calendrier /> : <Navigate to="/connexion" />} />
-          <Route path="/events" element={isAuthenticated() ? <Events /> : <Navigate to="/connexion" />} />
-          <Route path="/maison" element={isAuthenticated() ? <Maison /> : <Navigate to="/connexion" />} />
+          <Route path="/" element={auth ? <PageAccueil setAuth={setAuth}/> : <Navigate to="/connexion" />} />
+          <Route path="/calendrier" element={auth ? <Calendrier /> : <Navigate to="/connexion" />} />
+          <Route path="/events" element={auth ? <Events /> : <Navigate to="/connexion" />} />
+          <Route path="/maison" element={auth ? <Maison /> : <Navigate to="/connexion" />} />
         </Routes>
+
         {/* Le menu de navigation, visible sur toutes les pages après la connexion */}
-        {isAuthenticated() && <Menu />}
+        {auth && <Menu  />}
       </div>
     </Router>
   );
