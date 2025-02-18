@@ -2,6 +2,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using tktech_bdd.Model;
 using tktech_bdd.Dto;
+using Microsoft.IdentityModel.Tokens;  // Pour les classes de gestion des tokens
+using System.IdentityModel.Tokens.Jwt;  // Pour JwtSecurityTokenHandler et JwtSecurityToken
+using System.Security.Claims;
+using System.Text;
+using Microsoft.Extensions.Configuration;
 using Swashbuckle.AspNetCore.Annotations;
 
 namespace tktech_bdd.Controllers;
@@ -11,10 +16,13 @@ namespace tktech_bdd.Controllers;
 public class PersonneController : ControllerBase
 {
     private readonly ProjetContext _context;
+    private readonly IConfiguration _configuration; // Déclarez cette variable
 
-    public PersonneController(ProjetContext context)
+    // Injectez IConfiguration dans le constructeur du contrôleur
+    public PersonneController(ProjetContext context, IConfiguration configuration)
     {
         _context = context;
+        _configuration = configuration; // Initialisez _configuration
     }
 
     // GET: api/personne
@@ -128,4 +136,47 @@ public class PersonneController : ControllerBase
 
         return Ok();
     }
+
+    // POST: api/personne/login
+    [HttpPost("login")]
+    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    {
+        var personne = await _context.Personnes
+            .FirstOrDefaultAsync(p => p.Pseudo == request.Pseudo);
+
+        if (personne == null || personne.MotDePasse != request.MotDePasse)
+        {
+            return Unauthorized(new { message = "Identifiants invalides" });
+        }
+
+        var token = GenerateJwtToken(personne);
+
+        return Ok(new { token });
+    }
+
+    private string GenerateJwtToken(Personne personne)
+    {
+        var claims = new[]
+        {
+            new Claim(ClaimTypes.Name, personne.Pseudo),
+            new Claim(ClaimTypes.NameIdentifier, personne.Id.ToString())
+        };
+
+        var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["Jwt:Secret"]!));
+        var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
+        var token = new JwtSecurityToken(
+            issuer: _configuration["Jwt:Issuer"],
+            audience: _configuration["Jwt:Audience"],
+            claims: claims,
+            expires: DateTime.Now.AddHours(1),
+            signingCredentials: creds
+        );
+
+        return new JwtSecurityTokenHandler().WriteToken(token);
+    }
 }
+
+    
+
+    
+

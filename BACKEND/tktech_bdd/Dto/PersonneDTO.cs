@@ -23,4 +23,11 @@ namespace tktech_bdd.Dto
             PhotoProfil = personne.PhotoProfil;
         }
     }
+
+    // DTO pour la requête de login
+    public class LoginRequest
+    {
+        public string Pseudo { get; set; }=null!;
+        public string MotDePasse { get; set; }=null!;
+    }
 }

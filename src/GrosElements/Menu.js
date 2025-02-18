@@ -8,11 +8,10 @@ import './Menu.css';
 const Menu = () => {
   return (
     <div className="menu">
-      {/* Bouton vers la page Profil */}
       <BoutonMenu 
-        icon={<MdDashboard />} 
-        text="Accueil" 
-        lien="/" 
+        icon={<FaCalendarAlt />} 
+        text="Calendrier" 
+        lien="/calendrier" 
       />
 
       {/* Bouton vers la page News */}
@@ -32,11 +31,10 @@ const Menu = () => {
         lien="/maison" 
       />
 
-      {/* Bouton vers la page Profil */}
       <BoutonMenu 
-        icon={<FaCalendarAlt />} 
-        text="Calendrier" 
-        lien="/calendrier" 
+        icon={<MdDashboard />} 
+        text="Accueil" 
+        lien="/" 
       />
 
       
