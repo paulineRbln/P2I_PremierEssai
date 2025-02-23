@@ -1,6 +1,7 @@
 import React, {useState} from 'react';
 import { RectangleAjout, RectangleAffichage } from '../PetitsElements/RectangleAffichage';
 import './Notif.css'; // Si tu as des styles supplémentaires
+import {FaTimes} from  'react-icons/fa';
 
 export function Notif({ titre, notifications, couleur, task }) {
   // Vérifier si la liste notifications est null ou vide
@@ -71,14 +72,14 @@ export function ChoixActions({choix1, choix2, titre, eventOnClic1, eventOnClic2 
 }
 
 
-export function FormulaireAjoutEvent({ closePopup }) {
+export function FormulaireAjoutEvent({ closePopup, personneId }) {
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const nouvelEvenement = {
       id: 0, // Géré par la BDD
       nom,
@@ -87,17 +88,35 @@ export function FormulaireAjoutEvent({ closePopup }) {
       estFait: false, // Un événement n'est pas "fait" par défaut
       date,
     };
-
+  
     try {
+      // 1. Créer l'événement
       const response = await fetch("http://localhost:5222/api/element", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nouvelEvenement),
       });
-
+  
       if (response.ok) {
-        alert("Événement ajouté avec succès !");
-        closePopup(); // Fermer le popup après succès
+        const eventData = await response.json(); // Récupère les données de l'événement créé  
+     
+        const association = {
+          personneId, // Utilise l'ID de la personne depuis le localStorage
+          elementId: eventData.id, // ID de l'événement créé
+          type: "Inscription", // Type d'association, ici c'est un événement
+          date: "", // Pas de date spécifiée
+        };
+  
+        // Envoie la requête pour créer l'association
+        const associationResponse = await fetch("http://localhost:5222/api/association", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(association),
+        });
+  
+        if (!associationResponse.ok) {
+          alert("Erreur lors de l'inscription à l'événement");
+        }
       } else {
         alert("Erreur lors de l'ajout de l'événement");
       }
@@ -106,38 +125,48 @@ export function FormulaireAjoutEvent({ closePopup }) {
       alert("Une erreur s'est produite");
     }
   };
+  
 
   return (
     <div className="modal-overlay" onClick={closePopup}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-        <h2>Nouvel événement</h2>
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Titre de l'événement"
-            value={nom}
-            onChange={(e) => setNom(e.target.value)}
-            required
-          />
-          <textarea
-            placeholder="Infos supplémentaires"
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            required
-          />
-          <input
-            type="date"
-            value={date}
-            onChange={(e) => setDate(e.target.value)}
-            required
-          />
-          <button type="submit" className="btn-ajouter">
-            Ajouter
-          </button>
-          <button type="button" className="btn-fermer" onClick={closePopup}>
-            X
-          </button>
-        </form>
+        <div className="connexion-container">
+          <form onSubmit={handleSubmit}>
+            <div>
+              <h3>Titre de l'événement</h3>
+              <input
+                type="text"
+                className="encadre"
+                value={nom}
+                onChange={(e) => setNom(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <h3>Infos supplémentaires</h3>
+              <textarea
+                className="encadre"
+                value={description}
+                onChange={(e) => setDescription(e.target.value)}
+                required
+              />
+            </div>
+            <div>
+              <h3>Date de l'événement</h3>
+              <input
+                type="date"
+                className="encadre"
+                value={date}
+                onChange={(e) => setDate(e.target.value)}
+                required
+              />
+            </div>
+            <button className="connecter" type="submit">Ajouter</button>
+          </form>
+          <button className="btn-fermer" type="button" onClick={closePopup}>
+            <FaTimes className="close-icon" /> {/* Utilisation de l'icône croix */}
+            </button>
+        </div>
       </div>
     </div>
   );
