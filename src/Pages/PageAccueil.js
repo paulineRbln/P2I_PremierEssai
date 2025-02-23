@@ -10,20 +10,12 @@ function PageAccueil() {
   const [personneId, setPersonneId] = useState(null);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    if (token) {
-      try {
-        const decodedToken = jwtDecode(token);
-        console.log("Token décodé:", decodedToken); // Affiche tout le contenu du token
-        // Récupérer l'ID de la personne avec la clé correcte
-        const personneId = decodedToken['http://schemas.xmlsoap.org/ws/2005/05/identity/claims/nameidentifier'];
-        console.log("ID de la personne:", personneId); // Affiche l'ID
-        setPersonneId(personneId);
-      } catch (error) {
-        console.error("Erreur lors du décodage du token", error);
-      }
+    // Lire directement l'ID de la personne depuis le localStorage
+    const id = localStorage.getItem('personneId');
+    if (id) {
+      setPersonneId(id);
     }
-  }, []);
+  }, []); // Ce useEffect se lance une seule fois au montage du composant
 
   // Récupérer les tâches à faire de la personne
   useEffect(() => {
@@ -64,6 +56,7 @@ function PageAccueil() {
   const handleLogout = () => {
     // Supprimer le token du localStorage
     localStorage.removeItem('token');
+    localStorage.removeItem('personneId');
     
     // Rediriger vers la page de connexion
     window.location.href ='/connexion';

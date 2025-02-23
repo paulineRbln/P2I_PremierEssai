@@ -26,6 +26,7 @@ console.log(localStorage.getItem("token"));
 
       const data = await response.json();
       localStorage.setItem("token", data.token);
+      localStorage.setItem("personneId", data.id);  // L'ID vient de la réponse
       window.location.href = "/";// Redirection vers l'accueil après connexion
 
     } catch (error) {

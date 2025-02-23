@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import './RectangleAffichage.css'; // Importer le fichier CSS
 
-const RectangleAffichage = ({ textGras, textPetit, couleur, task, date }) => {
+export function RectangleAffichage ({ textGras, textPetit, couleur, task, date }) {
   // État pour gérer la case à cocher (lue ou non)
   const [checked, setChecked] = useState(false);
 
@@ -29,4 +29,13 @@ const RectangleAffichage = ({ textGras, textPetit, couleur, task, date }) => {
   );
 };
 
-export default RectangleAffichage;
+
+export function RectangleAjout ({ texte, couleur, eventOnClic }) {
+  return (
+    <div className="bouton_ajout" style={{ backgroundColor: couleur }} onClick={eventOnClic}>
+        <h2>{texte}</h2>
+    </div>
+  );
+};
+
+export default {RectangleAffichage, RectangleAjout};

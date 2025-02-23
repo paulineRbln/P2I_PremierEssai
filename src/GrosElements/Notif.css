@@ -5,3 +5,71 @@
     color: #1A237E;
     text-align: left; /* Assure que le texte est aligné à gauche */
 }
+
+.choix_actions {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    margin-top: 20px;
+}
+
+.choix_actions .titre {
+    font-size: 1rem;
+    font-weight: bold;
+    margin: 3vh 8vw 0 8vw;
+    color: #1A237E;
+    text-align: left;
+}
+
+.bloc_rectangles {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 80%;
+}
+
+
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(26, 35, 126, 0.2);
+  backdrop-filter: blur(8px); /* Flou */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000; /* S'assure que le modal est au-dessus */
+}
+
+.modal-content {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 300px;
+  text-align: center;
+  position: relative;
+}
+
+.btn-ajouter {
+  background: #4a90e2;
+  color: white;
+  border: none;
+  padding: 10px;
+  margin-top: 10px;
+  cursor: pointer;
+}
+
+.btn-fermer {
+  background: red;
+  color: white;
+  border: none;
+  padding: 5px;
+  margin-top: 10px;
+  cursor: pointer;
+  position: absolute;
+  top: 10px;
+  right: 10px;
+}
