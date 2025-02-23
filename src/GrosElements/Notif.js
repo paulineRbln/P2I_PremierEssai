@@ -72,60 +72,73 @@ export function ChoixActions({choix1, choix2, titre, eventOnClic1, eventOnClic2 
 }
 
 
-export function FormulaireAjoutEvent({ closePopup, personneId }) {
+export function FormulaireAjoutElement({ closePopup, personneId, type }) {
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    const nouvelEvenement = {
+
+    // Créer l'élément (événement ou tâche)
+    const nouvelElement = {
       id: 0, // Géré par la BDD
       nom,
       description,
-      type: "Event",
-      estFait: false, // Un événement n'est pas "fait" par défaut
-      date,
+      type: type, // Type d'élément ("Event" ou "Task")
+      estFait: false, // Par défaut l'élément n'est pas "fait"
+      date: type === "Event" ? date : "", // La date est seulement utilisée pour les événements
     };
-  
+
     try {
-      // 1. Créer l'événement
+      // 1. Créer l'élément (événement ou tâche)
       const response = await fetch("http://localhost:5222/api/element", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nouvelEvenement),
+        body: JSON.stringify(nouvelElement),
       });
-  
+
       if (response.ok) {
-        const eventData = await response.json(); // Récupère les données de l'événement créé  
-     
-        const association = {
-          personneId, // Utilise l'ID de la personne depuis le localStorage
-          elementId: eventData.id, // ID de l'événement créé
-          type: "Inscription", // Type d'association, ici c'est un événement
-          date: "", // Pas de date spécifiée
-        };
-  
+        const elementData = await response.json(); // Récupérer les données de l'élément créé
+
+        // 2. Créer l'association en fonction du type
+        let association = null;
+        if (type === "Event") {
+          // Si c'est un événement, on crée une inscription
+          association = {
+            personneId,
+            elementId: elementData.id,
+            type: "Inscription", // Type d'association pour un événement
+            date: "", // Pas de date pour l'association
+          };
+        } else if (type === "Task") {
+          // Si c'est une tâche, on crée une attribution
+          association = {
+            personneId,
+            elementId: elementData.id,
+            type: "Attribution", // Type d'association pour une tâche
+            date: "", // Pas de date pour l'association
+          };
+        }
+
         // Envoie la requête pour créer l'association
         const associationResponse = await fetch("http://localhost:5222/api/association", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(association),
         });
-  
+
         if (!associationResponse.ok) {
-          alert("Erreur lors de l'inscription à l'événement");
-        }
+          alert("Erreur lors de l'inscription ou de l'attribution");
+        } 
       } else {
-        alert("Erreur lors de l'ajout de l'événement");
+        alert("Erreur lors de l'ajout de l'élément");
       }
     } catch (error) {
       console.error("Erreur:", error);
       alert("Une erreur s'est produite");
     }
   };
-  
 
   return (
     <div className="modal-overlay" onClick={closePopup}>
@@ -133,7 +146,7 @@ export function FormulaireAjoutEvent({ closePopup, personneId }) {
         <div className="connexion-container">
           <form onSubmit={handleSubmit}>
             <div>
-              <h3>Titre de l'événement</h3>
+              <h3>Nouve{type === "Event" ? "l événement" : "lle tâche"}</h3>
               <input
                 type="text"
                 className="encadre"
@@ -151,21 +164,34 @@ export function FormulaireAjoutEvent({ closePopup, personneId }) {
                 required
               />
             </div>
-            <div>
-              <h3>Date de l'événement</h3>
-              <input
-                type="date"
-                className="encadre"
-                value={date}
-                onChange={(e) => setDate(e.target.value)}
-                required
-              />
-            </div>
-            <button className="connecter" type="submit">Ajouter</button>
-          </form>
-          <button className="btn-fermer" type="button" onClick={closePopup}>
-            <FaTimes className="close-icon" /> {/* Utilisation de l'icône croix */}
+            {type === "Event" && (
+              <div>
+                <h3>Date de l'événement</h3>
+                <input
+                  type="date"
+                  className="encadre"
+                  value={date}
+                  onChange={(e) => setDate(e.target.value)}
+                  required
+                />
+              </div>
+            )}
+            
+            <button className="connecter" type="submit">
+              Ajouter
             </button>
+
+            {type === "Task" && (
+              <button className="connecter_bis" type="button" onClick={handleSubmit}>
+                J'ajoute et je m'y colle
+              </button>
+            )}
+
+          </form>
+
+          <button className="btn-fermer" type="button" onClick={closePopup}>
+            <FaTimes className="close-icon" />
+          </button>
         </div>
       </div>
     </div>

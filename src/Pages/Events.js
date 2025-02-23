@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import "./Events.css";
-import { ChoixActions, FormulaireAjoutEvent } from '../GrosElements/Notif'; 
+import { ChoixActions, FormulaireAjoutElement } from '../GrosElements/Notif'; 
 
 
 function Events() {
@@ -27,8 +27,8 @@ function Events() {
         eventOnClic2={() => setShowPopup2(!showPopup2)}  
       />
       
-      {showPopup1 && <FormulaireAjoutEvent closePopup={() => setShowPopup1(false)} personneId={personneId}/>}
-      {showPopup2 && <FormulaireAjoutEvent closePopup={() => setShowPopup2(false)} personneId={personneId} />}
+      {showPopup1 && <FormulaireAjoutElement closePopup={() => setShowPopup1(false)} personneId={personneId} type={"Task"}/>}
+      {showPopup2 && <FormulaireAjoutElement closePopup={() => setShowPopup2(false)} personneId={personneId} type={"Event"} />}
     </div>
   );
 }
