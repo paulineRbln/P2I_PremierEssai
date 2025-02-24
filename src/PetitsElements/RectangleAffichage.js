@@ -2,49 +2,86 @@ import React, { useState, useEffect } from 'react';
 import './RectangleAffichage.css'; // Importer le fichier CSS
 
 
-export function RectangleAffichage({ textGras, textPetit, couleur, task, estFait, date, association, typeE, personneId }) {
+export function RectangleAffichage({ textGras, textPetit, couleur, task, estFait, date, association, typeE, personneId, elementId }) {
   // État pour gérer la case à cocher (lue ou non)
-  const [checked, setChecked] = useState(estFait); // Initialiser avec l'association
+  const [checked, setChecked] = useState(estFait);  // Initialiser avec l'association
+  const [associe, setAssocie] = useState(association);  // Initialiser avec l'association
 
-  // Fonction pour gérer la case à cocher
+  // Fonction pour gérer l'activation de la case à cocher (ajout de l'association)
   const handleCheckboxChange = () => {
-    setChecked(!checked);
-
     // Déterminer le type d'association à créer : inscription pour événement, attribution pour tâche
-    const typeAssociation = 
-    typeE === "Event" ? "Inscription" :
-    typeE === "Task" ? "Attribution" :
-    typeE === "Objet" ? "Reservation" :
-    "Default";
+    const typeAssociation = typeE === "Event" ? "Inscription" :
+                            typeE === "Task" ? "Attribution" :
+                            typeE === "Objet" ? "Reservation" : "Default";
 
-    fetch('/api/association', {
+    fetch('http://localhost:5222/api/association', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        PersonneId: personneId,
-        ElementId: association.ElementId,  // Assurer que ElementId existe dans l'association
-        Type: typeAssociation,
+        personneId: personneId,
+        elementId: elementId,
+        type: typeAssociation,
+        date: "", // Si tu veux envoyer null pour la date, laisse cette ligne
       }),
     })
-      .then((response) => {
-        if (!response.ok) {
-          console.error('Échec de la création de l\'association');
-        }
+    .then((response) => {
+      if (!response.ok) {
+        console.error('Échec de la création de l\'association');
+      }
+      else{
+        setAssocie(!associe);
+      }
+    })
+    .catch((error) => {
+      console.error('Erreur lors de la création de l\'association', error);
+    });
+  };
+
+  // Fonction pour gérer le désistement (suppression de l'association)
+  const handleCheckboxChange2 = () => {
+    // Récupérer l'ID de l'association en fonction de personneId et elementId
+    fetch(`http://localhost:5222/api/association/personne/${personneId}/element/${elementId}`)
+      .then(response => response.json())
+      .then(data => {
+        // data contient l'ID de l'association
+        const associationId = data.id;
+        
+        // Supprimer l'association avec l'ID
+        fetch(`http://localhost:5222/api/association/${associationId}`, {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        })
+        .then((response) => {
+          if (!response.ok) {
+            console.error('Échec de la suppression de l\'association');
+          } else {
+            setAssocie(!associe); // Réinitialiser l'état de la case à cocher
+          }
+        })
+        .catch((error) => {
+          console.error('Erreur lors de la suppression de l\'association', error);
+        });
       })
       .catch((error) => {
-        console.error('Erreur lors de la création de l\'association', error);
+        console.error('Erreur lors de la récupération de l\'ID de l\'association', error);
       });
   };
 
+  const handleEstFaitChange = () => {
+    setChecked(!checked);
+  }
+
   return (
     <div className="rectangle" style={{ backgroundColor: couleur }}>
-      {task && association && (  // Afficher la case à cocher seulement si l'élément n'est pas associé
+      {task && association && (  // Afficher la case à cocher seulement si l'élément est associé
         <input
           type="checkbox"
           checked={checked}
-          onChange={handleCheckboxChange}
+          onChange={handleEstFaitChange}
           className="checkbox"
         />
       )}
@@ -52,10 +89,19 @@ export function RectangleAffichage({ textGras, textPetit, couleur, task, estFait
         {date && <p className="date_rect">{date}</p>}
         <h2>{textGras}</h2>
         <p className="petit_text">{textPetit}</p>
-        {!association && (
-          <button onClick={handleCheckboxChange}>
-            {task ? "Je m'y colle" : "Je m'inscris"}
-          </button>
+        
+        {!associe && !association && (
+          <div className="checkbox-button" onClick={handleCheckboxChange}>
+            {typeE === "Event" ? "Je m'inscris" : 
+            typeE === "Task" ? "Je m'y colle" :
+            typeE === "Objet" ? "Je reserve" : "Default"}
+          </div>
+        )}
+        
+        {associe && association && (
+          <div className="checkbox-button_2" onClick={handleCheckboxChange2}>
+            {"Je me désiste"}
+          </div>
         )}
       </div>
     </div>

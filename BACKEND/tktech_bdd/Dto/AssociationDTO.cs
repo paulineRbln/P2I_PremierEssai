@@ -29,20 +29,17 @@ namespace tktech_bdd.Dto
     {
         public int PersonneId { get; set; }
         public int ElementId { get; set; }
-        public bool EstAssocie { get; set; }
-        public string DeType { get; set; } = null!;
+        public int Id { get; set; }
 
         public EstAssocieDTO() { }
 
         // Constructeur qui initialise les propriétés à partir de l'entité Association
-        public EstAssocieDTO(int idP, int idE, bool estAssocie, string detype)
+        public EstAssocieDTO(int idP, int idE, int id)
         {
             
             PersonneId = idP;
             ElementId = idE;
-            EstAssocie = estAssocie;
-            DeType = detype;
-        }
+            Id = id;        }
     }
 
     public class NewsDTO

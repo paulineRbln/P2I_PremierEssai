@@ -16,12 +16,11 @@ export function Notif({ titre, notifications, couleur, task }) {
         .then((data) => setElementsAssocies(data))  // Mettre à jour l'état avec la liste des éléments associés
         .catch((error) => console.error('Erreur lors de la récupération des éléments associés', error));
     };
-    fetchElementsAssocies(); // Appeler la fonction de récupération des éléments associés
-  }, [personneId]); // Dépendance sur l'ID de la personne
+    fetchElementsAssocies(); 
+  }, [personneId,elementsAssocies]);
 
   // Vérifier si un élément de la notification est dans la liste des éléments associés
   const checkElementAssocie = (elementId) => {
-    console.log(elementsAssocies.some((element) => element.id === elementId));
     return elementsAssocies.some((element) => element.id === elementId); // Vérifier si l'élément est dans la liste des associés
   };
 
@@ -45,7 +44,7 @@ export function Notif({ titre, notifications, couleur, task }) {
 
         return (
           <RectangleAffichage
-            key={notif.Id}
+            key={notif.id}
             textGras={notif.nom}
             textPetit={notif.description}
             couleur={couleur}
@@ -55,6 +54,7 @@ export function Notif({ titre, notifications, couleur, task }) {
             association={isAssocie} // Passer l'état de l'association à RectangleAffichage
             typeE = {notif.type}
             personneId={personneId}  // Passer aussi personneId pour la gestion de la case à cocher
+            elementId={notif.id}
           />
         );
       })}

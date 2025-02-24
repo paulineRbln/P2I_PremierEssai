@@ -99,3 +99,33 @@
     font-weight: bold;
     margin: 2vw;
 }
+
+.checkbox-button {
+  position: absolute;         /* Positionnement absolu */
+  right: 10%;  
+  background-color: #1A237E;  /* Couleur du fond */
+  color: white;              /* Couleur du texte */
+  font-weight: bold;
+  padding: 3vw;
+  font-size: 0.8rem;
+  border: none;
+  border-radius: 10vh;         /* Bord arrondi */
+  cursor: pointer;
+  text-align: center;          /* Centrer le texte */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Transition pour l'effet hover */
+}
+
+.checkbox-button_2{
+    position: absolute;         /* Positionnement absolu */
+    right: 10%;  
+    background-color: #ccc;  /* Couleur du fond */
+    color: grey;              /* Couleur du texte */
+    font-weight: bold;
+    padding: 3vw;
+    font-size: 0.6rem;
+    border: none;
+    border-radius: 10vh;         /* Bord arrondi */
+    cursor: pointer;
+    text-align: center;          /* Centrer le texte */
+    transition: background-color 0.3s ease, color 0.3s ease; /* Transition pour l'effet hover */
+  }

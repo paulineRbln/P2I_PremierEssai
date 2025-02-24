@@ -84,14 +84,13 @@ namespace tktech_bdd.Controllers
                 var estAssocieDTO = new EstAssocieDTO(
                     association.PersonneId,
                     association.ElementId,
-                    true ,// L'association existe
-                    association.Type.ToString()
+                    association.Id
                 );
                 return Ok(estAssocieDTO);
             }
 
             // Si aucune association n'est trouvée, renvoyer un DTO avec `estAssocie` à false
-            var estAssocieDTONotFound = new EstAssocieDTO(personneId, elementId, false, "Aucun");
+            var estAssocieDTONotFound = new EstAssocieDTO(personneId, elementId, 0);
             return Ok(estAssocieDTONotFound);
         }
 
