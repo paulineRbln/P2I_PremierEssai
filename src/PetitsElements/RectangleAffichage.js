@@ -1,18 +1,46 @@
 import React, { useState, useEffect } from 'react';
 import './RectangleAffichage.css'; // Importer le fichier CSS
 
-export function RectangleAffichage ({ textGras, textPetit, couleur, task, date }) {
-  // État pour gérer la case à cocher (lue ou non)
-  const [checked, setChecked] = useState(false);
 
-  // Fonction pour gérer l'état de la case à cocher
+export function RectangleAffichage({ textGras, textPetit, couleur, task, estFait, date, association, typeE, personneId }) {
+  // État pour gérer la case à cocher (lue ou non)
+  const [checked, setChecked] = useState(estFait); // Initialiser avec l'association
+
+  // Fonction pour gérer la case à cocher
   const handleCheckboxChange = () => {
     setChecked(!checked);
+
+    // Déterminer le type d'association à créer : inscription pour événement, attribution pour tâche
+    const typeAssociation = 
+    typeE === "Event" ? "Inscription" :
+    typeE === "Task" ? "Attribution" :
+    typeE === "Objet" ? "Reservation" :
+    "Default";
+
+    fetch('/api/association', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        PersonneId: personneId,
+        ElementId: association.ElementId,  // Assurer que ElementId existe dans l'association
+        Type: typeAssociation,
+      }),
+    })
+      .then((response) => {
+        if (!response.ok) {
+          console.error('Échec de la création de l\'association');
+        }
+      })
+      .catch((error) => {
+        console.error('Erreur lors de la création de l\'association', error);
+      });
   };
 
   return (
     <div className="rectangle" style={{ backgroundColor: couleur }}>
-      {task && (
+      {task && association && (  // Afficher la case à cocher seulement si l'élément n'est pas associé
         <input
           type="checkbox"
           checked={checked}
@@ -24,10 +52,16 @@ export function RectangleAffichage ({ textGras, textPetit, couleur, task, date }
         {date && <p className="date_rect">{date}</p>}
         <h2>{textGras}</h2>
         <p className="petit_text">{textPetit}</p>
+        {!association && (
+          <button onClick={handleCheckboxChange}>
+            {task ? "Je m'y colle" : "Je m'inscris"}
+          </button>
+        )}
       </div>
     </div>
   );
-};
+}
+
 
 
 export function RectangleAjout ({ texte, couleur, eventOnClic }) {

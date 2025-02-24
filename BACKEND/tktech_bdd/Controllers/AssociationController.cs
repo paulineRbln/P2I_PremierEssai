@@ -60,6 +60,41 @@ namespace tktech_bdd.Controllers
             return Ok(associationDTO ?? new AssociationDTO()); // Retourner un objet vide si l'association n'est pas trouvée
         }
 
+        // GET: api/association/personne/{personneId}/element/{elementId}
+        [SwaggerOperation(
+            Summary = "Vérifier si une personne est associée à un élément",
+            Description = "Retourne une réponse indiquant si la personne est associée à l'élément spécifié"
+        )]
+        [SwaggerResponse(StatusCodes.Status200OK, "Association trouvée", typeof(EstAssocieDTO))]
+        [SwaggerResponse(StatusCodes.Status404NotFound, "Aucune association trouvée")]
+        [HttpGet("personne/{personneId}/element/{elementId}")]
+        public async Task<ActionResult<EstAssocieDTO>> GetAssociationByPersonneAndElement(
+            [FromRoute] int personneId,
+            [FromRoute] int elementId
+        )
+        {
+            // Recherche de l'association entre la personne et l'élément dans la base de données
+            var association = await _context.Associations
+                .Where(a => a.PersonneId == personneId && a.ElementId == elementId)
+                .FirstOrDefaultAsync();
+
+            // Si l'association est trouvée, renvoyer un DTO avec les informations
+            if (association != null)
+            {
+                var estAssocieDTO = new EstAssocieDTO(
+                    association.PersonneId,
+                    association.ElementId,
+                    true ,// L'association existe
+                    association.Type.ToString()
+                );
+                return Ok(estAssocieDTO);
+            }
+
+            // Si aucune association n'est trouvée, renvoyer un DTO avec `estAssocie` à false
+            var estAssocieDTONotFound = new EstAssocieDTO(personneId, elementId, false, "Aucun");
+            return Ok(estAssocieDTONotFound);
+        }
+
         // POST: api/association
         [SwaggerOperation(
             Summary = "Ajout d'une nouvelle association",

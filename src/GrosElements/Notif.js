@@ -1,9 +1,30 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import { RectangleAjout, RectangleAffichage } from '../PetitsElements/RectangleAffichage';
 import './Notif.css'; // Si tu as des styles supplémentaires
 import {FaTimes} from  'react-icons/fa';
 
+
 export function Notif({ titre, notifications, couleur, task }) {
+  const personneId = localStorage.getItem("personneId");  // Récupérer l'ID de la personne connectée
+  const [elementsAssocies, setElementsAssocies] = useState([]);  // Liste des éléments associés à la personne
+
+  // Utiliser useEffect pour récupérer les éléments associés dès que le composant est monté
+  useEffect(() => {
+    const fetchElementsAssocies = () => {
+      fetch(`http://localhost:5222/api/element/personne/${personneId}`)
+        .then((response) => response.json())
+        .then((data) => setElementsAssocies(data))  // Mettre à jour l'état avec la liste des éléments associés
+        .catch((error) => console.error('Erreur lors de la récupération des éléments associés', error));
+    };
+    fetchElementsAssocies(); // Appeler la fonction de récupération des éléments associés
+  }, [personneId]); // Dépendance sur l'ID de la personne
+
+  // Vérifier si un élément de la notification est dans la liste des éléments associés
+  const checkElementAssocie = (elementId) => {
+    console.log(elementsAssocies.some((element) => element.id === elementId));
+    return elementsAssocies.some((element) => element.id === elementId); // Vérifier si l'élément est dans la liste des associés
+  };
+
   // Vérifier si la liste notifications est null ou vide
   if (notifications === null || notifications.length === 0) {
     return (
@@ -13,24 +34,34 @@ export function Notif({ titre, notifications, couleur, task }) {
       </div>
     );
   }
-    
+
   return (
     <div className="notif">
       <h3>{titre}</h3>
 
-      {notifications.map((notif, index) => (
-        <RectangleAffichage
-          key={index}
-          textGras={notif.nom}
-          textPetit={notif.description}
-          couleur={couleur} // Couleur spécifique des notifications urgentes
-          task={task} // Passer la prop task pour afficher la case à cocher si task est true
-          date={notif.date}
-        />
-      ))}
+      {notifications.map((notif) => {
+        // Vérifier si cet élément est associé à la personne
+        const isAssocie = checkElementAssocie(notif.id);
+
+        return (
+          <RectangleAffichage
+            key={notif.Id}
+            textGras={notif.nom}
+            textPetit={notif.description}
+            couleur={couleur}
+            task={task}
+            date={notif.date}
+            estFait={notif.estFait}
+            association={isAssocie} // Passer l'état de l'association à RectangleAffichage
+            typeE = {notif.type}
+            personneId={personneId}  // Passer aussi personneId pour la gestion de la case à cocher
+          />
+        );
+      })}
     </div>
   );
 }
+
 
 
 
@@ -54,6 +85,7 @@ export function NotifNews({ titre, notifications, couleur }) {
           textGras={notif.titre}  // Utilisation du titre du DTO
           textPetit={notif.description}  // Utilisation de la description du DTO
           couleur={couleur}  // Passer la couleur
+          association={true}
         />
       ))}
     </div>
