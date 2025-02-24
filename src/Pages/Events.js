@@ -1,34 +1,73 @@
 import React, { useState, useEffect } from 'react';
 import "./Events.css";
-import { ChoixActions, FormulaireAjoutElement } from '../GrosElements/Notif'; 
-
+import { ChoixActions, FormulaireAjoutElement, Notif } from '../GrosElements/Notif'; 
+import { BoutonSwipe } from '../PetitsElements/RectangleAffichage';
 
 function Events() {
-  const [showPopup1, setShowPopup1] = useState(false);
-  const [showPopup2, setShowPopup2] = useState(false);
+  const [popupType, setPopupType] = useState(null); // "Task", "Event" ou null
   const [personneId, setPersonneId] = useState(null);
+  const [pageBouton, setPageBouton] = useState("Tâches");
+  console.log(pageBouton);
+
+  const [evenements, setEvenements] = useState([]);
+  const [taches, setTaches] = useState([]);
 
   useEffect(() => {
-    // Lire directement l'ID de la personne depuis le localStorage
     const id = localStorage.getItem('personneId');
     if (id) {
       setPersonneId(id);
     }
-  }, []); // Ce useEffect se lance une seule fois au montage du composant
+  }, []);
+
+  useEffect(() => {
+    fetch(`http://localhost:5222/api/element`)
+      .then(response => response.json())
+      .then(data => {
+        setEvenements(data.filter(item => item.type === 'Event'));
+        setTaches(data.filter(item => item.type === 'Task'));
+      })
+      .catch(error => console.error('Erreur lors de la récupération des éléments:', error));
+  }, [popupType,pageBouton ]); 
 
   return (
     <div className='page_event' style={{ backgroundColor: 'white', minHeight: '100vh', textAlign: 'center' }}>
       <h1>Tâches et événements</h1>
+
       <ChoixActions 
         choix1="Tâche" 
         choix2="Event" 
         titre="AJOUTER" 
-        eventOnClic1={() => setShowPopup1(!showPopup1)} 
-        eventOnClic2={() => setShowPopup2(!showPopup2)}  
+        eventOnClic1={() => setPopupType("Tâches")}  
+        eventOnClic2={() => setPopupType("Evenements")}  
       />
       
-      {showPopup1 && <FormulaireAjoutElement closePopup={() => setShowPopup1(false)} personneId={personneId} type={"Task"}/>}
-      {showPopup2 && <FormulaireAjoutElement closePopup={() => setShowPopup2(false)} personneId={personneId} type={"Event"} />}
+      <BoutonSwipe nom1="Tâches" nom2="Evenements" pageBouton={pageBouton} setChangeBouton={setPageBouton} />
+
+      {popupType && (
+        <FormulaireAjoutElement 
+          closePopup={() => setPopupType(null)} 
+          personneId={personneId} 
+          type={popupType} 
+          setBouton={setPageBouton}
+        />
+      )}
+
+      {pageBouton === "Tâches" && (
+        <Notif
+          titre="Tâches à faire"
+          notifications={taches}
+          couleur="#E8F5E9"
+          task={true}
+        />
+      )}
+
+      {pageBouton === "Evenements" && (
+        <Notif
+          titre="Evénements à venir"
+          notifications={evenements}
+          couleur="#CFEFEC"
+        />
+      )}
     </div>
   );
 }

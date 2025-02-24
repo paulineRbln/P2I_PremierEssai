@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './RectangleAffichage.css'; // Importer le fichier CSS
 
 export function RectangleAffichage ({ textGras, textPetit, couleur, task, date }) {
@@ -38,4 +38,38 @@ export function RectangleAjout ({ texte, couleur, eventOnClic }) {
   );
 };
 
-export default {RectangleAffichage, RectangleAjout};
+
+export function BoutonSwipe({ nom1, nom2, pageBouton, setChangeBouton }) {
+  const [active, setActive] = useState(pageBouton);
+
+  useEffect(() => {
+    setActive(pageBouton);
+  }, [pageBouton]);
+
+  const handleClick = (value) => {
+    setActive(value); // Met à jour l'état local
+    setChangeBouton(value); // Appelle la fonction passée en prop
+  };
+
+  return (
+    <div className="encadre_boutons">
+      <div
+        className={`bouton_int ${active === nom1 ? "active" : ""}`}
+        onClick={() => handleClick(nom1)}
+      >
+        {nom1}
+      </div>
+      <div className="sep">|</div>
+      <div
+        className={`bouton_int ${active === nom2 ? "active" : ""}`}
+        onClick={() => handleClick(nom2)}
+      >
+        {nom2}
+      </div>
+    </div>
+  );
+}
+
+
+
+

@@ -13,7 +13,7 @@ export function Notif({ titre, notifications, couleur, task }) {
       </div>
     );
   }
-
+    
   return (
     <div className="notif">
       <h3>{titre}</h3>
@@ -31,6 +31,8 @@ export function Notif({ titre, notifications, couleur, task }) {
     </div>
   );
 }
+
+
 
 export function NotifNews({ titre, notifications, couleur }) {
   // Vérifier si la liste notifications est null ou vide
@@ -72,7 +74,7 @@ export function ChoixActions({choix1, choix2, titre, eventOnClic1, eventOnClic2 
 }
 
 
-export function FormulaireAjoutElement({ closePopup, personneId, type }) {
+export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton }) {
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
@@ -85,9 +87,9 @@ export function FormulaireAjoutElement({ closePopup, personneId, type }) {
       id: 0, // Géré par la BDD
       nom,
       description,
-      type: type, // Type d'élément ("Event" ou "Task")
-      estFait: false, // Par défaut l'élément n'est pas "fait"
-      date: type === "Event" ? date : "", // La date est seulement utilisée pour les événements
+      type : type === "Evenements" ? "Event" : "Task", // "Evenements" ou "Tâches"
+      estFait: false, // Par défaut, l'élément n'est pas "fait"
+      date: type === "Evenements" ? date : "", // La date est utilisée uniquement pour les événements
     };
 
     try {
@@ -102,26 +104,14 @@ export function FormulaireAjoutElement({ closePopup, personneId, type }) {
         const elementData = await response.json(); // Récupérer les données de l'élément créé
 
         // 2. Créer l'association en fonction du type
-        let association = null;
-        if (type === "Event") {
-          // Si c'est un événement, on crée une inscription
-          association = {
-            personneId,
-            elementId: elementData.id,
-            type: "Inscription", // Type d'association pour un événement
-            date: "", // Pas de date pour l'association
-          };
-        } else if (type === "Task") {
-          // Si c'est une tâche, on crée une attribution
-          association = {
-            personneId,
-            elementId: elementData.id,
-            type: "Attribution", // Type d'association pour une tâche
-            date: "", // Pas de date pour l'association
-          };
-        }
+        let association = {
+          personneId,
+          elementId: elementData.id,
+          type: type === "Evenements" ? "Inscription" : "Attribution",
+          date: "",
+        };
 
-        // Envoie la requête pour créer l'association
+        // Envoi de la requête pour créer l'association
         const associationResponse = await fetch("http://localhost:5222/api/association", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -130,7 +120,10 @@ export function FormulaireAjoutElement({ closePopup, personneId, type }) {
 
         if (!associationResponse.ok) {
           alert("Erreur lors de l'inscription ou de l'attribution");
-        } 
+        } else {
+          closePopup(); // Fermer la popup
+          setBouton(type); // Mettre à jour la liste affichée
+        }
       } else {
         alert("Erreur lors de l'ajout de l'élément");
       }
@@ -146,7 +139,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type }) {
         <div className="connexion-container">
           <form onSubmit={handleSubmit}>
             <div>
-              <h3>Nouve{type === "Event" ? "l événement" : "lle tâche"}</h3>
+              <h3>Nouve{type === "Evenements" ? "l événement" : "lle tâche"}</h3>
               <input
                 type="text"
                 className="encadre"
@@ -164,7 +157,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type }) {
                 required
               />
             </div>
-            {type === "Event" && (
+            {type === "Evenements" && (
               <div>
                 <h3>Date de l'événement</h3>
                 <input
@@ -181,12 +174,11 @@ export function FormulaireAjoutElement({ closePopup, personneId, type }) {
               Ajouter
             </button>
 
-            {type === "Task" && (
+            {type === "Tâches" && (
               <button className="connecter_bis" type="button" onClick={handleSubmit}>
                 J'ajoute et je m'y colle
               </button>
             )}
-
           </form>
 
           <button className="btn-fermer" type="button" onClick={closePopup}>
