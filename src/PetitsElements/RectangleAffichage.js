@@ -33,7 +33,7 @@ export function RectangleAffichage({
         personneId: personneId,
         elementId: elementId,
         type: typeAssociation,
-        date: "", // Si tu veux envoyer null pour la date, laisse cette ligne
+        date: new Date().toISOString().split('T')[0], // Si tu veux envoyer null pour la date, laisse cette ligne
       }),
     })
       .then((response) => {
