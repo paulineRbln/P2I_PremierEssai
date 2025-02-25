@@ -47,6 +47,7 @@ namespace tktech_bdd.Dto
         public string Titre { get; set; } = null!;
         public string Description { get; set; } = null!;
         public string Date { get; set; } = null!;
+        public string Element { get; set; } = null!;
 
         // Constructeur pour initialiser avec les données d'une association
         public NewsDTO(Association association)
@@ -56,18 +57,21 @@ namespace tktech_bdd.Dto
                 Titre = "Nouvelle inscription";
                 Description = $"{association.Personne.Prenom} s'est inscrit à {association.Element.Nom}";
                 Date = association.Date?.ToString("yyyy-MM-dd") ?? string.Empty;
+                Element = association.Element.Nom;
             }
             else if (association.Type == TypeAssociation.Reservation)
             {
                 Titre = "Nouvelle réservation";
                 Description = $"{association.Personne.Prenom} a réservé {association.Element.Nom} pour le {association.Date?.ToString("yyyy-MM-dd")}";
                 Date = association.Date?.ToString("yyyy-MM-dd") ?? string.Empty;
+                Element = association.Element.Nom;
             }
             else
             {
                 Titre = "Notification";
                 Description = "Détails de la notification non disponibles.";
                 Date = association.Date?.ToString("yyyy-MM-dd") ?? string.Empty;
+                Element = association.Element.Nom;
             }
 
         }

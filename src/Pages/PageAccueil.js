@@ -57,7 +57,7 @@ function PageAccueil() {
               // Vérifier si la date est valide
               if (!isNaN(newsDate)) {
                 const formattedNewsDate = newsDate.toISOString().split('T')[0]; // Formater la date de la news en 'YYYY-MM-DD'
-                return formattedNewsDate === today; // Comparer avec la date d'aujourd'hui
+                return formattedNewsDate === today || news.titre=== "Nouvelle réservation"; // Comparer avec la date d'aujourd'hui
               }
             }
             return false;  // Ne pas inclure cette news si la date est manquante ou invalide

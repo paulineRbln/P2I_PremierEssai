@@ -205,5 +205,23 @@ namespace tktech_bdd.Controllers
 
             return Ok(newsDTO);
         }
+
+        // GET: api/association/reservations
+        [HttpGet("news/reservations")]
+        public async Task<ActionResult<IEnumerable<NewsDTO>>> GetResa()
+        {
+            // Récupérer toutes les réservations, sans tenir compte de la personne (toutes les réservations)
+            var news = await _context.Associations
+                .Where(a => a.Type == TypeAssociation.Reservation) // Récupérer uniquement les réservations
+                .Include(a => a.Personne)  // Inclure les informations de la personne liée à la réservation
+                .Include(a => a.Element)   // Inclure les informations de l'élément (événement ou objet réservé)
+                .ToListAsync();
+
+            // Mapper les résultats en NewsDTO
+            var newsDTO = news.Select(a => new NewsDTO(a)).ToList();
+
+            return Ok(newsDTO); // Retourner toutes les réservations sous forme de NewsDTO
+        }
+
     }
 }

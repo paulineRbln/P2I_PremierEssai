@@ -68,7 +68,7 @@ export function Notif({ titre, notifications, couleur, task }) {
 
 
 
-export function NotifNews({ titre, notifications, couleur }) {
+export function NotifNews({ titre, notifications, couleur, resa }) {
   // Vérifier si la liste notifications est null ou vide
   if (notifications === null || notifications.length === 0) {
     return (
@@ -85,7 +85,7 @@ export function NotifNews({ titre, notifications, couleur }) {
       {notifications.map((notif, index) => (
         <RectangleAffichage
           key={index}
-          textGras={notif.titre} // Utilisation du titre du DTO
+          textGras={resa ? notif.element : notif.titre} // Utilisation du titre du DTO
           textPetit={notif.description} // Utilisation de la description du DTO
           couleur={couleur} // Passer la couleur
           association={true}
@@ -108,6 +108,24 @@ export function ChoixActions({choix1, choix2, titre, eventOnClic1, eventOnClic2 
     </div>
   );
 }
+
+export function ChoixObjet({ listeObjets, eventOnClic }) {
+  return (
+    <div className="choix_actions">
+      <div className='bloc_rectangles_objet'>
+        {listeObjets.map((objet, index) => (
+          <RectangleAjout 
+            key={index} 
+            texte={objet.nom}  // Le nom de l'objet comme texte
+            couleur={"#1A237E"}  // La couleur des rectangles (fixée à un bleu ici)
+            eventOnClic={() => eventOnClic(objet.id)}  // Passer l'objet au clic
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
 
 
 export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton }) {
