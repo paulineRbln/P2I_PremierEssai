@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Notif, NotifNews } from '../GrosElements/Notif';
 import './PageAccueil.css'; // Importer le fichier CSS
-import {jwtDecode} from 'jwt-decode';
 
 function PageAccueil() {
   const [tachesAFaire, setTachesAFaire] = useState([]);
