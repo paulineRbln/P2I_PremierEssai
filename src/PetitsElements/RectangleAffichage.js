@@ -1,23 +1,33 @@
 import React, { useState, useEffect } from 'react';
 import './RectangleAffichage.css'; // Importer le fichier CSS
 
-
-export function RectangleAffichage({ textGras, textPetit, couleur, task, estFait, date, association, typeE, personneId, elementId }) {
-  // État pour gérer la case à cocher (lue ou non)
-  const [checked, setChecked] = useState(estFait);  // Initialiser avec l'association
-  const [associe, setAssocie] = useState(association);  // Initialiser avec l'association
+export function RectangleAffichage({
+  textGras,
+  textPetit,
+  couleur,
+  task,
+  estFait,
+  date,
+  association,
+  typeE,
+  personneId,
+  elementId,
+  isNotifNews // Ajout de prop pour gérer les NotifNews
+}) {
+  const [checked, setChecked] = useState(estFait);
+  const [associe, setAssocie] = useState(association);
 
   // Fonction pour gérer l'activation de la case à cocher (ajout de l'association)
   const handleCheckboxChange = () => {
-    // Déterminer le type d'association à créer : inscription pour événement, attribution pour tâche
-    const typeAssociation = typeE === "Event" ? "Inscription" :
-                            typeE === "Task" ? "Attribution" :
-                            typeE === "Objet" ? "Reservation" : "Default";
+    const typeAssociation =
+      typeE === "Event" ? "Inscription" :
+      typeE === "Task" ? "Attribution" :
+      typeE === "Objet" ? "Reservation" : "Default";
 
-    fetch('http://localhost:5222/api/association', {
-      method: 'POST',
+    fetch("http://localhost:5222/api/association", {
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         personneId: personneId,
@@ -26,88 +36,93 @@ export function RectangleAffichage({ textGras, textPetit, couleur, task, estFait
         date: "", // Si tu veux envoyer null pour la date, laisse cette ligne
       }),
     })
-    .then((response) => {
-      if (!response.ok) {
-        console.error('Échec de la création de l\'association');
-      }
-      else{
-        setAssocie(!associe);
-      }
-    })
-    .catch((error) => {
-      console.error('Erreur lors de la création de l\'association', error);
-    });
+      .then((response) => {
+        if (!response.ok) {
+          console.error("Échec de la création de l'association");
+        } else {
+          setAssocie(true); // Met à jour directement l'état associe
+        }
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la création de l'association", error);
+      });
   };
 
   // Fonction pour gérer le désistement (suppression de l'association)
   const handleCheckboxChange2 = () => {
-    // Récupérer l'ID de l'association en fonction de personneId et elementId
-    fetch(`http://localhost:5222/api/association/personne/${personneId}/element/${elementId}`)
-      .then(response => response.json())
-      .then(data => {
-        // data contient l'ID de l'association
+    fetch(
+      `http://localhost:5222/api/association/personne/${personneId}/element/${elementId}`
+    )
+      .then((response) => response.json())
+      .then((data) => {
         const associationId = data.id;
-        
-        // Supprimer l'association avec l'ID
+
         fetch(`http://localhost:5222/api/association/${associationId}`, {
-          method: 'DELETE',
+          method: "DELETE",
           headers: {
-            'Content-Type': 'application/json',
+            "Content-Type": "application/json",
           },
         })
-        .then((response) => {
-          if (!response.ok) {
-            console.error('Échec de la suppression de l\'association');
-          } else {
-            setAssocie(!associe); // Réinitialiser l'état de la case à cocher
-          }
-        })
-        .catch((error) => {
-          console.error('Erreur lors de la suppression de l\'association', error);
-        });
+          .then((response) => {
+            if (!response.ok) {
+              console.error("Échec de la suppression de l'association");
+            } else {
+              setAssocie(false); // Met à jour directement l'état associe
+            }
+          })
+          .catch((error) => {
+            console.error("Erreur lors de la suppression de l'association", error);
+          });
       })
       .catch((error) => {
-        console.error('Erreur lors de la récupération de l\'ID de l\'association', error);
+        console.error("Erreur lors de la récupération de l'ID de l'association", error);
       });
   };
 
   const handleEstFaitChange = () => {
     setChecked(!checked);
-  }
+  };
 
   return (
     <div className="rectangle" style={{ backgroundColor: couleur }}>
-      {task && association && (  // Afficher la case à cocher seulement si l'élément est associé
-        <input
-          type="checkbox"
-          checked={checked}
-          onChange={handleEstFaitChange}
-          className="checkbox"
-        />
-      )}
-      <div className="text-content">
-        {date && <p className="date_rect">{date}</p>}
-        <h2>{textGras}</h2>
-        <p className="petit_text">{textPetit}</p>
-        
-        {!associe && !association && (
-          <div className="checkbox-button" onClick={handleCheckboxChange}>
-            {typeE === "Event" ? "Je m'inscris" : 
-            typeE === "Task" ? "Je m'y colle" :
-            typeE === "Objet" ? "Je reserve" : "Default"}
-          </div>
+      <div className="contener_check">
+        {task && association && (
+          <input
+            type="checkbox"
+            checked={checked}
+            onChange={handleEstFaitChange}
+            className="checkbox"
+          />
         )}
-        
-        {associe && association && (
-          <div className="checkbox-button_2" onClick={handleCheckboxChange2}>
-            {"Je me désiste"}
-          </div>
-        )}
+        <div className="text-content">
+          {date && <p className="date_rect">{date}</p>}
+          <h2>{textGras}</h2>
+          <p className="petit_text">{textPetit}</p>
+        </div>
       </div>
+
+      {/* Afficher le bouton d'inscription seulement si l'utilisateur n'est pas associé et si ce n'est pas une notification de type "NotifNews" */}
+      {!associe && !association && !isNotifNews && (
+        <div className="checkbox-button" onClick={handleCheckboxChange}>
+          {typeE === "Event"
+            ? "Je m'inscris"
+            : typeE === "Task"
+            ? "Je m'y colle"
+            : typeE === "Objet"
+            ? "Je reserve"
+            : "Default"}
+        </div>
+      )}
+
+      {/* Afficher le bouton de désistement seulement si l'utilisateur est associé et ce n'est pas une notification de type "NotifNews" */}
+      {association && !isNotifNews && (
+        <div className="checkbox-button_2" onClick={handleCheckboxChange2}>
+          {"Je me désiste"}
+        </div>
+      )}
     </div>
   );
 }
-
 
 
 export function RectangleAjout ({ texte, couleur, eventOnClic }) {
@@ -117,7 +132,6 @@ export function RectangleAjout ({ texte, couleur, eventOnClic }) {
     </div>
   );
 };
-
 
 export function BoutonSwipe({ nom1, nom2, pageBouton, setChangeBouton }) {
   const [active, setActive] = useState(pageBouton);
@@ -149,7 +163,3 @@ export function BoutonSwipe({ nom1, nom2, pageBouton, setChangeBouton }) {
     </div>
   );
 }
-
-
-
-

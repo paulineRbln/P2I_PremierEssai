@@ -1,108 +1,117 @@
 .rectangle {
-    width: 90vw;
-    min-height: 12vh; /* Hauteur minimale de 12% de la hauteur de la fenêtre */
-    height: auto; /* Hauteur s'adapte au contenu */
-    margin: 11px auto;
-    border-radius: 20px;
-    color: #1A237E;
-    padding: 3% 8%;
-    box-sizing: border-box;
-    text-align: left;
-    display: flex;
-    flex-direction: row; /* Changer la direction du flex pour aligner la case et le texte */
-    align-items: center; /* Aligner verticalement la case à cocher et le texte */
-  }
-  
-  .checkbox {
-    margin-right: 10%; /* Espacement entre la case à cocher et le texte */
-    transform: scale(1.5); /* Agrandir la taille de la case à cocher */
-}
-  
-  .text-content {
-    display: flex;
-    flex-direction: column; /* Aligner le titre et le texte verticalement */
-    justify-content: center;
-  }
-  
-  .rectangle h2 {
-    font-weight: bold;
-    margin: 0;
-    font-size: 100%;
-  }
-  
-  .petit_text{
-    font-size: 80%;
-    margin: 5px 0;
-  }
-
-  .date_rect{
-    font-size: 70%;
-    margin-bottom: 10px;
-  }
-
-  .bouton_ajout {
-    width: 35vw;
-    min-height: 10vh; /* Hauteur minimale de 12% de la hauteur de la fenêtre */
-    height: auto; /* Hauteur s'adapte au contenu */
-    margin: 2vh auto;
-    border-radius: 20px;
-    color: white;
-    padding: 3% 8%;
-    box-sizing: border-box;
-    text-align: center;
-    display: flex;
-    justify-content: center; /* Centrer horizontalement */
-    align-items: center; /* Centrer verticalement */
+  width: 90vw;
+  min-height: 12vh; /* Hauteur minimale de 12% de la hauteur de la fenêtre */
+  height: auto; /* Hauteur s'adapte au contenu */
+  margin: 11px auto;
+  border-radius: 20px;
+  color: #1A237E;
+  padding: 4% 8%;
+  box-sizing: border-box;
+  text-align: left;
+  display: flex;
+  flex-direction: column; /* Changer la direction du flex pour mettre tout en colonne */
+  align-items: flex-start; /* Alignement de texte à gauche */
+  position: relative; /* Permet à l'élément positionné de se placer par rapport à lui */
 }
 
+.checkbox {
+  margin-right: 10%; /* Espacement entre la case à cocher et le texte */
+  transform: scale(1.5); /* Agrandir la taille de la case à cocher */
+}
 
-  .bouton_ajout h2 {
-    font-weight: bold;
-    margin: 0;
-    font-size: 110%;
-  }
+.contener_check {
+  display: flex;
+  justify-content: flex-start; /* Placer la case à cocher à gauche et le texte à droite */
+  align-items: center; /* Centrer la case à cocher et le texte verticalement */
+  width: 100%; /* Assurer que le texte prenne toute la largeur du parent */
+}
 
-  .encadre_boutons {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background-color: #f8f9fa;
-    border-radius: 50px;
-    padding: 5px;
-    width: 80vw;
-    margin: 2vh auto; /* Centre l'élément */
-    left: 50%;
-    top: 50%;
-    box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
+.text-content {
+  display: flex;
+  flex-direction: column; /* Aligner le titre et le texte verticalement */
+  justify-content: flex-start; /* Aligner en haut */
+  width: 100%; /* Assurer que le texte prenne toute la largeur du parent */
+}
+
+.rectangle h2 {
+  font-weight: bold;
+  margin: 0;
+  font-size: 100%;
+}
+
+.petit_text {
+  font-size: 80%;
+  margin: 5px 0;
+}
+
+.date_rect {
+  font-size: 70%;
+  margin-bottom: 10px;
+}
+
+.bouton_ajout {
+  width: 35vw;
+  min-height: 10vh; /* Hauteur minimale de 12% de la hauteur de la fenêtre */
+  height: auto; /* Hauteur s'adapte au contenu */
+  margin: 2vh auto;
+  border-radius: 20px;
+  color: white;
+  padding: 3% 8%;
+  box-sizing: border-box;
+  text-align: center;
+  display: flex;
+  justify-content: center; /* Centrer horizontalement */
+  align-items: center; /* Centrer verticalement */
+}
+
+.bouton_ajout h2 {
+  font-weight: bold;
+  margin: 0;
+  font-size: 110%;
+}
+
+.encadre_boutons {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f8f9fa;
+  border-radius: 50px;
+  padding: 5px;
+  width: 80vw;
+  margin: 2vh auto; /* Centre l'élément */
+  left: 50%;
+  top: 50%;
+  box-shadow: 0px 2px 10px rgba(0, 0, 0, 0.1);
 }
 
 .bouton_int {
-    flex: 1;
-    text-align: center;
-    padding: 10px 20px;
-    border-radius: 50px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
-    color: #666;
+  flex: 1;
+  text-align: center;
+  padding: 10px 20px;
+  border-radius: 50px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  color: #666;
 }
 
 .bouton_int.active {
-    background-color: white;
-    color: black;
-    font-weight: bold;
-    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
+  background-color: white;
+  color: black;
+  font-weight: bold;
+  box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.2);
 }
 
 .sep {
-    color: gray;
-    font-weight: bold;
-    margin: 2vw;
+  color: gray;
+  font-weight: bold;
+  margin: 2vw;
 }
 
 .checkbox-button {
-  position: absolute;         /* Positionnement absolu */
-  right: 10%;  
+  position: absolute;
+  bottom: 10%; /* Place le bouton à 10% du bas du rectangle */
+  right: 5%; /* Place le bouton à 5% du côté droit */
   background-color: #1A237E;  /* Couleur du fond */
   color: white;              /* Couleur du texte */
   font-weight: bold;
@@ -115,17 +124,20 @@
   transition: background-color 0.3s ease, color 0.3s ease; /* Transition pour l'effet hover */
 }
 
-.checkbox-button_2{
-    position: absolute;         /* Positionnement absolu */
-    right: 10%;  
-    background-color: #ccc;  /* Couleur du fond */
-    color: grey;              /* Couleur du texte */
-    font-weight: bold;
-    padding: 3vw;
-    font-size: 0.6rem;
-    border: none;
-    border-radius: 10vh;         /* Bord arrondi */
-    cursor: pointer;
-    text-align: center;          /* Centrer le texte */
-    transition: background-color 0.3s ease, color 0.3s ease; /* Transition pour l'effet hover */
-  }
+.checkbox-button_2 {
+  position: absolute;        
+  bottom: 10%; /* Place le bouton à 10% du bas du rectangle */
+  right: 5%; /* Place le bouton à 5% du côté droit */
+  background-color: transparent;  /* Couleur du fond */
+  color: #1A237E;              /* Couleur du texte */
+  font-weight: bold;
+  border-width: 2px;          /* Bordure fine */
+  border-color: #1A237E;      /* Couleur de la bordure */
+  padding: 2vw;
+  font-size: 0.6rem;
+  border-style: solid;        /* Bordure solide */
+  border-radius: 10vh;        /* Bord arrondi */
+  cursor: pointer;
+  text-align: center;         /* Centrer le texte */
+  transition: background-color 0.3s ease, color 0.3s ease; /* Transition pour l'effet hover */
+}

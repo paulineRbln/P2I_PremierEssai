@@ -19,6 +19,7 @@ export function Notif({ titre, notifications, couleur, task }) {
     fetchElementsAssocies(); 
   }, [personneId,elementsAssocies]);
 
+
   // Vérifier si un élément de la notification est dans la liste des éléments associés
   const checkElementAssocie = (elementId) => {
     return elementsAssocies.some((element) => element.id === elementId); // Vérifier si l'élément est dans la liste des associés
@@ -51,11 +52,13 @@ export function Notif({ titre, notifications, couleur, task }) {
             task={task}
             date={notif.date}
             estFait={notif.estFait}
-            association={isAssocie} // Passer l'état de l'association à RectangleAffichage
-            typeE = {notif.type}
-            personneId={personneId}  // Passer aussi personneId pour la gestion de la case à cocher
+            association={isAssocie} 
+            typeE={notif.type}
+            personneId={personneId}
             elementId={notif.id}
+            isNotifNews={false}
           />
+
         );
       })}
     </div>
@@ -82,10 +85,11 @@ export function NotifNews({ titre, notifications, couleur }) {
       {notifications.map((notif, index) => (
         <RectangleAffichage
           key={index}
-          textGras={notif.titre}  // Utilisation du titre du DTO
-          textPetit={notif.description}  // Utilisation de la description du DTO
-          couleur={couleur}  // Passer la couleur
+          textGras={notif.titre} // Utilisation du titre du DTO
+          textPetit={notif.description} // Utilisation de la description du DTO
+          couleur={couleur} // Passer la couleur
           association={true}
+          isNotifNews={true} // C'est une NotifNews
         />
       ))}
     </div>
