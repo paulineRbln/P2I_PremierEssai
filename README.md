@@ -28,11 +28,19 @@ Clonez le dépôt du projet sur votre machine locale :
 
 
 #### 2. Installer et Configurer le Backend (API)
-**cd BACKEND/tktech_bdd**
+executer dans le terminal : **dotnet tool install --global dotnet-ef**
+puis allez dans le répertoire tktech_bdd
+**cd BACKEND/tktech_bdd** 
+puis 
 **dotnet ef database update**
+
+puis 
 **dotnet run**
 
 #### 3. Installer et Configurer le Frontend (React) 
 Rendez vous dans la racine du dépot (tktech_app)
+
 **npm install**
+puis 
+
 **npm start**
