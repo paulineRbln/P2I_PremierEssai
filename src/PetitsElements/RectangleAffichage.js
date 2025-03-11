@@ -12,75 +12,94 @@ export function RectangleAffichage({
   typeE,
   personneId,
   elementId,
-  isNotifNews // Ajout de prop pour gérer les NotifNews
+  isNotifNews,
+  refresh
 }) {
   const [checked, setChecked] = useState(estFait);
   const [associe, setAssocie] = useState(association);
 
-  // Fonction pour gérer l'activation de la case à cocher (ajout de l'association)
+  // Fonction pour gérer l'ajout de l'association
   const handleCheckboxChange = () => {
     const typeAssociation =
       typeE === "Event" ? "Inscription" :
       typeE === "Task" ? "Attribution" :
-      typeE === "Objet" ? "Reservation" : "Default";
+      "Reservation";
 
     fetch("http://localhost:5222/api/association", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
-        personneId: personneId,
-        elementId: elementId,
+        personneId,
+        elementId,
         type: typeAssociation,
-        date: new Date().toISOString().split('T')[0], // Si tu veux envoyer null pour la date, laisse cette ligne
+        date: new Date().toISOString().split("T")[0],
       }),
     })
       .then((response) => {
-        if (!response.ok) {
-          console.error("Échec de la création de l'association");
-        } else {
-          setAssocie(true); // Met à jour directement l'état associe
+        if (response.ok) {
+          setAssocie(true);
+          refresh((prev) => !prev);
         }
       })
       .catch((error) => {
-        console.error("Erreur lors de la création de l'association", error);
+        console.error("Erreur lors de la création de l'association:", error);
       });
   };
 
-  // Fonction pour gérer le désistement (suppression de l'association)
-  const handleCheckboxChange2 = () => {
-    fetch(
-      `http://localhost:5222/api/association/personne/${personneId}/element/${elementId}`
-    )
-      .then((response) => response.json())
-      .then((data) => {
-        const associationId = data.id;
+  // Fonction pour gérer la suppression de l'association
+  const handleCheckboxChange2 = (asso) => {
+    if (!asso && !elementId) {
+      console.error("Impossible de supprimer : ni asso ni elementId ne sont définis.");
+      return;
+    }
 
-        fetch(`http://localhost:5222/api/association/${associationId}`, {
-          method: "DELETE",
-          headers: {
-            "Content-Type": "application/json",
-          },
-        })
-          .then((response) => {
-            if (!response.ok) {
-              console.error("Échec de la suppression de l'association");
-            } else {
-              setAssocie(false); // Met à jour directement l'état associe
-            }
-          })
-          .catch((error) => {
-            console.error("Erreur lors de la suppression de l'association", error);
-          });
+    if (asso) {
+      fetch(`http://localhost:5222/api/association/${asso}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
       })
-      .catch((error) => {
-        console.error("Erreur lors de la récupération de l'ID de l'association", error);
-      });
+        .then((response) => {
+          if (response.ok) {
+            setAssocie(false);
+            refresh((prev) => !prev);
+          }
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la suppression de l'association:", error);
+        });
+    } else {
+      fetch(`http://localhost:5222/api/association/personne/${personneId}/element/${elementId}`)
+        .then((response) => response.json())
+        .then((data) => {
+          if (!data || data.length === 0) return;
+
+          const associationId = Array.isArray(data) ? data[0]?.id : data.id;
+          if (!associationId) return;
+
+          fetch(`http://localhost:5222/api/association/${associationId}`, {
+            method: "DELETE",
+            headers: { "Content-Type": "application/json" },
+          })
+            .then((response) => {
+              if (response.ok) {
+                setAssocie(false);
+                refresh((prev) => !prev);
+              }
+            })
+            .catch((error) => {
+              console.error("Erreur lors de la suppression de l'association:", error);
+            });
+        })
+        .catch((error) => {
+          console.error("Erreur lors de la récupération de l'ID de l'association:", error);
+        });
+    }
   };
 
+  // Fonction pour cocher/décocher une tâche
   const handleEstFaitChange = () => {
     setChecked(!checked);
+    refresh((prev) => !prev);
   };
 
   return (
@@ -101,29 +120,29 @@ export function RectangleAffichage({
         </div>
       </div>
 
-      {/* Afficher le bouton d'inscription seulement si l'utilisateur n'est pas associé et si ce n'est pas une notification de type "NotifNews" */}
+      {/* Bouton pour s'inscrire / s'attribuer une tâche */}
       {!associe && !association && !isNotifNews && (
         <div className="checkbox-button" onClick={handleCheckboxChange}>
           {typeE === "Event"
             ? "Je m'inscris"
             : typeE === "Task"
             ? "Je m'y colle"
-            : typeE === "Objet"
-            ? "Je reserve"
-            : "Default"}
+            : "Réserver"}
         </div>
       )}
 
-      {/* Afficher le bouton de désistement seulement si l'utilisateur est associé et ce n'est pas une notification de type "NotifNews" */}
+      {/* Bouton pour se désister / annuler une réservation */}
       {association && !isNotifNews && (
-        <div className="checkbox-button_2" onClick={handleCheckboxChange2}>
-          {"Je me désiste"}
+        <div
+          className="checkbox-button_2"
+          onClick={() => handleCheckboxChange2(typeE === "Reservation" ? elementId : null)}
+        >
+          {typeE === "Reservation" ? "Annuler" : "Je me désiste"}
         </div>
       )}
     </div>
   );
 }
-
 
 export function RectangleAjout ({ texte, couleur, eventOnClic }) {
   return (

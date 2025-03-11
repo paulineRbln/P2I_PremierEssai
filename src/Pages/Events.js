@@ -7,6 +7,7 @@ function Events() {
   const [popupType, setPopupType] = useState(null); // "Task", "Event" ou null
   const [personneId, setPersonneId] = useState(null);
   const [pageBouton, setPageBouton] = useState("Tâches");
+  const [refresh, setRefresh] = useState(false);
 
   const [evenements, setEvenements] = useState([]);
   const [taches, setTaches] = useState([]);
@@ -26,7 +27,7 @@ function Events() {
         setTaches(data.filter(item => item.type === 'Task'));
       })
       .catch(error => console.error('Erreur lors de la récupération des éléments:', error));
-  }, [popupType,pageBouton]); 
+  }, [popupType,pageBouton, refresh]); 
 
   return (
     <div className='page_event' style={{ backgroundColor: 'white', minHeight: '100vh', textAlign: 'center' }}>
@@ -57,6 +58,7 @@ function Events() {
           notifications={taches}
           couleur="#E8F5E9"
           task={true}
+          refresh={setRefresh}
         />
       )}
 
@@ -65,6 +67,7 @@ function Events() {
           titre="Evénements à venir"
           notifications={evenements}
           couleur="#CFEFEC"
+          refresh={setRefresh}
         />
       )}
     </div>

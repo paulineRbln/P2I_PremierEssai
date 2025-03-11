@@ -1,64 +1,84 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from "react";
 import "./Maison.css";
-import { ChoixObjet , NotifNews, FormulaireAjoutElement} from '../GrosElements/Notif';
+import { ChoixObjet, NotifNews, Notif, FormulaireAjoutElement } from "../GrosElements/Notif";
+import { BoutonSwipe } from "../PetitsElements/RectangleAffichage";
 
 function Maison() {
-  const [popupType, setPopupType] = useState(null); 
+  const [popupType, setPopupType] = useState(null);
   const [personneId, setPersonneId] = useState(null);
   const [objets, setObjets] = useState([]);
-  const [choixObjet, setChoixObjet] = useState(null); // Pour garder une trace du choix de l'objet
-  const [resas, setResas] = useState(null); // Pour garder une trace du choix de l'objet
+  const [choixObjet, setChoixObjet] = useState(null);
+  const [resas, setResas] = useState([]);
+  const [pageBouton, setPageBouton] = useState("Mes réservations"); // Défaut : voir les réservations des autres
+  const[refresh, setRefresh] = useState(false);
 
+  
   useEffect(() => {
-    const id = localStorage.getItem('personneId');
+    const id = localStorage.getItem("personneId");
     if (id) {
-      setPersonneId(id);
+      setPersonneId(parseInt(id, 10)); // Convertir en nombre
     }
   }, []);
 
   useEffect(() => {
-    fetch(`http://localhost:5222/api/element`)
-      .then(response => response.json())
-      .then(data => {
-        setObjets(data.filter(item => item.type === 'Objet')); // On filtre les objets
+    fetch("http://localhost:5222/api/element")
+      .then((response) => response.json())
+      .then((data) => {
+        setObjets(data.filter((item) => item.type === "Objet"));
       })
-      .catch(error => console.error('Erreur lors de la récupération des objets:', error));
-  }, []); // Cette dépendance est vide, donc l'appel API se fait seulement au premier rendu
+      .catch((error) => console.error("Erreur lors de la récupération des objets:", error));
+  }, [refresh]);
 
   useEffect(() => {
-    fetch(`http://localhost:5222/api/association/news/reservations`)
-      .then(response => response.json())
-      .then(data => {
-        setResas(data);  // Mettre à jour l'état avec les réservations récupérées
+    fetch("http://localhost:5222/api/association/news/reservations")
+      .then((response) => response.json())
+      .then((data) => {
+        setResas(data);
       })
-      .catch(error => console.error('Erreur lors de la récupération des réservations:', error));
-  }, []);
+      .catch((error) => console.error("Erreur lors de la récupération des associations:", error));
+  }, [pageBouton, popupType, refresh]);
 
-  // Fonction appelée lors du clic sur un objet
   const handleObjetClick = (objet) => {
-    setChoixObjet(objet); // Mettre à jour l'état avec l'objet sélectionné
-    setPopupType (true);
+    setChoixObjet(objet);
+    setPopupType(true);
   };
 
+  const mesResas = resas.filter((resa) => resa.personneId === personneId);
+  const autresResas = resas.filter((resa) => resa.personneId !== personneId);
+
+
   return (
-    <div className='page_objets' style={{ backgroundColor: 'white', minHeight: '100vh', textAlign: 'center' }}>
+    <div className="page_objets" style={{ backgroundColor: "white", minHeight: "100vh", textAlign: "center" }}>
       <h1>Appareils et salles</h1>
-      {/* Passer les objets récupérés au composant ChoixObjet */}
+
       <ChoixObjet listeObjets={objets} eventOnClic={handleObjetClick} />
+
       {popupType && choixObjet && (
-        <FormulaireAjoutElement 
+        <FormulaireAjoutElement
           closePopup={() => setPopupType(false)}
           personneId={personneId}
-          type="Reservation"
-          objetId={choixObjet} // Passer l'ID de l'objet sélectionné
+          type="Mes réservations"
+          objetId={choixObjet}
+          reservations={resas}
+          setBouton={setPageBouton} // Passer setPageBouton pour changer d'affichage après réservation
+          refresh= {setRefresh}
         />
       )}
-      <NotifNews
-              titre="Réservations en cours"
-              notifications={resas}
-              couleur="#FFCCBC"
-              resa = {true}
-            />
+
+      <BoutonSwipe
+        nom1="Mes réservations"
+        nom2="Autres réservations"
+        pageBouton={pageBouton}
+        setChangeBouton={setPageBouton}
+      />
+
+      {pageBouton === "Autres réservations" && (
+        <NotifNews titre="Réservations des autres" notifications={autresResas} couleur="#FFCCBC" resa={true} />
+      )}
+
+      {pageBouton === "Mes réservations" && (
+        <Notif titre="Mes réservations" notifications={mesResas} couleur="#E8F5E9" resa ={true} refresh={setRefresh}/>
+      )}
     </div>
   );
 }

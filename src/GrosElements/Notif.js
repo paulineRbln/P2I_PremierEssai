@@ -4,7 +4,7 @@ import './Notif.css'; // Si tu as des styles supplémentaires
 import {FaTimes} from  'react-icons/fa';
 
 
-export function Notif({ titre, notifications, couleur, task }) {
+export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
   const personneId = localStorage.getItem("personneId");  // Récupérer l'ID de la personne connectée
   const [elementsAssocies, setElementsAssocies] = useState([]);  // Liste des éléments associés à la personne
 
@@ -17,7 +17,7 @@ export function Notif({ titre, notifications, couleur, task }) {
         .catch((error) => console.error('Erreur lors de la récupération des éléments associés', error));
     };
     fetchElementsAssocies(); 
-  }, [personneId,elementsAssocies]);
+  }, [personneId,elementsAssocies, refresh]);
 
 
   // Vérifier si un élément de la notification est dans la liste des éléments associés
@@ -42,21 +42,21 @@ export function Notif({ titre, notifications, couleur, task }) {
       {notifications.map((notif) => {
         // Vérifier si cet élément est associé à la personne
         const isAssocie = checkElementAssocie(notif.id);
-
         return (
           <RectangleAffichage
             key={notif.id}
-            textGras={notif.nom}
+            textGras={resa ?  notif.date : notif.nom }
             textPetit={notif.description}
             couleur={couleur}
             task={task}
-            date={notif.date}
+            date={!resa ? notif.date : ""}
             estFait={notif.estFait}
-            association={isAssocie} 
-            typeE={notif.type}
+            association={resa ? true : isAssocie} 
+            typeE={resa ? "Reservation" : notif.type}
             personneId={personneId}
             elementId={notif.id}
             isNotifNews={false}
+            refresh={refresh}
           />
 
         );
@@ -70,6 +70,8 @@ export function Notif({ titre, notifications, couleur, task }) {
 
 export function NotifNews({ titre, notifications, couleur, resa }) {
   // Vérifier si la liste notifications est null ou vide
+  console.log(notifications);
+
   if (notifications === null || notifications.length === 0) {
     return (
       <div className="notif">
@@ -128,25 +130,10 @@ export function ChoixObjet({ listeObjets, eventOnClic }) {
 
 
 
-export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton, objetId }) {
+export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton, objetId, reservations, refresh }) {
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState("");
-  const [reservations, setReservations] = useState([]); 
-  
-  console.log(reservations)
-  useEffect(() => {
-    if (type === "Reservation") {
-      fetch("http://localhost:5222/api/association")
-        .then((response) => response.json())
-        .then((data) => {
-          // Filtrer les associations de type "Reservation"
-          const reservationsFiltrees = data.filter((assoc) => assoc.type === "Reservation");
-          setReservations(reservationsFiltrees);
-        })
-        .catch((error) => console.error("Erreur lors de la récupération des associations:", error));
-    }
-  }, [type]);
+  const [date, setDate] = useState(""); 
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -157,10 +144,10 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
       type: "",
     };
 
-    if (type === "Reservation") {
+    if (type === "Mes réservations") {
       // Vérifie si une réservation existe déjà pour cet objet à cette date
       const reservationExistante = reservations.some(
-        (resa) => resa.elementId === objetId && resa.date === date
+        (resa) => resa.objetId === objetId && resa.date === date
       );
 
       if (reservationExistante) {
@@ -188,6 +175,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
         } else {
           closePopup();
           if (setBouton) setBouton(type);
+          refresh((prev) => !prev);
         }
       } catch (error) {
         console.error("Erreur:", error);
@@ -217,6 +205,8 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
         if (!response.ok) {
           alert("Erreur lors de l'ajout de l'élément");
           return;
+        } else {
+          refresh((prev) => !prev);
         }
 
         const elementData = await response.json();
@@ -245,6 +235,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
       } else {
         closePopup();
         setBouton(type);
+        refresh((prev) => !prev);
       }
     } catch (error) {
       console.error("Erreur:", error);
@@ -257,7 +248,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="connexion-container">
           <form onSubmit={handleSubmit}>
-            {type === "Reservation" ? (
+            {type === "Mes réservations" ? (
               <>
                 <h3>Nouvelle réservation</h3>
                 <div>

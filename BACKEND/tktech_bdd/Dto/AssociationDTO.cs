@@ -44,7 +44,10 @@ namespace tktech_bdd.Dto
 
     public class NewsDTO
     {
+        public int Id  { get; set; }
         public string Titre { get; set; } = null!;
+        public int PersonneId { get; set; }
+        public int ObjetId { get; set; }
         public string Description { get; set; } = null!;
         public string Date { get; set; } = null!;
         public string Element { get; set; } = null!;
@@ -54,21 +57,30 @@ namespace tktech_bdd.Dto
         {
             if (association.Type == TypeAssociation.Inscription)
             {
+                Id = association.Id;
                 Titre = "Nouvelle inscription";
+                PersonneId = association.PersonneId;
+                ObjetId = association.ElementId;
                 Description = $"{association.Personne.Prenom} s'est inscrit à {association.Element.Nom}";
                 Date = association.Date?.ToString("yyyy-MM-dd") ?? string.Empty;
                 Element = association.Element.Nom;
             }
             else if (association.Type == TypeAssociation.Reservation)
             {
+                Id = association.Id;
                 Titre = "Nouvelle réservation";
+                PersonneId = association.PersonneId;
+                ObjetId = association.ElementId;
                 Description = $"{association.Personne.Prenom} a réservé {association.Element.Nom} pour le {association.Date?.ToString("yyyy-MM-dd")}";
                 Date = association.Date?.ToString("yyyy-MM-dd") ?? string.Empty;
                 Element = association.Element.Nom;
             }
             else
             {
+                Id = association.Id;
                 Titre = "Notification";
+                PersonneId = association.PersonneId;
+                ObjetId = association.ElementId;
                 Description = "Détails de la notification non disponibles.";
                 Date = association.Date?.ToString("yyyy-MM-dd") ?? string.Empty;
                 Element = association.Element.Nom;

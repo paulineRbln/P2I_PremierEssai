@@ -1,6 +1,6 @@
 .rectangle {
   width: 90vw;
-  min-height: 10vh; /* Hauteur minimale de 12% de la hauteur de la fenêtre */
+  min-height: 12vh; /* Hauteur minimale de 12% de la hauteur de la fenêtre */
   height: auto; /* Hauteur s'adapte au contenu */
   margin: 11px auto;
   border-radius: 20px;
@@ -50,8 +50,8 @@
 }
 
 .bouton_ajout {
-  width: 35vw;
-  min-height: 10vh; /* Hauteur minimale de 12% de la hauteur de la fenêtre */
+  width: 25vw;
+  min-height: 8vh; /* Hauteur minimale de 12% de la hauteur de la fenêtre */
   height: auto; /* Hauteur s'adapte au contenu */
   margin: 1vh auto;
   border-radius: 20px;
@@ -67,7 +67,7 @@
 .bouton_ajout h2 {
   font-weight: bold;
   margin: 0;
-  font-size: 110%;
+  font-size: 100%;
 }
 
 .encadre_boutons {
