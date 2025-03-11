@@ -128,58 +128,123 @@ export function ChoixObjet({ listeObjets, eventOnClic }) {
 
 
 
-export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton }) {
+export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton, objetId }) {
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState("");
+  const [reservations, setReservations] = useState([]); 
+  
+  console.log(reservations)
+  useEffect(() => {
+    if (type === "Reservation") {
+      fetch("http://localhost:5222/api/association")
+        .then((response) => response.json())
+        .then((data) => {
+          // Filtrer les associations de type "Reservation"
+          const reservationsFiltrees = data.filter((assoc) => assoc.type === "Reservation");
+          setReservations(reservationsFiltrees);
+        })
+        .catch((error) => console.error("Erreur lors de la récupération des associations:", error));
+    }
+  }, [type]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Créer l'élément (événement ou tâche)
-    const nouvelElement = {
-      id: 0, // Géré par la BDD
-      nom,
-      description,
-      type : type === "Evenements" ? "Event" : "Task", // "Evenements" ou "Tâches"
-      estFait: false, // Par défaut, l'élément n'est pas "fait"
-      date: type === "Evenements" ? date : "", // La date est utilisée uniquement pour les événements
+    let association = {
+      personneId,
+      date,
+      type: "",
     };
 
-    try {
-      // 1. Créer l'élément (événement ou tâche)
-      const response = await fetch("http://localhost:5222/api/element", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nouvelElement),
-      });
+    if (type === "Reservation") {
+      // Vérifie si une réservation existe déjà pour cet objet à cette date
+      const reservationExistante = reservations.some(
+        (resa) => resa.elementId === objetId && resa.date === date
+      );
 
-      if (response.ok) {
-        const elementData = await response.json(); // Récupérer les données de l'élément créé
+      if (reservationExistante) {
+        alert("Cet objet est déjà réservé à cette date.");
+        return;
+      }
 
-        // 2. Créer l'association en fonction du type
-        let association = {
-          personneId,
-          elementId: elementData.id,
-          type: type === "Evenements" ? "Inscription" : "Attribution",
-          date: "",
-        };
+      // Création de l'association pour la réservation
+      const association = {
+        personneId,
+        elementId: objetId,
+        date,
+        type: "Reservation",
+      };
 
-        // Envoi de la requête pour créer l'association
-        const associationResponse = await fetch("http://localhost:5222/api/association", {
+      try {
+        const response = await fetch("http://localhost:5222/api/association", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(association),
         });
 
-        if (!associationResponse.ok) {
-          alert("Erreur lors de l'inscription ou de l'attribution");
+        if (!response.ok) {
+          alert("Erreur lors de la réservation");
         } else {
-          closePopup(); // Fermer la popup
-          setBouton(type); // Mettre à jour la liste affichée
+          closePopup();
+          if (setBouton) setBouton(type);
         }
+      } catch (error) {
+        console.error("Erreur:", error);
+        alert("Une erreur s'est produite");
+      }
+
+      return;
+
+    }else {
+      // Création de l'élément (événement ou tâche)
+      const nouvelElement = {
+        id: 0, // Géré par la BDD
+        nom,
+        description,
+        type: type === "Evenements" ? "Event" : "Task",
+        estFait: false,
+        date: type === "Evenements" ? date : "",
+      };
+
+      try {
+        const response = await fetch("http://localhost:5222/api/element", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(nouvelElement),
+        });
+
+        if (!response.ok) {
+          alert("Erreur lors de l'ajout de l'élément");
+          return;
+        }
+
+        const elementData = await response.json();
+        association = {
+          ...association,
+          elementId: elementData.id,
+          type: type === "Evenements" ? "Inscription" : "Attribution",
+        };
+      } catch (error) {
+        console.error("Erreur:", error);
+        alert("Une erreur s'est produite");
+        return;
+      }
+    }
+
+    // Envoi de l'association pour une réservation, un événement ou une tâche
+    try {
+      const associationResponse = await fetch("http://localhost:5222/api/association", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(association),
+      });
+
+      if (!associationResponse.ok) {
+        alert("Erreur lors de la création de l'association");
       } else {
-        alert("Erreur lors de l'ajout de l'élément");
+        closePopup();
+        setBouton(type);
       }
     } catch (error) {
       console.error("Erreur:", error);
@@ -192,38 +257,56 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="connexion-container">
           <form onSubmit={handleSubmit}>
-            <div>
-              <h3>Nouve{type === "Evenements" ? "l événement" : "lle tâche"}</h3>
-              <input
-                type="text"
-                className="encadre"
-                value={nom}
-                onChange={(e) => setNom(e.target.value)}
-                required
-              />
-            </div>
-            <div>
-              <h3>Infos supplémentaires</h3>
-              <textarea
-                className="encadre"
-                value={description}
-                onChange={(e) => setDescription(e.target.value)}
-                required
-              />
-            </div>
-            {type === "Evenements" && (
-              <div>
-                <h3>Date de l'événement</h3>
-                <input
-                  type="date"
-                  className="encadre"
-                  value={date}
-                  onChange={(e) => setDate(e.target.value)}
-                  required
-                />
-              </div>
+            {type === "Reservation" ? (
+              <>
+                <h3>Nouvelle réservation</h3>
+                <div>
+                  <h3>Date de réservation</h3>
+                  <input
+                    type="date"
+                    className="encadre"
+                    value={date}
+                    onChange={(e) => setDate(e.target.value)}
+                    required
+                  />
+                </div>
+              </>
+            ) : (
+              <>
+                <div>
+                  <h3>Nouve{type === "Evenements" ? "l événement" : "lle tâche"}</h3>
+                  <input
+                    type="text"
+                    className="encadre"
+                    value={nom}
+                    onChange={(e) => setNom(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <h3>Infos supplémentaires</h3>
+                  <textarea
+                    className="encadre"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                  />
+                </div>
+                {type === "Evenements" && (
+                  <div>
+                    <h3>Date de l'événement</h3>
+                    <input
+                      type="date"
+                      className="encadre"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      required
+                    />
+                  </div>
+                )}
+              </>
             )}
-            
+
             <button className="connecter" type="submit">
               Ajouter
             </button>

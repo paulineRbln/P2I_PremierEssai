@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import "./Maison.css";
-import { ChoixObjet , NotifNews} from '../GrosElements/Notif';
+import { ChoixObjet , NotifNews, FormulaireAjoutElement} from '../GrosElements/Notif';
 
 function Maison() {
+  const [popupType, setPopupType] = useState(null); 
   const [personneId, setPersonneId] = useState(null);
   const [objets, setObjets] = useState([]);
   const [choixObjet, setChoixObjet] = useState(null); // Pour garder une trace du choix de l'objet
@@ -36,7 +37,7 @@ function Maison() {
   // Fonction appelée lors du clic sur un objet
   const handleObjetClick = (objet) => {
     setChoixObjet(objet); // Mettre à jour l'état avec l'objet sélectionné
-    console.log('Objet choisi:', objet);  // Afficher l'objet choisi (facultatif pour débogage)
+    setPopupType (true);
   };
 
   return (
@@ -44,6 +45,14 @@ function Maison() {
       <h1>Appareils et salles</h1>
       {/* Passer les objets récupérés au composant ChoixObjet */}
       <ChoixObjet listeObjets={objets} eventOnClic={handleObjetClick} />
+      {popupType && choixObjet && (
+        <FormulaireAjoutElement 
+          closePopup={() => setPopupType(false)}
+          personneId={personneId}
+          type="Reservation"
+          objetId={choixObjet} // Passer l'ID de l'objet sélectionné
+        />
+      )}
       <NotifNews
               titre="Réservations en cours"
               notifications={resas}
