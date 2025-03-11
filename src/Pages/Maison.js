@@ -5,6 +5,7 @@ import { BoutonSwipe } from "../PetitsElements/RectangleAffichage";
 
 function Maison() {
   const [popupType, setPopupType] = useState(null);
+  const[addObjet, setAddObjet] = useState(null);
   const [personneId, setPersonneId] = useState(null);
   const [objets, setObjets] = useState([]);
   const [choixObjet, setChoixObjet] = useState(null);
@@ -51,16 +52,27 @@ function Maison() {
     <div className="page_objets" style={{ backgroundColor: "white", minHeight: "100vh", textAlign: "center" }}>
       <h1>Appareils et salles</h1>
 
-      <ChoixObjet listeObjets={objets} eventOnClic={handleObjetClick} />
+      <ChoixObjet listeObjets={objets} eventOnClic={handleObjetClick} addObjet={setAddObjet} />
 
       {popupType && choixObjet && (
         <FormulaireAjoutElement
           closePopup={() => setPopupType(false)}
           personneId={personneId}
           type="Mes réservations"
-          objetId={choixObjet}
+          objetId={choixObjet.id}
           reservations={resas}
           setBouton={setPageBouton} // Passer setPageBouton pour changer d'affichage après réservation
+          refresh= {setRefresh}
+          supression={true}
+          descriptionDonnee={choixObjet.description}
+        />
+      )}
+
+      {addObjet && (
+        <FormulaireAjoutElement
+          closePopup={() => setAddObjet(false)}
+          personneId={personneId}
+          type="Objet"
           refresh= {setRefresh}
         />
       )}

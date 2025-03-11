@@ -111,7 +111,7 @@ export function ChoixActions({choix1, choix2, titre, eventOnClic1, eventOnClic2 
   );
 }
 
-export function ChoixObjet({ listeObjets, eventOnClic }) {
+export function ChoixObjet({ listeObjets, eventOnClic, addObjet }) {
   return (
     <div className="choix_actions">
       <div className='bloc_rectangles_objet'>
@@ -120,9 +120,15 @@ export function ChoixObjet({ listeObjets, eventOnClic }) {
             key={index} 
             texte={objet.nom}  // Le nom de l'objet comme texte
             couleur={"#1A237E"}  // La couleur des rectangles (fixée à un bleu ici)
-            eventOnClic={() => eventOnClic(objet.id)}  // Passer l'objet au clic
+            eventOnClic={() => eventOnClic(objet)}  // Passer l'objet au clic
           />
         ))}
+        <RectangleAjout 
+            texte={"+"}  // Le nom de l'objet comme texte
+            couleur={"#f8f9fa"}  // La couleur des rectangles (fixée à un bleu ici)
+            eventOnClic={addObjet}  // Passer l'objet au clic
+            couleurTxt={"#1A237E"}
+          />
       </div>
     </div>
   );
@@ -130,10 +136,34 @@ export function ChoixObjet({ listeObjets, eventOnClic }) {
 
 
 
-export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton, objetId, reservations, refresh }) {
+export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton, objetId, reservations, refresh, supression, descriptionDonnee }) {
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(""); 
+
+  const handleDelete = async () => {
+    if (!objetId) {
+      alert("Impossible de supprimer : aucun objetId fourni.");
+      return;
+    }
+
+    try {
+      const response = await fetch(`http://localhost:5222/api/element/${objetId}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+      });
+
+      if (!response.ok) {
+        alert("Erreur lors de la suppression de l'objet.");
+      } else {
+        closePopup();
+        refresh((prev) => !prev);
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression :", error);
+      alert("Une erreur s'est produite.");
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -190,7 +220,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
         id: 0, // Géré par la BDD
         nom,
         description,
-        type: type === "Evenements" ? "Event" : "Task",
+        type: type === "Evenements" ? "Event" : "Objet"? "Objet" : "Task",
         estFait: false,
         date: type === "Evenements" ? date : "",
       };
@@ -234,7 +264,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
         alert("Erreur lors de la création de l'association");
       } else {
         closePopup();
-        setBouton(type);
+        if (setBouton) setBouton(type);
         refresh((prev) => !prev);
       }
     } catch (error) {
@@ -247,6 +277,11 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
     <div className="modal-overlay" onClick={closePopup}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="connexion-container">
+        {descriptionDonnee && (
+              <p className='petit_text'> 
+                {descriptionDonnee}
+              </p>)
+            }
           <form onSubmit={handleSubmit}>
             {type === "Mes réservations" ? (
               <>
@@ -265,7 +300,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
             ) : (
               <>
                 <div>
-                  <h3>Nouve{type === "Evenements" ? "l événement" : "lle tâche"}</h3>
+                  <h3>Nouve{type === "Evenements" ? "l événement" : "Objet" ?  "l objet" : "lle tâche"}</h3>
                   <input
                     type="text"
                     className="encadre"
@@ -305,6 +340,12 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
             {type === "Tâches" && (
               <button className="connecter_bis" type="button" onClick={handleSubmit}>
                 J'ajoute et je m'y colle
+              </button>
+            )}
+
+            {supression && (
+              <button className="connecter_bis" type="button" onClick={handleDelete}>
+                Supprimer
               </button>
             )}
           </form>

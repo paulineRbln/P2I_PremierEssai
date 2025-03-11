@@ -144,10 +144,14 @@ export function RectangleAffichage({
   );
 }
 
-export function RectangleAjout ({ texte, couleur, eventOnClic }) {
+export function RectangleAjout({ texte, couleur, eventOnClic, couleurTxt }) {
   return (
-    <div className="bouton_ajout" style={{ backgroundColor: couleur }} onClick={eventOnClic}>
-        <h2>{texte}</h2>
+    <div 
+      className="bouton_ajout" 
+      style={{ backgroundColor: couleur, color: couleurTxt ? couleurTxt : "white" }} 
+      onClick={eventOnClic}
+    >
+      <h2>{texte}</h2>
     </div>
   );
 };

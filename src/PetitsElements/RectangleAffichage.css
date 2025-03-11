@@ -1,6 +1,6 @@
 .rectangle {
   width: 90vw;
-  min-height: 12vh; /* Hauteur minimale de 12% de la hauteur de la fenêtre */
+  min-height: 15vh; /* Hauteur minimale de 12% de la hauteur de la fenêtre */
   height: auto; /* Hauteur s'adapte au contenu */
   margin: 11px auto;
   border-radius: 20px;
@@ -56,6 +56,7 @@
   margin: 1vh auto;
   border-radius: 20px;
   color: white;
+  border-color: #1A237E;
   padding: 2% 6%;
   box-sizing: border-box;
   text-align: center;
