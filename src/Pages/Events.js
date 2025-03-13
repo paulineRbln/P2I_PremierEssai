@@ -49,6 +49,7 @@ function Events() {
           personneId={personneId} 
           type={popupType} 
           setBouton={setPageBouton}
+          refresh={setRefresh}
         />
       )}
 

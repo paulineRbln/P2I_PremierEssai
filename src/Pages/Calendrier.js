@@ -149,7 +149,7 @@ function Calendrier() {
           dateDonnee={dateSelectionneeFormat} // Passer la date sélectionnée
           personneId={personneId} 
           type={"Evenements"} 
-          setRefresh={setRefresh}
+          refresh={setRefresh}
         />
       )}
     </div>
