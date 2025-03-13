@@ -7,6 +7,7 @@ function PageAccueil() {
   const [evenements, setEvenements] = useState([]);
   const [news, setNews] = useState([]);
   const [personneId, setPersonneId] = useState(null);
+  const[refresh, setRefresh] = useState(false);
 
   useEffect(() => {
     // Lire directement l'ID de la personne depuis le localStorage
@@ -27,7 +28,7 @@ function PageAccueil() {
         })
         .catch(error => console.error('Erreur lors de la récupération des tâches:', error));
     }
-  }, [personneId]);
+  }, [personneId, refresh]);
 
   // Récupérer les événements depuis l'API
   useEffect(() => {
@@ -68,7 +69,7 @@ function PageAccueil() {
         })
         .catch(error => console.error('Erreur lors de la récupération des news:', error));
     }
-  }, [personneId]);
+  }, [personneId, refresh]);
   
   const handleLogout = () => {
     // Supprimer le token du localStorage
@@ -92,6 +93,7 @@ function PageAccueil() {
         notifications={tachesAFaire}
         couleur="#E8F5E9"
         task={true}
+        refresh={setRefresh}
       />
 
       {/* Affichage des événements */}
@@ -99,12 +101,14 @@ function PageAccueil() {
         titre="Vos événements à venir"
         notifications={evenements}
         couleur="#CFEFEC"
+        refresh={setRefresh}
       />
 
       <NotifNews
         titre="News du jour"
         notifications={news}
         couleur="#FFCCBC"
+        refresh={setRefresh}
       />
     </div>
   );

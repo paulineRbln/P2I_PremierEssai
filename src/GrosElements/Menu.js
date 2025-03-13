@@ -2,7 +2,6 @@ import React from 'react';
 import { FaHome, FaCalendarAlt, FaUser } from 'react-icons/fa'; // Ajouter des icônes
 import { MdDashboard, MdOutlineTaskAlt } from "react-icons/md";
 import BoutonMenu from '../Boutons/BoutonMenu'; // Importer le composant BoutonMenu
-import BoutonPlus from '../Boutons/BoutonPlus';
 import './Menu.css';
 
 const Menu = () => {
