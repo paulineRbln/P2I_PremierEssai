@@ -1,0 +1,58 @@
+
+.calendrier-container h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 8vh 8vw 2vh 8vw;
+    color: #1A237E;
+    text-align: left; /* Assure que le texte est aligné à gauche */
+}
+
+.calendrier-container {
+        background-color: white;
+        min-height: 100vh;
+        margin-bottom: 12vh;
+    }
+    
+  
+  .react-calendar {
+    width: 100%;
+    max-width: 90vw;
+    margin: 0 auto;
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Couleurs des jours selon le type d'élément */
+  .jour-evenement {
+    background-color: #CFEFEC !important; /* Bleu */
+    border-radius: 100%;
+  }
+  
+  .jour-tache {
+    background-color: #E8F5E9 !important; /* Vert */
+    border-radius: 100%;
+  }
+  
+  .jour-reservation {
+    background-color: #FFCCBC !important; /* Orange */
+    border-radius: 100%;
+  }
+
+  .jour-multiple-types {
+    background-color: #ddcbfd !important; /* Violet lila */
+    border-radius: 100%;
+  }
+  
+  .ajoutE {
+    width: 40%;
+    background-color: #1A237E;
+    color: white;
+    font-weight: bold;
+    text-align: center;
+    padding: 1.5vw;
+    font-size: 0.8rem;
+    border-radius: 10vh;
+    margin-top: 10px;
+    margin-left: 30vw;
+    }

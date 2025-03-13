@@ -136,7 +136,7 @@ export function ChoixObjet({ listeObjets, eventOnClic, addObjet }) {
 
 
 
-export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton, objetId, reservations, refresh, supression, descriptionDonnee }) {
+export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonnee, setBouton, objetId, reservations, refresh, supression, descriptionDonnee }) {
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
   const [date, setDate] = useState(""); 
@@ -167,109 +167,104 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     let association = {
       personneId,
       date,
       type: "",
     };
-
+  
     if (type === "Mes réservations") {
       // Vérifie si une réservation existe déjà pour cet objet à cette date
       const reservationExistante = reservations.some(
         (resa) => resa.objetId === objetId && resa.date === date
       );
-
+  
       if (reservationExistante) {
         alert("Cet objet est déjà réservé à cette date.");
         return;
       }
-
+  
       // Création de l'association pour la réservation
-      const association = {
+      association = {
         personneId,
         elementId: objetId,
         date,
         type: "Reservation",
       };
-
+  
       try {
         const response = await fetch("http://localhost:5222/api/association", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(association),
         });
-
+  
         if (!response.ok) {
           alert("Erreur lors de la réservation");
         } else {
           closePopup();
           if (setBouton) setBouton(type);
-          refresh((prev) => !prev);
+          if (refresh) refresh((prev) => !prev);
         }
       } catch (error) {
         console.error("Erreur:", error);
         alert("Une erreur s'est produite");
       }
-
+  
       return;
-
-    }else {
+    } else {
       // Création de l'élément (événement ou tâche)
       const nouvelElement = {
         id: 0, // Géré par la BDD
         nom,
         description,
-        type: type === "Evenements" ? "Event" : "Objet"? "Objet" : "Task",
+        type: type === "Evenements" ? "Event" : type === "Objet" ? "Objet" : "Task",
         estFait: false,
-        date: type === "Evenements" ? date : "",
+        date: type === "Evenements" ? dateDonnee ? dateDonnee : date : "",
       };
-
+  
       try {
+        // Ajout de l'élément (événement ou tâche) dans la base de données
         const response = await fetch("http://localhost:5222/api/element", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(nouvelElement),
         });
-
+  
         if (!response.ok) {
           alert("Erreur lors de l'ajout de l'élément");
           return;
-        } else {
-          refresh((prev) => !prev);
         }
-
+  
+        // Récupérer les données de l'élément ajouté
         const elementData = await response.json();
+  
+        // Mettre à jour l'association avec l'élément créé
         association = {
           ...association,
           elementId: elementData.id,
           type: type === "Evenements" ? "Inscription" : "Attribution",
         };
+  
+        // Envoi de l'association après l'ajout de l'élément
+        const associationResponse = await fetch("http://localhost:5222/api/association", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(association),
+        });
+  
+        if (!associationResponse.ok) {
+          alert("Erreur lors de la création de l'association");
+        } else {
+          closePopup();
+          if (setBouton) setBouton(type);
+          if (refresh) refresh((prev) => !prev);
+        }
       } catch (error) {
         console.error("Erreur:", error);
         alert("Une erreur s'est produite");
-        return;
       }
-    }
-
-    // Envoi de l'association pour une réservation, un événement ou une tâche
-    try {
-      const associationResponse = await fetch("http://localhost:5222/api/association", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(association),
-      });
-
-      if (!associationResponse.ok) {
-        alert("Erreur lors de la création de l'association");
-      } else {
-        closePopup();
-        if (setBouton) setBouton(type);
-        refresh((prev) => !prev);
-      }
-    } catch (error) {
-      console.error("Erreur:", error);
-      alert("Une erreur s'est produite");
     }
   };
 
@@ -320,14 +315,14 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, setBouton
                 </div>
                 {type === "Evenements" && (
                   <div>
-                    <h3>Date de l'événement</h3>
-                    <input
+                    <h3>Date de l'événement {dateDonnee}</h3>
+                    {!dateDonnee && <input
                       type="date"
                       className="encadre"
                       value={date}
                       onChange={(e) => setDate(e.target.value)}
                       required
-                    />
+                    />}
                   </div>
                 )}
               </>
