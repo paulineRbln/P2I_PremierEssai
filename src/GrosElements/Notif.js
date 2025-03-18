@@ -35,7 +35,7 @@ export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
     );
   }
 
-  
+
 
   return (
     <div className="notif">
@@ -487,6 +487,57 @@ export function FormulaireModifProfil({ closePopup, personneId, refresh }) {
           </form>
 
           <button className="btn-fermer" type="button" onClick={closePopup}>
+            <FaTimes className="close-icon" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function FormulaireSuppression({ elementId, closeForm, refresh }) {
+  const [loading, setLoading] = useState(false); // Gérer l'état de chargement pendant la suppression
+
+  // Fonction pour supprimer l'élément et ses associations
+  const handleDelete = async () => {
+    setLoading(true);
+
+    try {
+      const response = await fetch(`http://localhost:5222/api/element/${elementId}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (response.ok) {
+        refresh((prev) => !prev); // Rafraîchir après suppression
+        closeForm(); // Fermer le formulaire de suppression
+      } else {
+        alert("Erreur lors de la suppression de l'élément.");
+      }
+    } catch (error) {
+      console.error("Erreur lors de la suppression:", error);
+      alert("Une erreur s'est produite lors de la suppression.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={closeForm}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="connexion-container">
+          <h3>Supprimer l'élément ?</h3>
+          <button
+            className="connecter"
+            type="button"
+            onClick={handleDelete}
+            disabled={loading} // Désactiver le bouton pendant le chargement
+          >
+            {loading ? "Suppression en cours..." : "Supprimer"}
+          </button>
+          <button className="btn-fermer" type="button" onClick={closeForm}>
             <FaTimes className="close-icon" />
           </button>
         </div>

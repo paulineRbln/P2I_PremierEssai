@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './RectangleAffichage.css'; // Importer le fichier CSS
+import { FormulaireSuppression } from '../GrosElements/Notif';
 
 export function RectangleAffichage({
   textGras,
@@ -17,6 +18,7 @@ export function RectangleAffichage({
 }) {
   const [checked, setChecked] = useState(estFait);
   const [associe, setAssocie] = useState(association);
+  const [showDeleteForm, setShowDeleteForm] = useState(false);
 
   // Fonction pour gérer l'ajout de l'association
   const handleCheckboxChange = () => {
@@ -127,6 +129,13 @@ export function RectangleAffichage({
       });
   };
 
+  // Fonction pour afficher le formulaire de suppression
+  const handleDeleteClick = () => {
+    if (!isNotifNews) { // Affiche le formulaire de suppression seulement si ce n'est pas un NotifNews
+      setShowDeleteForm(true);
+    }
+  };
+
   return (
     <div className="rectangle" style={{ backgroundColor: couleur }}>
       <div className="contener_check">
@@ -138,7 +147,7 @@ export function RectangleAffichage({
             className="checkbox"
           />
         )}
-        <div className="text-content">
+        <div className="text-content" onClick={handleDeleteClick}>
           {date && <p className="date_rect">{date}</p>}
           <h2>{textGras}</h2>
           <p className="petit_text">{textPetit}</p>
@@ -165,6 +174,15 @@ export function RectangleAffichage({
           {typeE === "Reservation" ? "Annuler" : "Je me désiste"}
         </div>
       )}
+
+      {showDeleteForm && (
+        <FormulaireSuppression
+          elementId={elementId}
+          closeForm={() => setShowDeleteForm(false)}
+          refresh={refresh}
+        />
+      )}
+
     </div>
   );
 }

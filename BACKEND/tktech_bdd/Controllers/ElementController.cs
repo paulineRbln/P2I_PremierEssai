@@ -119,27 +119,43 @@ public class ElementController : ControllerBase
 
     // DELETE: api/element/{id}
     [SwaggerOperation(
-        Summary = "Supprimer un élément",
-        Description = "Supprime un élément définitivement"
+        Summary = "Supprimer un élément et toutes ses associations",
+        Description = "Supprime un élément ainsi que toutes les associations qui lui sont liées"
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Élément supprimé", typeof(ElementDTO))]
-    [SwaggerResponse(StatusCodes.Status404NotFound, "Élément non supprimé")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Élément et associations supprimés")]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Élément ou associations non trouvés")]
     [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteElement(
+    public async Task<IActionResult> DeleteElementWithAssociations(
         [FromRoute, SwaggerParameter(Description = "Identifiant de l'élément (doit être un entier)")]
             int id
     )
     {
+        // Rechercher l'élément à supprimer
         var element = await _context.Elements.FindAsync(id);
 
         if (element == null)
-            return Ok(new ElementDTO()); // Retourne un objet vide si l'élément n'est pas trouvé
+        {
+            // Retourne un objet vide si l'élément n'est pas trouvé
+            return NotFound();
+        }
 
+        // Supprimer toutes les associations liées à cet élément
+        var associations = await _context.Associations.Where(a => a.ElementId == id).ToListAsync();
+        if (associations.Any())
+        {
+            _context.Associations.RemoveRange(associations); // Supprimer toutes les associations
+        }
+
+        // Supprimer l'élément
         _context.Elements.Remove(element);
+
+        // Sauvegarder les changements dans la base de données
         await _context.SaveChangesAsync();
 
-        return Ok();
+        // Retourner une réponse de succès
+        return Ok(new { message = "Élément et associations supprimés avec succès" });
     }
+
 
     // GET: api/element/personne/{personneId}
     [SwaggerOperation(
