@@ -35,6 +35,8 @@ export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
     );
   }
 
+  
+
   return (
     <div className="notif">
       <h3>{titre}</h3>

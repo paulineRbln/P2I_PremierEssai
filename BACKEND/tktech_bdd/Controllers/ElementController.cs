@@ -167,4 +167,50 @@ public class ElementController : ControllerBase
 
         return Ok(elementsDTO); // Retourner la liste des éléments sous forme de DTO
     }
+
+
+    // PUT: api/element/{id}/estFait
+    [SwaggerOperation(
+        Summary = "Modifier la propriété estFait d'un élément",
+        Description = "Modifie uniquement la propriété estFait d'un élément à partir de son identifiant"
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Propriété estFait modifiée", typeof(ElementDTO))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Élément non trouvé")]
+    [HttpPut("{id}/{estFait}")]
+    public async Task<IActionResult> PutEstFait(
+        [FromRoute, SwaggerParameter(Description = "Identifiant de l'élément (doit être un entier)")] int id,
+        [FromRoute, SwaggerParameter(Description = "Nouveau statut de la propriété estFait")] bool estFait
+    )
+    {
+        var element = await _context.Elements.FindAsync(id);
+
+        if (element == null)
+        {
+            return NotFound(); // Retourne un 404 si l'élément n'est pas trouvé
+        }
+
+        // Mise à jour de la propriété estFait
+        element.EstFait = estFait;
+
+        _context.Entry(element).State = EntityState.Modified;
+
+        try
+        {
+            await _context.SaveChangesAsync();
+        }
+        catch (DbUpdateConcurrencyException)
+        {
+            if (!_context.Elements.Any(e => e.Id == id))
+            {
+                return NotFound(); // Retourne 404 si l'élément n'existe plus
+            }
+            else
+            {
+                throw; // Lance l'exception si une autre erreur se produit
+            }
+        }
+
+        // Retourne l'élément mis à jour sous forme de DTO
+        return Ok(new ElementDTO(element));
+    }
 }

@@ -96,10 +96,35 @@ export function RectangleAffichage({
     }
   };
 
-  // Fonction pour cocher/décocher une tâche
+  // Fonction pour cocher/décocher une tâche et mettre à jour l'état dans la base de données
   const handleEstFaitChange = () => {
-    setChecked(!checked);
-    refresh((prev) => !prev);
+    // Inverser l'état de la case à cocher localement
+    const newChecked = !checked;
+    setChecked(newChecked);
+
+    // Envoi de la requête PUT pour mettre à jour la propriété estFait de l'élément
+    fetch(`http://localhost:5222/api/element/${elementId}/${newChecked}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          // Mise à jour réussie, rafraîchir l'état
+          refresh((prev) => !prev);
+        } else {
+          // Si la mise à jour échoue, afficher une erreur
+          console.error("Erreur lors de la mise à jour de estFait.");
+          // Rétablir l'état initial si la mise à jour échoue
+          setChecked(checked);
+        }
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la mise à jour de estFait:", error);
+        // Rétablir l'état initial en cas d'erreur
+        setChecked(checked);
+      });
   };
 
   return (
