@@ -13,8 +13,6 @@ function Calendrier() {
   const [showForm, setShowForm] = useState(false); // Etat pour afficher ou cacher le formulaire
   const [personneId, setPersonneId] = useState(localStorage.getItem('personneId'));
 
-  console.log(elements);
-
   useEffect(() => {
     const id = localStorage.getItem('personneId');
     if (id) {
@@ -60,7 +58,8 @@ function Calendrier() {
     const dateFormatee = formatDate(date);
     const jourSemaine = date.getDay();
     const estWeekend = jourSemaine === 0 || jourSemaine === 6;
-
+    const estAujourdHui = dateFormatee === formatDate(new Date()); // Vérifie si la date est aujourd'hui
+  
     const contientEvenement = elements.some(
       (element) => element.date === dateFormatee && element.type === "Event"
     );
@@ -70,9 +69,11 @@ function Calendrier() {
     const contientReservation = elements.some(
       (element) => element.date === dateFormatee && element.type === "Reservation"
     );
-
+  
     const multipleTypes = [contientEvenement, contientTache, contientReservation].filter(Boolean).length > 1;
-
+  
+    // Appliquer des classes conditionnelles
+    if (estAujourdHui) return "jour-aujourdhui"; // Classe spécifique pour le jour actuel
     if (estWeekend) return "weekend";
     if (multipleTypes) return "jour-multiple-types";
     if (contientEvenement) return "jour-evenement";
@@ -80,6 +81,7 @@ function Calendrier() {
     if (contientReservation) return "jour-reservation";
     return null;
   };
+  
 
   const evenementsDuJour = elements.filter(
     (element) => formatDate(new Date(element.date)) === formatDate(dateSelectionnee) && element.type === "Event"

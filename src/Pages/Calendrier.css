@@ -43,6 +43,13 @@
     background-color: #ddcbfd !important; /* Violet lila */
     border-radius: 100%;
   }
+
+  .jour-aujourdhui {
+    background-color: #b8b8b8 !important; /* Jaune doux ou une autre couleur que vous préférez */
+    border-radius: 100%;
+    font-weight: bold;
+    color: black; /* Pour s'assurer que le texte reste lisible */
+  }
   
   .ajoutE {
     width: 40%;
