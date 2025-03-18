@@ -41,7 +41,7 @@
     display: flex;
     justify-content: center;  /* Centrer horizontalement */
     align-items: flex-start;  /* Aligner le contenu vers le haut */
-    padding-top: 10vh;  /* Décaler le contenu un peu vers le bas */
+    padding-top: 3vh;  /* Décaler le contenu un peu vers le bas */
     z-index: 1000; 
   }
   

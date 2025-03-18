@@ -5,7 +5,7 @@ import { BoutonSwipe } from '../PetitsElements/RectangleAffichage';
 
 function Events() {
   const [popupType, setPopupType] = useState(null); // "Task", "Event" ou null
-  const [personneId, setPersonneId] = useState(null);
+  const [personneId, setPersonneId] = useState(localStorage.getItem('personneId'));
   const [pageBouton, setPageBouton] = useState("Tâches");
   const [refresh, setRefresh] = useState(false);
 

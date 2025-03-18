@@ -1,0 +1,24 @@
+.btn-deconnexion {
+    width: 50%;
+    background-color: #ffffff; /* Fond blanc */
+    color: #1A237E; /* Texte bleu */
+    font-weight: bold;
+    padding: 3vw;
+    font-size: 1rem;
+    border: 2px solid #1A237E; /* Bordure bleue */
+    border-radius: 10vh; /* Bordure arrondie */
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.btn-modif{
+    width: 30%;
+    background-color: #1A237E; /* Fond blanc */
+    color: #ffffff; /* Texte bleu */
+    font-weight: bold;
+    padding: 3vw;
+    font-size: 1rem;
+    border-radius: 10vh; /* Bordure arrondie */
+    cursor: pointer;
+    margin-top: 10px;
+}

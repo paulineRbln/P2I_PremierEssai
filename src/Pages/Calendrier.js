@@ -11,7 +11,7 @@ function Calendrier() {
   const [elements, setElements] = useState([]);
   const [refresh, setRefresh] = useState(false);
   const [showForm, setShowForm] = useState(false); // Etat pour afficher ou cacher le formulaire
-  const [personneId, setPersonneId] = useState(null);
+  const [personneId, setPersonneId] = useState(localStorage.getItem('personneId'));
   
     useEffect(() => {
       // Lire directement l'ID de la personne depuis le localStorage

@@ -11,7 +11,7 @@ const Menu = () => {
       <BoutonMenu 
         icon={<FaUser />} 
         text="Profil" 
-        lien="/calendrier" 
+        lien="/profil" 
       />
 
       {/* Bouton vers la page News */}
@@ -25,7 +25,6 @@ const Menu = () => {
         icon={<FaCalendarAlt />} 
         text="Calendrier" 
         lien="/calendrier" 
-        color = "#71727A"
       />
       
 

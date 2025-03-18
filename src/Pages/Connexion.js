@@ -120,10 +120,6 @@ function Inscription() {
           <input type="text" className="encadre" value={pseudo} onChange={(e) => setPseudo(e.target.value)} required />
         </div>
         <div>
-          <h3>Photo de profil (URL)</h3>
-          <input type="text" className="encadre" value={photoProfil} onChange={(e) => setPhotoProfil(e.target.value)} />
-        </div>
-        <div>
           <h3>Mot de passe</h3>
           <input type="password" className="encadre" value={motDePasse} onChange={(e) => setMotDePasse(e.target.value)} required />
         </div>

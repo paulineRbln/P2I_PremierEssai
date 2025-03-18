@@ -6,7 +6,7 @@ function PageAccueil() {
   const [tachesAFaire, setTachesAFaire] = useState([]);
   const [evenements, setEvenements] = useState([]);
   const [news, setNews] = useState([]);
-  const [personneId, setPersonneId] = useState(null);
+  const [personneId, setPersonneId] = useState(localStorage.getItem('personneId'));
   const[refresh, setRefresh] = useState(false);
 
   useEffect(() => {
@@ -71,21 +71,11 @@ function PageAccueil() {
     }
   }, [personneId, refresh]);
   
-  const handleLogout = () => {
-    // Supprimer le token du localStorage
-    localStorage.removeItem('token');
-    localStorage.removeItem('personneId');
-    
-    // Rediriger vers la page de connexion
-    window.location.href ='/connexion';
-  };
 
   return (
     <div className="page-accueil" style={{ backgroundColor: 'white', minHeight: '100vh', textAlign: 'center' }}>
       <h1>Bienvenue dans ta Koloc Tranquille</h1>
-      <button onClick={handleLogout} className="btn-deconnexion">
-        Se déconnecter
-      </button>
+      
 
       {/* Affichage des tâches à faire */}
       <Notif

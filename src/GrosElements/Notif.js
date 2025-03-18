@@ -70,7 +70,6 @@ export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
 
 export function NotifNews({ titre, notifications, couleur, resa }) {
   // Vérifier si la liste notifications est null ou vide
-  console.log(notifications);
 
   if (notifications === null || notifications.length === 0) {
     return (
@@ -343,6 +342,146 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
                 Supprimer
               </button>
             )}
+          </form>
+
+          <button className="btn-fermer" type="button" onClick={closePopup}>
+            <FaTimes className="close-icon" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+
+export function FormulaireModifProfil({ closePopup, personneId, refresh }) {
+  const [nom, setNom] = useState("");
+  const [prenom, setPrenom] = useState("");
+  const [pseudo, setPseudo] = useState("");
+  const [motDePasse, setMotDePasse] = useState("");
+  const [photoProfil, setPhotoProfil] = useState("");
+  const [estProprio, setEstProprio] = useState(false); // Valeur par défaut, ajustable si nécessaire
+
+  useEffect(() => {
+    // Récupérer les informations de l'utilisateur via l'API
+    const fetchUserData = async () => {
+      try {
+        const response = await fetch(`http://localhost:5222/api/personne/${personneId}`);
+        if (!response.ok) {
+          throw new Error("Erreur lors de la récupération des données de l'utilisateur.");
+        }
+        const data = await response.json();
+        setNom(data.nom);
+        setPrenom(data.prenom);
+        setPseudo(data.pseudo);
+        setPhotoProfil(data.photoProfil);
+      } catch (error) {
+        console.error(error);
+        alert("Erreur lors du chargement des données.");
+      }
+    };
+
+    fetchUserData();
+  }, [personneId]);
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    
+    const updatedData = {
+      id: personneId,
+      nom,
+      prenom,
+      pseudo,
+      photoProfil,
+      motDePasse,
+      estProprio,
+    };
+
+    try {
+      const response = await fetch(`http://localhost:5222/api/personne/${personneId}`, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(updatedData),
+      });
+
+      if (!response.ok) {
+        alert("Erreur lors de la mise à jour des données.");
+      } else {
+        closePopup();
+        if (refresh) refresh((prev) => !prev); // Refresh si nécessaire
+      }
+    } catch (error) {
+      console.error("Erreur:", error);
+      alert("Une erreur s'est produite.");
+    }
+  };
+
+  return (
+    <div className="modal-overlay" onClick={closePopup}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="connexion-container">
+          <h3>Modifier mon profil</h3>
+          <form onSubmit={handleSubmit}>
+            <div>
+              <h3>Nom</h3>
+              <input
+                type="text"
+                className="encadre"
+                value={nom}
+                onChange={(e) => setNom(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <h3>Prénom</h3>
+              <input
+                type="text"
+                className="encadre"
+                value={prenom}
+                onChange={(e) => setPrenom(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <h3>Pseudo</h3>
+              <input
+                type="text"
+                className="encadre"
+                value={pseudo}
+                onChange={(e) => setPseudo(e.target.value)}
+                required
+              />
+            </div>
+
+            <div>
+              <h3>Mot de passe</h3>
+              <input
+                type="password"
+                className="encadre"
+                value={motDePasse}
+                onChange={(e) => setMotDePasse(e.target.value)}
+                placeholder="Réécrire mot de passe"
+                required
+              />
+            </div>
+
+            <div>
+              <h3>Etes-vous propriétaire ?</h3>
+              <input
+                type="checkbox"
+                className="encadre"
+                checked={estProprio}
+                onChange={(e) => setEstProprio(e.target.checked)}
+              />
+            </div>
+
+            <button className="connecter" type="submit">
+              Enregistrer les modifications
+            </button>
           </form>
 
           <button className="btn-fermer" type="button" onClick={closePopup}>

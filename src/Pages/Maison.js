@@ -6,7 +6,7 @@ import { BoutonSwipe } from "../PetitsElements/RectangleAffichage";
 function Maison() {
   const [popupType, setPopupType] = useState(null);
   const[addObjet, setAddObjet] = useState(null);
-  const [personneId, setPersonneId] = useState(null);
+  const [personneId, setPersonneId] = useState(localStorage.getItem('personneId'));
   const [objets, setObjets] = useState([]);
   const [choixObjet, setChoixObjet] = useState(null);
   const [resas, setResas] = useState([]);
