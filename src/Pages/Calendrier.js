@@ -12,52 +12,55 @@ function Calendrier() {
   const [refresh, setRefresh] = useState(false);
   const [showForm, setShowForm] = useState(false); // Etat pour afficher ou cacher le formulaire
   const [personneId, setPersonneId] = useState(localStorage.getItem('personneId'));
-  
-    useEffect(() => {
-      // Lire directement l'ID de la personne depuis le localStorage
-      const id = localStorage.getItem('personneId');
-      if (id) {
-        setPersonneId(id);
-      }
-    }, []); // Ce useEffect se lance une seule fois au montage du composant
+
+  console.log(elements);
 
   useEffect(() => {
-    // Récupérer les données de /api/association pour les réservations
+    const id = localStorage.getItem('personneId');
+    if (id) {
+      setPersonneId(id);
+    }
+  }, []);
+
+  useEffect(() => {
     fetch("http://localhost:5222/api/association/news/reservations")
       .then((response) => response.json())
       .then((dataAssociations) => {
-        // Récupérer les événements de /api/element
         fetch("http://localhost:5222/api/element")
           .then((response) => response.json())
           .then((dataElements) => {
-            // Filtrer uniquement les événements de /api/element
+            // Séparer les types de données
             const evenements = dataElements.filter((e) => e.type === "Event");
-            // Fusionner les deux sources de données
-            setElements([...dataAssociations, ...evenements]);
+            const taches = dataElements.filter((e) => e.type === "Task" && !e.estFait); // Filtrer les tâches non faites
+  
+            // Fusionner les données récupérées : événements, réservations, et tâches
+            setElements([
+              ...dataAssociations, // Réservations
+              ...evenements,       // Événements
+              ...taches,           // Tâches non faites
+            ]);
           })
           .catch((error) =>
-            console.error("Erreur lors de la récupération des événements :", error)
+            console.error("Erreur lors de la récupération des éléments:", error)
           );
       })
       .catch((error) =>
-        console.error("Erreur lors de la récupération des associations :", error)
+        console.error("Erreur lors de la récupération des associations:", error)
       );
-  }, [refresh]);
+  }, [refresh, personneId]);
 
-  // Fonction pour formater la date au format YYYY-MM-DD
   const formatDate = (date) => {
     const year = date.getFullYear();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Mois avec un 0 devant si nécessaire
-    const day = date.getDate().toString().padStart(2, "0"); // Jour avec un 0 devant si nécessaire
+    const month = (date.getMonth() + 1).toString().padStart(2, "0");
+    const day = date.getDate().toString().padStart(2, "0");
     return `${year}-${month}-${day}`;
   };
 
   const obtenirClasseDate = ({ date }) => {
-    const dateFormatee = formatDate(date); // Utilisation de formatDate() pour la date locale au format YYYY-MM-DD
-    const jourSemaine = date.getDay(); // 0 = Dimanche, 6 = Samedi
+    const dateFormatee = formatDate(date);
+    const jourSemaine = date.getDay();
     const estWeekend = jourSemaine === 0 || jourSemaine === 6;
 
-    // Vérifier les types d'éléments pour la date sélectionnée
     const contientEvenement = elements.some(
       (element) => element.date === dateFormatee && element.type === "Event"
     );
@@ -68,19 +71,16 @@ function Calendrier() {
       (element) => element.date === dateFormatee && element.type === "Reservation"
     );
 
-    // Vérifier si plusieurs types d'éléments sont présents pour ce jour
     const multipleTypes = [contientEvenement, contientTache, contientReservation].filter(Boolean).length > 1;
 
-    // Appliquer les classes en fonction des conditions
-    if (estWeekend) return "weekend"; // Applique la classe 'weekend' pour les week-ends
-    if (multipleTypes) return "jour-multiple-types"; // Applique la classe 'jour-multiple-types' pour plusieurs types d'éléments
-    if (contientEvenement) return "jour-evenement"; // Applique la classe 'jour-evenement' pour un événement
-    if (contientTache) return "jour-tache"; // Applique la classe 'jour-tache' pour une tâche
-    if (contientReservation) return "jour-reservation"; // Applique la classe 'jour-reservation' pour une réservation
+    if (estWeekend) return "weekend";
+    if (multipleTypes) return "jour-multiple-types";
+    if (contientEvenement) return "jour-evenement";
+    if (contientTache) return "jour-tache";
+    if (contientReservation) return "jour-reservation";
     return null;
   };
 
-  // Récupérer les événements et réservations pour la date sélectionnée
   const evenementsDuJour = elements.filter(
     (element) => formatDate(new Date(element.date)) === formatDate(dateSelectionnee) && element.type === "Event"
   );
@@ -89,13 +89,14 @@ function Calendrier() {
     (element) => formatDate(new Date(element.date)) === formatDate(dateSelectionnee) && element.type === "Reservation"
   );
 
-  // Vérifier si la date sélectionnée est aujourd'hui
+  const tachesDuJour = elements.filter(
+    (element) => formatDate(new Date(element.date)) === formatDate(dateSelectionnee) && element.type === "Task"
+  );
+
   const dateAujourdhui = formatDate(new Date());
   const dateSelectionneeFormat = formatDate(dateSelectionnee);
 
   const titreNotif = dateSelectionneeFormat === dateAujourdhui ? "Aujourd'hui" : dateSelectionneeFormat;
-
-
 
   return (
     <div className="calendrier-container">
@@ -104,18 +105,17 @@ function Calendrier() {
       <Calendar
         onChange={setDateSelectionnee}
         value={dateSelectionnee}
-        tileClassName={obtenirClasseDate} // Appliquer la classe CSS selon le type d'élément
+        tileClassName={obtenirClasseDate}
       />
 
       <div className="ajoutE" onClick={() => setShowForm(!showForm)} > {"Ajouter un evenement"} </div>
-
 
       {/* Affichage des notifications sous le calendrier pour les événements */}
       {evenementsDuJour.length > 0 && (
         <Notif
           titre={titreNotif}
-          notifications={evenementsDuJour} // Utiliser evenementsDuJour ici
-          couleur="#CFEFEC" // Bleu foncé, à ajuster selon besoin
+          notifications={evenementsDuJour}
+          couleur="#CFEFEC"
           task={false}
           resa={false}
           refresh={setRefresh}
@@ -126,8 +126,8 @@ function Calendrier() {
       {reservationsDuJour.length > 0 && evenementsDuJour.length === 0 && (
         <NotifNews
           titre={titreNotif}
-          notifications={reservationsDuJour} // Utiliser reservationsDuJour ici
-          couleur="#FFCCBC" // Couleur spécifique pour les réservations
+          notifications={reservationsDuJour}
+          couleur="#FFCCBC"
           refresh={setRefresh}
         />
       )}
@@ -135,18 +135,29 @@ function Calendrier() {
       {reservationsDuJour.length > 0 && evenementsDuJour.length > 0 && (
         <NotifNews
           titre={""}
-          notifications={reservationsDuJour} // Utiliser reservationsDuJour ici
-          couleur="#FFCCBC" // Couleur spécifique pour les réservations
+          notifications={reservationsDuJour}
+          couleur="#FFCCBC"
           refresh={setRefresh}
         />
       )}
-      
+
+      {/* Affichage des notifications sous le calendrier pour les tâches non faites */}
+      {tachesDuJour.length > 0 && (
+        <Notif
+          titre={titreNotif}
+          notifications={tachesDuJour}
+          couleur="#E8F5E9"  // Couleur spécifique pour les tâches
+          task={true}  // Assurez-vous que task est bien passé à true pour indiquer que ce sont des tâches
+          resa={false}
+          refresh={setRefresh}
+        />
+      )}
 
       {/* Affichage du formulaire d'ajout d'événement si showForm est vrai */}
       {showForm && (
         <FormulaireAjoutElement
           closePopup={() => setShowForm(false)} 
-          dateDonnee={dateSelectionneeFormat} // Passer la date sélectionnée
+          dateDonnee={dateSelectionneeFormat} 
           personneId={personneId} 
           type={"Evenements"} 
           refresh={setRefresh}
