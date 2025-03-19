@@ -124,6 +124,38 @@ namespace tktech_bdd.Migrations
                     b.ToTable("Recurrences");
                 });
 
+            modelBuilder.Entity("tktech_bdd.Model.Score", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NbElementsAchetes")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NbEvenementsCree")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NbEvenementsParticipe")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NbProblemesAnnonces")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NbReservations")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NbTaches")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PersonneId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Scores");
+                });
+
             modelBuilder.Entity("tktech_bdd.Model.Association", b =>
                 {
                     b.HasOne("tktech_bdd.Model.Element", "Element")

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace tktech_bdd.Migrations
 {
     [DbContext(typeof(ProjetContext))]
-    [Migration("20250212165959_InitialCreate")]
-    partial class InitialCreate
+    [Migration("20250319155344_AddScoreTable")]
+    partial class AddScoreTable
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -125,6 +125,38 @@ namespace tktech_bdd.Migrations
                     b.HasIndex("ElementId");
 
                     b.ToTable("Recurrences");
+                });
+
+            modelBuilder.Entity("tktech_bdd.Model.Score", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NbElementsAchetes")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NbEvenementsCree")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NbEvenementsParticipe")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NbProblemesAnnonces")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NbReservations")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("NbTaches")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("PersonneId")
+                        .HasColumnType("INTEGER");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Scores");
                 });
 
             modelBuilder.Entity("tktech_bdd.Model.Association", b =>

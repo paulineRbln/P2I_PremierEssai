@@ -47,6 +47,45 @@ namespace tktech_bdd.Data
             context.Personnes.AddRange(personnePauline, personneMartin, personneStephane);
             context.SaveChanges();  // Sauvegarder pour s'assurer que les Personnes ont des Id
 
+            // Création d'un Score pour chaque personne ajoutée
+            var scorePauline = new Score
+            {
+                Id = personnePauline.Id,
+                PersonneId = personnePauline.Id, // Lier le score à la personne
+                NbTaches = 0,
+                NbEvenementsCree = 0,
+                NbEvenementsParticipe = 0,
+                NbReservations = 0,
+                NbProblemesAnnonces = 0,
+                NbElementsAchetes = 0
+            };
+            var scoreMartin = new Score
+            {
+                Id = personneMartin.Id,
+                PersonneId = personneMartin.Id, // Lier le score à la personne
+                NbTaches = 0,
+                NbEvenementsCree = 0,
+                NbEvenementsParticipe = 0,
+                NbReservations = 0,
+                NbProblemesAnnonces = 0,
+                NbElementsAchetes = 0
+            };
+            var scoreStephane = new Score
+            {
+                Id = personneStephane.Id,
+                PersonneId = personneStephane.Id, // Lier le score à la personne
+                NbTaches = 0,
+                NbEvenementsCree = 0,
+                NbEvenementsParticipe = 0,
+                NbReservations = 0,
+                NbProblemesAnnonces = 0,
+                NbElementsAchetes = 0
+            };
+
+            // Ajouter les scores dans la base de données
+            context.Scores.AddRange(scorePauline, scoreMartin, scoreStephane);
+            context.SaveChanges(); // Sauvegarder les scores dans la base de données
+
             // Création des éléments
             var tache1 = new Element
             {

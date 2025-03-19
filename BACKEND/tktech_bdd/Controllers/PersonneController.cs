@@ -73,11 +73,24 @@ public class PersonneController : ControllerBase
         if (personne == null)
             return BadRequest("Les données de la personne sont invalides.");
 
+        // Ajoutez la personne à la base de données
         _context.Personnes.Add(personne);
         await _context.SaveChangesAsync();
 
+        // Créez un Score pour cette nouvelle personne
+        var score = new Score
+        {
+            PersonneId = personne.Id // Lier le score à la personne en utilisant son ID
+        };
+
+        // Ajoutez le score à la base de données
+        _context.Scores.Add(score);
+        await _context.SaveChangesAsync();
+
+        // Retourner l'objet personne après la création
         return CreatedAtAction(nameof(GetPersonneById), new { id = personne.Id }, personne);
     }
+
 
     // PUT: api/personne/{id}
     [SwaggerOperation(
@@ -131,6 +144,13 @@ public class PersonneController : ControllerBase
 
         if (personne == null)
             return NotFound();
+
+        // Supprimer le score associé à cette personne
+        var score = await _context.Scores.FirstOrDefaultAsync(s => s.PersonneId == id);
+        if (score != null)
+        {
+            _context.Scores.Remove(score);
+        }
 
         // Supprimer toutes les associations liées à cette personne
         var associations = await _context.Associations

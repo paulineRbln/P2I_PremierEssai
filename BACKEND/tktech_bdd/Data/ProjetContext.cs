@@ -8,6 +8,7 @@ public class ProjetContext : DbContext
     public DbSet<Recurrence> Recurrences { get; set; } = null!;
     public DbSet<Element> Elements { get; set; } = null!;
     public DbSet<Association> Associations { get; set; } = null!;
+    public DbSet<Score>  Scores{ get; set; } = null!;
 
     public string DbPath { get; private set; }
 

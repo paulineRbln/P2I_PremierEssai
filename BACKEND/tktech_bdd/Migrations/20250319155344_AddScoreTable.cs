@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace tktech_bdd.Migrations
 {
     /// <inheritdoc />
-    public partial class InitialCreate : Migration
+    public partial class AddScoreTable : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -44,6 +44,25 @@ namespace tktech_bdd.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Personnes", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Scores",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "INTEGER", nullable: false)
+                        .Annotation("Sqlite:Autoincrement", true),
+                    PersonneId = table.Column<int>(type: "INTEGER", nullable: false),
+                    NbTaches = table.Column<int>(type: "INTEGER", nullable: false),
+                    NbEvenementsCree = table.Column<int>(type: "INTEGER", nullable: false),
+                    NbEvenementsParticipe = table.Column<int>(type: "INTEGER", nullable: false),
+                    NbReservations = table.Column<int>(type: "INTEGER", nullable: false),
+                    NbProblemesAnnonces = table.Column<int>(type: "INTEGER", nullable: false),
+                    NbElementsAchetes = table.Column<int>(type: "INTEGER", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Scores", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -118,6 +137,9 @@ namespace tktech_bdd.Migrations
 
             migrationBuilder.DropTable(
                 name: "Recurrences");
+
+            migrationBuilder.DropTable(
+                name: "Scores");
 
             migrationBuilder.DropTable(
                 name: "Personnes");
