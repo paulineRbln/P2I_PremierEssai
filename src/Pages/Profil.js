@@ -41,6 +41,32 @@ function Profil() {
         setShowForm(true);
     }
 
+    const handleSupprCompte = () => {
+        if (window.confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.")) {
+            // Appeler l'API pour supprimer le compte
+            fetch(`http://localhost:5222/api/personne/${personneId}`, {
+                method: 'DELETE',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Supprimer les informations locales et rediriger vers la page de connexion
+                    localStorage.removeItem('personneId');
+                    localStorage.removeItem('token');
+                    window.location.href = '/connexion';
+                } else {
+                    alert("Erreur lors de la suppression du compte. Veuillez réessayer.");
+                }
+            })
+            .catch(error => {
+                console.error("Erreur de suppression : ", error);
+                alert("Une erreur est survenue. Veuillez réessayer.");
+            });
+        }
+    };
+
     return (
         <div className="page-accueil" style={{ backgroundColor: 'white', minHeight: '100vh', textAlign: 'center' }}>
             <h1>{infoUser && infoUser[0].description}</h1>
@@ -52,6 +78,9 @@ function Profil() {
             <NotifNews titre={"A propos de vous"} notifications={infoUser} couleur={"#ffffff"} />
             <button onClick={handleModifier} className="btn-modif">
             Modifier
+            </button>
+            <button onClick={handleSupprCompte} className="btn-suppr_profil">
+            Supprimer mon compte
             </button>
         </div>
     )

@@ -116,9 +116,9 @@ public class PersonneController : ControllerBase
     // DELETE: api/personne/{id}
     [SwaggerOperation(
         Summary = "Supprimer une personne",
-        Description = "Supprime une personne à partir de son identifiant"
+        Description = "Supprime une personne à partir de son identifiant et toutes ses associations"
     )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Personne supprimée")]
+    [SwaggerResponse(StatusCodes.Status200OK, "Personne et ses associations supprimées")]
     [SwaggerResponse(StatusCodes.Status404NotFound, "Personne non trouvée")]
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeletePersonne(
@@ -126,16 +126,28 @@ public class PersonneController : ControllerBase
             int id
     )
     {
+        // Récupérer la personne à supprimer
         var personne = await _context.Personnes.FindAsync(id);
 
         if (personne == null)
             return NotFound();
 
+        // Supprimer toutes les associations liées à cette personne
+        var associations = await _context.Associations
+            .Where(a => a.PersonneId == id)
+            .ToListAsync();
+
+        _context.Associations.RemoveRange(associations);
+
+        // Supprimer la personne
         _context.Personnes.Remove(personne);
+
+        // Sauvegarder les changements dans la base de données
         await _context.SaveChangesAsync();
 
         return Ok();
     }
+
 
     // POST: api/personne/login
     [HttpPost("login")]

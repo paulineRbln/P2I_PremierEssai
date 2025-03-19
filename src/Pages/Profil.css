@@ -1,3 +1,4 @@
+/* Bouton Déconnexion */
 .btn-deconnexion {
     width: 50%;
     background-color: #ffffff; /* Fond blanc */
@@ -8,17 +9,35 @@
     border: 2px solid #1A237E; /* Bordure bleue */
     border-radius: 10vh; /* Bordure arrondie */
     cursor: pointer;
-    margin-top: 10px;
+    margin: 10px auto; /* Centrer les boutons et ajouter un espacement */
+    display: block; /* S'assurer que le bouton prend toute la largeur disponible */
 }
 
-.btn-modif{
+/* Bouton Modifier */
+.btn-modif {
     width: 30%;
-    background-color: #1A237E; /* Fond blanc */
-    color: #ffffff; /* Texte bleu */
+    background-color: #1A237E; /* Fond bleu */
+    color: #ffffff; /* Texte blanc */
     font-weight: bold;
     padding: 3vw;
     font-size: 1rem;
     border-radius: 10vh; /* Bordure arrondie */
     cursor: pointer;
-    margin-top: 10px;
+    margin: 10px auto; /* Centrer les boutons et ajouter un espacement */
+    display: block; /* S'assurer que le bouton prend toute la largeur disponible */
+}
+
+/* Bouton Supprimer le profil */
+.btn-suppr_profil {
+    width: 50%;
+    background-color: #ffffff; /* Fond blanc */
+    color: red; /* Texte rouge */
+    font-weight: bold;
+    padding: 1.5vw;
+    font-size: 0.8rem;
+    border: 2px solid red; /* Bordure rouge */
+    border-radius: 10vh; /* Bordure arrondie */
+    cursor: pointer;
+    margin: 10px auto; /* Centrer les boutons et ajouter un espacement */
+    display: block; /* S'assurer que le bouton prend toute la largeur disponible */
 }
