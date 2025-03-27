@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import './RectangleAffichage.css'; // Importer le fichier CSS
 import { FormulaireSuppression } from '../GrosElements/Notif';
+import { lienAPIMachine } from '../LienAPI/lienAPI';
 
 export function RectangleAffichage({
   textGras,
@@ -27,7 +28,7 @@ export function RectangleAffichage({
       typeE === "Task" ? "Attribution" :
       "Reservation";
 
-    fetch("http://localhost:5222/api/association", {
+    fetch(`${lienAPIMachine()}/association`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -56,7 +57,7 @@ export function RectangleAffichage({
     }
 
     if (asso) {
-      fetch(`http://localhost:5222/api/association/${asso}`, {
+      fetch(`${lienAPIMachine()}/association/${asso}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       })
@@ -70,7 +71,7 @@ export function RectangleAffichage({
           console.error("Erreur lors de la suppression de l'association:", error);
         });
     } else {
-      fetch(`http://localhost:5222/api/association/personne/${personneId}/element/${elementId}`)
+      fetch(`${lienAPIMachine()}/association/personne/${personneId}/element/${elementId}`)
         .then((response) => response.json())
         .then((data) => {
           if (!data || data.length === 0) return;
@@ -78,7 +79,7 @@ export function RectangleAffichage({
           const associationId = Array.isArray(data) ? data[0]?.id : data.id;
           if (!associationId) return;
 
-          fetch(`http://localhost:5222/api/association/${associationId}`, {
+          fetch(`${lienAPIMachine()}/association/${associationId}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
           })
@@ -105,7 +106,7 @@ export function RectangleAffichage({
     setChecked(newChecked);
 
     // Envoi de la requête PUT pour mettre à jour la propriété estFait de l'élément
-    fetch(`http://localhost:5222/api/element/${elementId}/${newChecked}`, {
+    fetch(`${lienAPIMachine()}/element/${elementId}/${newChecked}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

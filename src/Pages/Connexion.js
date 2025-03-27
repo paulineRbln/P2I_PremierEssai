@@ -1,14 +1,16 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { lienAPIMachine } from "../LienAPI/lienAPI"; // Importer la fonction lienAPIMachine
 import "./Connexion.css"; // Importation du style
 
+// Composant Connexion
 function Connexion() {
   const [pseudo, setPseudo] = useState("");
   const [motDePasse, setMotDePasse] = useState("");
   const [erreur, setErreur] = useState("");
   const navigate = useNavigate();
 
-console.log(localStorage.getItem("token"));
+  console.log(localStorage.getItem("token"));
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -16,7 +18,7 @@ console.log(localStorage.getItem("token"));
     const credentials = { pseudo, motDePasse };
 
     try {
-      const response = await fetch("http://localhost:5222/api/personne/login", {
+      const response = await fetch(`${lienAPIMachine()}/personne/login`, { // Utiliser lienAPIMachine pour l'URL
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
@@ -27,7 +29,7 @@ console.log(localStorage.getItem("token"));
       const data = await response.json();
       localStorage.setItem("token", data.token);
       localStorage.setItem("personneId", data.id);  // L'ID vient de la réponse
-      window.location.href = "/";// Redirection vers l'accueil après connexion
+      window.location.href = "/"; // Redirection vers l'accueil après connexion
 
     } catch (error) {
       setErreur(error.message);
@@ -68,6 +70,7 @@ console.log(localStorage.getItem("token"));
   );
 }
 
+// Composant Inscription
 function Inscription() {
   const [nom, setNom] = useState("");
   const [prenom, setPrenom] = useState("");
@@ -89,7 +92,7 @@ function Inscription() {
     const nouvellePersonne = { id: 0, nom, prenom, pseudo, photoProfil, motDePasse, estProprio };
 
     try {
-      const response = await fetch("http://localhost:5222/api/personne", {
+      const response = await fetch(`${lienAPIMachine()}/personne`, {  // Utiliser lienAPIMachine pour l'URL
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nouvellePersonne),

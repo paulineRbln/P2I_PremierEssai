@@ -5,6 +5,7 @@ import "./Calendrier.css"; // Importer le fichier CSS
 import { Notif } from "../GrosElements/Notif";
 import { NotifNews } from "../GrosElements/Notif"; // Assurez-vous que NotifNews est importé
 import { FormulaireAjoutElement } from '../GrosElements/Notif'; // Importez le formulaire d'ajout d'événement
+import { lienAPIMachine } from "../LienAPI/lienAPI"; // Importer la fonction lienAPIMachine
 
 function Calendrier() {
   const [dateSelectionnee, setDateSelectionnee] = useState(new Date());
@@ -21,10 +22,10 @@ function Calendrier() {
   }, []);
 
   useEffect(() => {
-    fetch("http://localhost:5222/api/association/news/reservations")
+    fetch(`${lienAPIMachine()}/association/news/reservations`)
       .then((response) => response.json())
       .then((dataAssociations) => {
-        fetch("http://localhost:5222/api/element")
+        fetch(`${lienAPIMachine()}/element`)
           .then((response) => response.json())
           .then((dataElements) => {
             // Séparer les types de données
@@ -81,7 +82,6 @@ function Calendrier() {
     if (contientReservation) return "jour-reservation";
     return null;
   };
-  
 
   const evenementsDuJour = elements.filter(
     (element) => formatDate(new Date(element.date)) === formatDate(dateSelectionnee) && element.type === "Event"

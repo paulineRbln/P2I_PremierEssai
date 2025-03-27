@@ -2,6 +2,7 @@ import React, {useState, useEffect} from 'react';
 import { RectangleAjout, RectangleAffichage } from '../PetitsElements/RectangleAffichage';
 import './Notif.css'; // Si tu as des styles supplémentaires
 import {FaTimes} from  'react-icons/fa';
+import { lienAPIMachine } from '../LienAPI/lienAPI';
 
 
 export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
@@ -11,7 +12,7 @@ export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
   // Utiliser useEffect pour récupérer les éléments associés dès que le composant est monté
   useEffect(() => {
     const fetchElementsAssocies = () => {
-      fetch(`http://localhost:5222/api/element/personne/${personneId}`)
+      fetch(`${lienAPIMachine()}/element/personne/${personneId}`)
         .then((response) => response.json())
         .then((data) => setElementsAssocies(data))  // Mettre à jour l'état avec la liste des éléments associés
         .catch((error) => console.error('Erreur lors de la récupération des éléments associés', error));
@@ -149,7 +150,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
     }
 
     try {
-      const response = await fetch(`http://localhost:5222/api/element/${objetId}`, {
+      const response = await fetch(`${lienAPIMachine()}/element/${objetId}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
       });
@@ -195,7 +196,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
       };
   
       try {
-        const response = await fetch("http://localhost:5222/api/association", {
+        const response = await fetch(`${lienAPIMachine()}/association`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(association),
@@ -227,7 +228,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
   
       try {
         // Ajout de l'élément (événement ou tâche) dans la base de données
-        const response = await fetch("http://localhost:5222/api/element", {
+        const response = await fetch(`${lienAPIMachine()}/element`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(nouvelElement),
@@ -249,7 +250,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
         };
   
         // Envoi de l'association après l'ajout de l'élément
-        const associationResponse = await fetch("http://localhost:5222/api/association", {
+        const associationResponse = await fetch(`${lienAPIMachine()}/association`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(association),
@@ -368,7 +369,7 @@ export function FormulaireModifProfil({ closePopup, personneId, refresh }) {
     // Récupérer les informations de l'utilisateur via l'API
     const fetchUserData = async () => {
       try {
-        const response = await fetch(`http://localhost:5222/api/personne/${personneId}`);
+        const response = await fetch(`${lienAPIMachine()}/personne/${personneId}`);
         if (!response.ok) {
           throw new Error("Erreur lors de la récupération des données de l'utilisateur.");
         }
@@ -400,7 +401,7 @@ export function FormulaireModifProfil({ closePopup, personneId, refresh }) {
     };
 
     try {
-      const response = await fetch(`http://localhost:5222/api/personne/${personneId}`, {
+      const response = await fetch(`${lienAPIMachine()}/personne/${personneId}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -503,7 +504,7 @@ export function FormulaireSuppression({ elementId, closeForm, refresh }) {
     setLoading(true);
 
     try {
-      const response = await fetch(`http://localhost:5222/api/element/${elementId}`, {
+      const response = await fetch(`${lienAPIMachine()}/element/${elementId}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

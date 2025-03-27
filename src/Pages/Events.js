@@ -1,7 +1,9 @@
+// Events.js
 import React, { useState, useEffect } from 'react';
 import "./Events.css";
 import { ChoixActions, FormulaireAjoutElement, Notif } from '../GrosElements/Notif'; 
 import { BoutonSwipe } from '../PetitsElements/RectangleAffichage';
+import { lienAPIMachine } from '../LienAPI/lienAPI'; // Importer la fonction lienAPIMachine
 
 function Events() {
   const [popupType, setPopupType] = useState(null); // "Task", "Event" ou null
@@ -20,14 +22,14 @@ function Events() {
   }, []);
 
   useEffect(() => {
-    fetch(`http://localhost:5222/api/element`)
+    fetch(`${lienAPIMachine()}/element`)  // Utiliser lienAPIMachine pour l'URL
       .then(response => response.json())
       .then(data => {
         setEvenements(data.filter(item => item.type === 'Event'));
         setTaches(data.filter(item => item.type === 'Task'));
       })
       .catch(error => console.error('Erreur lors de la récupération des éléments:', error));
-  }, [popupType,pageBouton, refresh]); 
+  }, [popupType, pageBouton, refresh]);
 
   return (
     <div className='page_event' style={{ backgroundColor: 'white', minHeight: '100vh', textAlign: 'center' }}>

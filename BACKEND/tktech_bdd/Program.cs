@@ -37,7 +37,7 @@ builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp", policy =>
     {
-        policy.WithOrigins("http://localhost:3000") // Autoriser les requêtes venant de ton frontend React
+        policy.WithOrigins("http://localhost:3000", "http://192.168.1.43:3000") // Autoriser les requêtes venant de ton frontend React
               .AllowAnyMethod()  // Autoriser toutes les méthodes HTTP (GET, POST, etc.)
               .AllowAnyHeader(); // Autoriser tous les en-têtes
     });
@@ -77,4 +77,4 @@ using (var scope = app.Services.CreateScope())
     SeedData.Initialize(context);  // Passer le ProjetContext à SeedData.Initialize
 }
 
-app.Run();
+app.Run("http://0.0.0.0:5222");
