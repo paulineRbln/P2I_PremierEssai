@@ -58,7 +58,6 @@ function Calendrier() {
   const obtenirClasseDate = ({ date }) => {
     const dateFormatee = formatDate(date);
     const jourSemaine = date.getDay();
-    const estWeekend = jourSemaine === 0 || jourSemaine === 6;
     const estAujourdHui = dateFormatee === formatDate(new Date()); // Vérifie si la date est aujourd'hui
   
     const contientEvenement = elements.some(
@@ -75,7 +74,6 @@ function Calendrier() {
   
     // Appliquer des classes conditionnelles
     if (estAujourdHui) return "jour-aujourdhui"; // Classe spécifique pour le jour actuel
-    if (estWeekend) return "weekend";
     if (multipleTypes) return "jour-multiple-types";
     if (contientEvenement) return "jour-evenement";
     if (contientTache) return "jour-tache";
