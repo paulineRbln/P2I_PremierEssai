@@ -228,5 +228,31 @@ public class ElementController : ControllerBase
 
         // Retourne l'élément mis à jour sous forme de DTO
         return Ok(new ElementDTO(element));
+  }
+
+
+    // Controller pour récupérer les inscrits à un événement
+    [SwaggerOperation(
+        Summary = "Liste des inscrits à un événement",
+        Description = "Retourne la liste des personnes inscrites à un événement spécifique"
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Liste des inscrits trouvée", typeof(IEnumerable<PersonneDTO>))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Aucun inscrit trouvé")]
+    [HttpGet("{id}/inscrits")]
+    public async Task<ActionResult<IEnumerable<PersonneDTO>>> GetInscritsByEventId(int id)
+    {
+        // Rechercher les associations liées à cet événement
+        var inscrits = await _context.Associations
+            .Where(a => a.ElementId == id)  // Filtrer par l'ID de l'événement
+            .Include(a => a.Personne)  // Inclure la personne inscrite
+            .Select(a => new PersonneDTO(a.Personne))  // Convertir la personne en DTO
+            .ToListAsync();
+
+        if (inscrits == null || !inscrits.Any())
+        {
+            return NotFound(); // Retourner 404 si aucune personne n'est inscrite
+        }
+
+        return Ok(inscrits); // Retourner la liste des inscrits
     }
 }

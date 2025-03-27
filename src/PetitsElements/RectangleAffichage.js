@@ -181,6 +181,7 @@ export function RectangleAffichage({
           elementId={elementId}
           closeForm={() => setShowDeleteForm(false)}
           refresh={refresh}
+          event = {typeE === "Event" ? true : false}
         />
       )}
 

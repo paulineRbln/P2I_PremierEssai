@@ -496,8 +496,32 @@ export function FormulaireModifProfil({ closePopup, personneId, refresh }) {
   );
 }
 
-export function FormulaireSuppression({ elementId, closeForm, refresh }) {
+export function FormulaireSuppression({ elementId, closeForm, refresh, event = false }) {
+  const [inscrits, setInscrits] = useState([]); // Liste des inscrits
   const [loading, setLoading] = useState(false); // Gérer l'état de chargement pendant la suppression
+
+  // Récupérer la liste des inscrits à l'événement
+  useEffect(() => {
+    if (event) {
+      const fetchInscrits = async () => {
+        setLoading(true);
+        try {
+          const response = await fetch(`${lienAPIMachine()}/element/${elementId}/inscrits`);
+          if (response.ok) {
+            const data = await response.json();
+            setInscrits(data); // Mettre à jour la liste des inscrits
+          } else {
+            console.error("Erreur lors de la récupération des inscrits.");
+          }
+        } catch (error) {
+          console.error("Erreur de connexion:", error);
+        } finally {
+          setLoading(false);
+        }
+      };
+      fetchInscrits();
+    }
+  }, [elementId, event]);
 
   // Fonction pour supprimer l'élément et ses associations
   const handleDelete = async () => {
@@ -529,7 +553,25 @@ export function FormulaireSuppression({ elementId, closeForm, refresh }) {
     <div className="modal-overlay" onClick={closeForm}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="connexion-container">
-          <h3>Supprimer l'élément ?</h3>
+          <h3>{event ? "" : "Supprimer l'élément ?"}</h3>
+
+          {event && (
+            <div className="inscrits-list">
+              <h4>Liste des inscrits :</h4>
+              {loading ? (
+                <p>Chargement des inscrits...</p>
+              ) : inscrits.length > 0 ? (
+                <ul>
+                  {inscrits.map((inscrit) => (
+                    <li key={inscrit.id}>{inscrit.prenom}</li> // Affiche uniquement le prénom de l'inscrit
+                  ))}
+                </ul>
+              ) : (
+                <p>Aucun inscrit pour cet événement.</p>
+              )}
+            </div>
+          )}
+
           <button
             className="connecter"
             type="button"
