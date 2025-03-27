@@ -36,4 +36,18 @@ namespace tktech_bdd.Dto
         }
 
     }
+
+    public class AssociationElementsDTO
+    {
+        public int ElementId1 { get; set; }
+        public int ElementId2 { get; set; }
+
+        public AssociationElementsDTO() { }
+
+        public AssociationElementsDTO(AssociationElements associationElements)
+        {
+            ElementId1 = associationElements.ElementId1;
+            ElementId2 = associationElements.ElementId2;
+        }
+    }
 }

@@ -51,4 +51,22 @@ namespace tktech_bdd.Model
             }
         }
     }
+
+    public class AssociationElements
+    {
+        public int Id { get; set; }
+        public int ElementId1 { get; set; } // Premier élément
+        public int ElementId2 { get; set; } // Deuxième élément
+        public Element Element1 { get; set; } = null!; // Premier élément (relation)
+        public Element Element2 { get; set; } = null!; // Deuxième élément (relation)
+
+        public AssociationElements() { }
+
+        // Constructeur qui prend un AssociationElementsDTO et initialise les propriétés
+        public AssociationElements(AssociationElementsDTO associationElementsDTO)
+        {
+            ElementId1 = associationElementsDTO.ElementId1;
+            ElementId2 = associationElementsDTO.ElementId2;
+        }
+    }
 }
