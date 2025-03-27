@@ -250,7 +250,7 @@ public class ElementController : ControllerBase
 
         if (inscrits == null || !inscrits.Any())
         {
-            return NotFound(); // Retourner 404 si aucune personne n'est inscrite
+            return Ok(new List<PersonneDTO>()); 
         }
 
         return Ok(inscrits); // Retourner la liste des inscrits

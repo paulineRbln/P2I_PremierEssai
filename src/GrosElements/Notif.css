@@ -89,3 +89,8 @@
     justify-content: center; 
     width: 90%;
   }
+
+  .message_vide {
+    margin: 3vh 8vw 0 8vw;
+    text-align: left; /* Assure que le texte est aligné à gauche */
+  }

@@ -4,7 +4,6 @@ import './Notif.css'; // Si tu as des styles supplémentaires
 import {FaTimes} from  'react-icons/fa';
 import { lienAPIMachine } from '../LienAPI/lienAPI';
 
-
 export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
   const personneId = localStorage.getItem("personneId");  // Récupérer l'ID de la personne connectée
   const [elementsAssocies, setElementsAssocies] = useState([]);  // Liste des éléments associés à la personne
@@ -31,7 +30,7 @@ export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
     return (
       <div className="notif">
         <h3>{titre}</h3>
-        <p>Aucune notification disponible.</p>
+        <p className='message_vide'>Aucune notification disponible.</p>
       </div>
     );
   }
@@ -67,7 +66,6 @@ export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
     </div>
   );
 }
-
 
 
 
@@ -549,6 +547,8 @@ export function FormulaireSuppression({ elementId, closeForm, refresh, event = f
     }
   };
 
+
+
   return (
     <div className="modal-overlay" onClick={closeForm}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
@@ -580,6 +580,7 @@ export function FormulaireSuppression({ elementId, closeForm, refresh, event = f
           >
             {loading ? "Suppression en cours..." : "Supprimer"}
           </button>
+
           <button className="btn-fermer" type="button" onClick={closeForm}>
             <FaTimes className="close-icon" />
           </button>

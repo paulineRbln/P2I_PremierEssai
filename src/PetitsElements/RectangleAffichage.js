@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import './RectangleAffichage.css'; // Importer le fichier CSS
 import { FormulaireSuppression } from '../GrosElements/Notif';
 import { lienAPIMachine } from '../LienAPI/lienAPI';
+import { useNavigate } from "react-router-dom";  // Pour la navigation
 
 export function RectangleAffichage({
   textGras,
@@ -20,6 +21,7 @@ export function RectangleAffichage({
   const [checked, setChecked] = useState(estFait);
   const [associe, setAssocie] = useState(association);
   const [showDeleteForm, setShowDeleteForm] = useState(false);
+  const navigate = useNavigate();  // Pour rediriger l'utilisateur
 
   // Fonction pour gérer l'ajout de l'association
   const handleCheckboxChange = () => {
@@ -47,6 +49,32 @@ export function RectangleAffichage({
       .catch((error) => {
         console.error("Erreur lors de la création de l'association:", error);
       });
+  };
+
+  // Fonction pour vérifier si l'utilisateur est inscrit à l'événement
+  const checkIfUserIsInscribed = (eventId) => {
+    fetch(`${lienAPIMachine()}/element/${eventId}/inscrits`)
+      .then(response => response.json())
+      .then(data => {
+        // Vérifier si l'utilisateur est dans la liste des inscrits
+        const isUserInscribed = data.some((inscrit) => {
+          return String(inscrit.id) === String(personneId);
+        });
+        
+        if (typeE === "Event" && isUserInscribed) {
+          navigate(`/infosEvent/${eventId}`);  // Rediriger vers la page de l'événement
+        } else {
+          openSuppressionForm(eventId);  // Ouvrir le formulaire de suppression si non inscrit
+        }
+      })
+      .catch((error) => {
+        console.error("Erreur de connexion:", error);
+      });
+  };
+
+  // Fonction pour afficher le formulaire de suppression
+  const openSuppressionForm = (eventId) => {
+    setShowDeleteForm(true);  // Afficher le formulaire de suppression
   };
 
   // Fonction pour gérer la suppression de l'association
@@ -101,11 +129,9 @@ export function RectangleAffichage({
 
   // Fonction pour cocher/décocher une tâche et mettre à jour l'état dans la base de données
   const handleEstFaitChange = () => {
-    // Inverser l'état de la case à cocher localement
     const newChecked = !checked;
     setChecked(newChecked);
 
-    // Envoi de la requête PUT pour mettre à jour la propriété estFait de l'élément
     fetch(`${lienAPIMachine()}/element/${elementId}/${newChecked}`, {
       method: "PUT",
       headers: {
@@ -114,26 +140,24 @@ export function RectangleAffichage({
     })
       .then((response) => {
         if (response.ok) {
-          // Mise à jour réussie, rafraîchir l'état
           refresh((prev) => !prev);
         } else {
-          // Si la mise à jour échoue, afficher une erreur
           console.error("Erreur lors de la mise à jour de estFait.");
-          // Rétablir l'état initial si la mise à jour échoue
           setChecked(checked);
         }
       })
       .catch((error) => {
         console.error("Erreur lors de la mise à jour de estFait:", error);
-        // Rétablir l'état initial en cas d'erreur
         setChecked(checked);
       });
   };
 
-  // Fonction pour afficher le formulaire de suppression
+  // Fonction de gestion du clic sur le texte
   const handleDeleteClick = () => {
-    if (!isNotifNews) { // Affiche le formulaire de suppression seulement si ce n'est pas un NotifNews
-      setShowDeleteForm(true);
+    if (typeE === "Event") {
+      checkIfUserIsInscribed(elementId);  // Vérifier si l'utilisateur est inscrit
+    } else {
+      openSuppressionForm(elementId);  // Ouvrir le formulaire si ce n'est pas un événement
     }
   };
 
@@ -155,7 +179,6 @@ export function RectangleAffichage({
         </div>
       </div>
 
-      {/* Bouton pour s'inscrire / s'attribuer une tâche */}
       {!associe && !association && !isNotifNews && (
         <div className="checkbox-button" onClick={handleCheckboxChange}>
           {typeE === "Event"
@@ -166,7 +189,6 @@ export function RectangleAffichage({
         </div>
       )}
 
-      {/* Bouton pour se désister / annuler une réservation */}
       {association && !isNotifNews && (
         <div
           className="checkbox-button_2"
@@ -181,13 +203,13 @@ export function RectangleAffichage({
           elementId={elementId}
           closeForm={() => setShowDeleteForm(false)}
           refresh={refresh}
-          event = {typeE === "Event" ? true : false}
+          event={typeE === "Event"}
         />
       )}
-
     </div>
   );
 }
+
 
 export function RectangleAjout({ texte, couleur, eventOnClic, couleurTxt }) {
   return (
@@ -227,6 +249,27 @@ export function BoutonSwipe({ nom1, nom2, pageBouton, setChangeBouton }) {
         onClick={() => handleClick(nom2)}
       >
         {nom2}
+      </div>
+    </div>
+  );
+}
+
+export function DescriptionEvent({ date, description, listeInscrits }) {
+  return (
+    <div className="description_event">
+      <h3>{date}</h3>
+      <p>{description}</p>
+      <div className="inscrits-list">
+        <h4>Liste des inscrits :</h4>
+        {listeInscrits.length > 0 ? (
+          <ul>
+            {listeInscrits.map((inscrit) => (
+              <li key={inscrit.id}>{inscrit.prenom}</li> // Affiche uniquement le prénom de l'inscrit
+            ))}
+          </ul>
+        ) : (
+          <p>Aucun inscrit pour cet événement.</p>
+        )}
       </div>
     </div>
   );

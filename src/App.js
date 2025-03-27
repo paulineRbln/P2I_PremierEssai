@@ -6,6 +6,7 @@ import Calendrier from './Pages/Calendrier'; // Votre composant Profil
 import Maison from './Pages/Maison'; // Votre composant Profil
 import Menu from './GrosElements/Menu'; // Menu de navigation
 import Profil from './Pages/Profil';
+import InfosEvent from './Pages/InfosEvent';
 import {Connexion, Inscription} from './Pages/Connexion'; // Composant de connexion
 
 function App() {
@@ -24,6 +25,7 @@ function App() {
           <Route path="/events" element={localStorage.getItem("token") ? <Events /> : <Navigate to="/connexion" />} />
           <Route path="/maison" element={localStorage.getItem("token") ? <Maison /> : <Navigate to="/connexion" />} />
           <Route path="/profil" element={localStorage.getItem("token") ? <Profil /> : <Navigate to="/connexion" />} />
+          <Route path="/infosEvent/:eventId" element={localStorage.getItem("token") ? <InfosEvent /> : <Navigate to="/connexion" />} />
         </Routes>
 
         {/* Le menu de navigation, visible sur toutes les pages après la connexion */}

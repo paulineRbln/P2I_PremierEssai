@@ -142,3 +142,21 @@
   text-align: center;         /* Centrer le texte */
   transition: background-color 0.3s ease, color 0.3s ease; /* Transition pour l'effet hover */
 }
+
+
+.description_event{
+  width: 90vw;
+  min-height: 15vh; /* Hauteur minimale de 12% de la hauteur de la fenêtre */
+  height: auto; /* Hauteur s'adapte au contenu */
+  margin: 11px auto;
+  border-radius: 20px;
+  color: #1A237E;
+  background-color: #CFEFEC;
+  padding: 4% 8%;
+  box-sizing: border-box;
+  text-align: left;
+  display: flex;
+  flex-direction: column; /* Changer la direction du flex pour mettre tout en colonne */
+  align-items: flex-start; /* Alignement de texte à gauche */
+  position: relative; /* Permet à l'élément positionné de se placer par rapport à lui */
+}

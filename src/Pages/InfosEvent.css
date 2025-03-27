@@ -1,0 +1,30 @@
+.event-info {
+    background-color: white;
+    min-height: 100vh;
+    margin-bottom: 12vh;
+}
+
+.event-info h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 8vh 8vw 2vh 8vw;
+    color: #1A237E;
+    text-align: left; /* Assure que le texte est aligné à gauche */
+}
+
+
+
+
+.suppr_event {
+    width: 30vw;
+    background-color: white; /* Changer la couleur de fond en blanc */
+    color: #1A237E; /* Couleur du texte en bleu marine */
+    font-weight: bold;
+    padding: 1.2vw;
+    font-size: 1rem;
+    border: 2px solid #1A237E; /* Bordure bleu marine */
+    border-radius: 10vh;
+    cursor: pointer;
+    margin: 0.2vh 8vw 0.2vh 8vw;
+    text-align: center; /* Centrer le texte à l'intérieur du bouton */
+}
