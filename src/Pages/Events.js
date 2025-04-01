@@ -8,7 +8,7 @@ import { lienAPIMachine } from '../LienAPI/lienAPI'; // Importer la fonction lie
 function Events() {
   const [popupType, setPopupType] = useState(null); // "Task", "Event" ou null
   const [personneId, setPersonneId] = useState(localStorage.getItem('personneId'));
-  const [pageBouton, setPageBouton] = useState("Tâches");
+  const [pageBouton, setPageBouton] = useState("Evenements");
   const [refresh, setRefresh] = useState(false);
 
   const [evenements, setEvenements] = useState([]);
@@ -36,14 +36,14 @@ function Events() {
       <h1>Tâches et événements</h1>
 
       <ChoixActions 
-        choix1="Tâche" 
-        choix2="Event" 
+        choix1="Event" 
+        choix2="Tâche" 
         titre="AJOUTER" 
-        eventOnClic1={() => setPopupType("Tâches")}  
-        eventOnClic2={() => setPopupType("Evenements")}  
+        eventOnClic1={() => setPopupType("Evenements")}  
+        eventOnClic2={() => setPopupType("Tâches")}  
       />
       
-      <BoutonSwipe nom1="Tâches" nom2="Evenements" pageBouton={pageBouton} setChangeBouton={setPageBouton} />
+      <BoutonSwipe nom1="Evenements" nom2="Tâches" pageBouton={pageBouton} setChangeBouton={setPageBouton} />
 
       {popupType && (
         <FormulaireAjoutElement 
