@@ -14,6 +14,7 @@ function InfosEvent() {
   const [notifications, setNotifications] = useState([]);
   const [popupType, setPopupType] = useState(null); // To manage popup type
   const navigate = useNavigate(); // Initialiser navigate
+  const [refresh, setRefresh] = useState(false);
   
   // Récupérer les données de l'événement
   useEffect(() => {
@@ -65,7 +66,9 @@ function InfosEvent() {
     fetchEventData();
     fetchInscrits();
     fetchNotifications();
-  }, [eventId, popupType]); // Recharger les données à chaque changement de eventId
+  }, [eventId, popupType, refresh]); // Recharger les données à chaque changement de eventId
+
+  console.log(notifications, eventId);
 
   if (!eventData) {
     return <p>Chargement des informations de l'événement...</p>;
@@ -120,7 +123,7 @@ function InfosEvent() {
         type="button"
         onClick={openNotificationPopup}
       >
-        Ajouter une notification
+        Envoyer un message
       </button>
 
       {/* Utilisation du composant NotifNews pour afficher les notifications */}
@@ -128,6 +131,7 @@ function InfosEvent() {
         titre="Notifications de l'évènement"
         notifications={notifications}
         couleur="#FFCCBC"
+        refresh={setRefresh}
       />
 
       {/* Render the FormulaireAjoutElement popup for adding a notification */}

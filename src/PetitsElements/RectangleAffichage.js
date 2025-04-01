@@ -161,6 +161,26 @@ export function RectangleAffichage({
     }
   };
 
+  // Fonction pour marquer une notification comme résolue
+  const handleResolveClick = () => {
+    fetch(`${lienAPIMachine()}/element/${elementId}`, {
+      method: "DELETE",
+      headers: {
+        "Content-Type": "application/json",
+      },
+    })
+      .then((response) => {
+        if (response.ok) {
+          refresh((prev) => !prev); // Rafraîchir la liste des notifications
+        } else {
+          console.error("Erreur lors de la suppression de la notification.");
+        }
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la suppression:", error);
+      });
+  };
+
   return (
     <div className="rectangle" style={{ backgroundColor: couleur }}>
       <div className="contener_check">
@@ -196,6 +216,13 @@ export function RectangleAffichage({
         >
           {typeE === "Reservation" ? "Annuler" : "Je me désiste"}
         </div>
+      )}
+
+      {/* Bouton "Résolu" uniquement si typeE est "Notif" */}
+      {typeE === "Notif" &&  (
+        <button className="checkbox-button_2" onClick={handleResolveClick}>
+          Résolu
+        </button>
       )}
 
       {showDeleteForm && (

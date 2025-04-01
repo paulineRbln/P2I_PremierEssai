@@ -56,7 +56,7 @@ export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
             association={resa ? true : isAssocie} 
             typeE={resa ? "Reservation" : notif.type}
             personneId={personneId}
-            elementId={notif.id}
+            elementId={notif.type === "Notif" ? notif.objetId : notif.id}
             isNotifNews={false}
             refresh={refresh}
           />
@@ -69,7 +69,7 @@ export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
 
 
 
-export function NotifNews({ titre, notifications, couleur, resa }) {
+export function NotifNews({ titre, notifications, couleur, resa, refresh }) {
   // Vérifier si la liste notifications est null ou vide
 
   if (notifications === null || notifications.length === 0) {
@@ -92,6 +92,9 @@ export function NotifNews({ titre, notifications, couleur, resa }) {
           couleur={couleur} // Passer la couleur
           association={true}
           isNotifNews={true} // C'est une NotifNews
+          typeE={notif.type}
+          elementId={notif.type === "Notif" ? notif.objetId : notif.id}
+          refresh={refresh}
         />
       ))}
     </div>
@@ -289,9 +292,10 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
         id: 0, // Géré par la BDD
         nom,
         description,
-        type: type === "Evenements" ? "Event" : type === "Objet" ? "Objet" : "Task",
+        type: type === "Evenements" ? "Event" : type === "Objet" ? "Objet" : type === "Notif" ?  "Notif" : "Task",
         estFait: false,
         date: type === "Evenements" ? dateDonnee ? dateDonnee : date : "",
+        associationAUnElement : eventId
       };
   
       try {
@@ -343,11 +347,11 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="connexion-container">
           {descriptionDonnee && (
-            <p className="petit_text"> 
+            <p className="petit_text">
               {descriptionDonnee}
             </p>
           )}
-
+  
           <form onSubmit={handleSubmit}>
             {type === "Mes réservations" && !isProblemReported ? (
               <>
@@ -366,7 +370,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
             ) : (
               <>
                 <div>
-                  <h3>{isProblemReported ? "Type de problème" : "Nom"}</h3>
+                  <h3>{isProblemReported ? "Type de problème" : type === "Notif" ? "Titre de la notification" : `Nouvel${type==="Evenements" ? " évenement" : type==="Objet" ? " objet" : "le tâche"}`}</h3>
                   <input
                     type="text"
                     className="encadre"
@@ -375,9 +379,9 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
                     required
                   />
                 </div>
-
+  
                 <div>
-                  <h3>{isProblemReported ? "Description du problème" : "Description"}</h3>
+                  <h3>{isProblemReported ? "Description du problème" :  type === "Notif" ? "Message" : "Description"}</h3>
                   <textarea
                     className="encadre"
                     value={description}
@@ -387,24 +391,24 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
                 </div>
               </>
             )}
-
+  
             <button className="connecter" type="submit">
               {isProblemReported ? "Signaler" : "Ajouter"}
             </button>
-
+  
             {type === "Tâches" && (
               <button className="connecter_bis" type="button" onClick={handleSubmit}>
                 J'ajoute et je m'y colle
               </button>
             )}
-
+  
             {supression && !isProblemReported && (
               <button className="connecter_bis" type="button" onClick={handleDelete}>
                 Supprimer
               </button>
             )}
           </form>
-
+  
           {type === "Mes réservations" && !isProblemReported && (
             <div>
               <button
@@ -416,14 +420,14 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
               </button>
             </div>
           )}
-
+  
           <button className="btn-fermer" type="button" onClick={closePopup}>
             <FaTimes className="close-icon" />
           </button>
         </div>
       </div>
     </div>
-  );
+  );  
 }
 
 
