@@ -70,6 +70,20 @@
     margin-top: 2vh;
   }
   
+  .btn-signal_pb{
+    width: 70%;
+    background-color: #ffffff; /* Fond blanc */
+    color: red; /* Texte rouge */
+    font-weight: bold;
+    padding: 1.6vw;
+    font-size: 0.8rem;
+    border: 2px solid red; /* Bordure rouge */
+    border-radius: 10vh; /* Bordure arrondie */
+    cursor: pointer;
+    margin: 10px auto; /* Centrer les boutons et ajouter un espacement */
+    display: block; /* S'assurer que le bouton prend toute la largeur disponible */
+  }
+
   .connecter_bis{
     width: 100%;
     background-color: #f0e0e0;

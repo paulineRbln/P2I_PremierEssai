@@ -11,6 +11,7 @@ function PageAccueil() {
   const [personneId, setPersonneId] = useState(localStorage.getItem('personneId'));
   const [refresh, setRefresh] = useState(false);
 
+ 
   useEffect(() => {
     // Lire directement l'ID de la personne depuis le localStorage
     const id = localStorage.getItem('personneId');
@@ -18,7 +19,7 @@ function PageAccueil() {
       setPersonneId(id);
     }
   }, []); // Ce useEffect se lance une seule fois au montage du composant
-
+  
   // Récupérer les tâches à faire de la personne
   useEffect(() => {
     if (personneId) {

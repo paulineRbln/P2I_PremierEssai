@@ -135,6 +135,7 @@ export function ChoixObjet({ listeObjets, eventOnClic, addObjet }) {
 }
 
 
+
 export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonnee, setBouton, objetId, reservations, refresh, supression, descriptionDonnee, eventId }) {
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
@@ -142,6 +143,12 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
     const today = new Date();
     return today.toISOString().split('T')[0]; // Cela renvoie la date sous le format 'yyyy-mm-dd'
   });
+  const [isProblemReported, setIsProblemReported] = useState(false); // État pour savoir si un problème est signalé
+
+  // Gestionnaire pour signaler un problème
+  const handleSignalProblem = () => {
+    setIsProblemReported(true); // Affiche les champs nécessaires pour la notification
+  };
 
   const handleDelete = async () => {
     if (!objetId) {
@@ -176,7 +183,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
       type: "",
     };
   
-    if (type === "Mes réservations") {
+    if (type === "Mes réservations" && !isProblemReported) {
       // Vérifie si une réservation existe déjà pour cet objet à cette date
       const reservationExistante = reservations.some(
         (resa) => resa.objetId === objetId && resa.date === date
@@ -215,7 +222,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
       }
   
       return;
-    } else if (type === "Notif") {
+    } else if (isProblemReported) {
       // Création de la notification (élément de type 'Notif')
       const nouvelleNotification = {
         id: 0, // Géré par la BDD
@@ -224,6 +231,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
         type: "Notif", // Type de l'élément, ici "Notif"
         estFait: false, // Statut de la notification
         date: date, // Date de la notification
+        associationAUnElement : objetId,
       };
 
       // Si un eventId est fourni, ajouter l'attribut AssociationAUnElement
@@ -252,10 +260,8 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
           personneId,  // La personne qui crée la notification
           elementId: notificationData.id,  // L'ID de la notification créée
           type: "EnvoiNotif",  // Type d'association entre la personne et la notification
-          date : date,
+          date: date,
         };
-
-        console.log(association);
 
         // Envoi de l'association avec la notification
         const associationResponse = await fetch(`${lienAPIMachine()}/association`, {
@@ -337,12 +343,13 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="connexion-container">
           {descriptionDonnee && (
-            <p className='petit_text'> 
+            <p className="petit_text"> 
               {descriptionDonnee}
             </p>
           )}
+
           <form onSubmit={handleSubmit}>
-            {type === "Mes réservations" ? (
+            {type === "Mes réservations" && !isProblemReported ? (
               <>
                 <h3>Nouvelle réservation</h3>
                 <div>
@@ -356,32 +363,10 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
                   />
                 </div>
               </>
-            ) : type === "Notif" ? (
-              <>
-                <div>
-                  <h3>Nouvelle notification</h3>
-                  <input
-                    type="text"
-                    className="encadre"
-                    value={nom}
-                    onChange={(e) => setNom(e.target.value)}
-                    required
-                  />
-                </div>
-                <div>
-                  <h3>Description de la notification</h3>
-                  <textarea
-                    className="encadre"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    required
-                  />
-                </div>
-              </>
             ) : (
               <>
                 <div>
-                  <h3>Nouve{type === "Evenements" ? "l événement" : "Objet" ? "l objet" : "lle tâche"}</h3>
+                  <h3>{isProblemReported ? "Type de problème" : "Nom"}</h3>
                   <input
                     type="text"
                     className="encadre"
@@ -390,8 +375,9 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
                     required
                   />
                 </div>
+
                 <div>
-                  <h3>Infos supplémentaires</h3>
+                  <h3>{isProblemReported ? "Description du problème" : "Description"}</h3>
                   <textarea
                     className="encadre"
                     value={description}
@@ -399,23 +385,11 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
                     required
                   />
                 </div>
-                {type === "Evenements" && (
-                  <div>
-                    <h3>Date de l'événement {dateDonnee}</h3>
-                    {!dateDonnee && <input
-                      type="date"
-                      className="encadre"
-                      value={date}
-                      onChange={(e) => setDate(e.target.value)}
-                      required
-                    />}
-                  </div>
-                )}
               </>
             )}
 
             <button className="connecter" type="submit">
-              Ajouter
+              {isProblemReported ? "Signaler" : "Ajouter"}
             </button>
 
             {type === "Tâches" && (
@@ -424,12 +398,24 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
               </button>
             )}
 
-            {supression && (
+            {supression && !isProblemReported && (
               <button className="connecter_bis" type="button" onClick={handleDelete}>
                 Supprimer
               </button>
             )}
           </form>
+
+          {type === "Mes réservations" && !isProblemReported && (
+            <div>
+              <button
+                className="btn-signal_pb"
+                type="button"
+                onClick={handleSignalProblem}
+              >
+                Signaler un problème sur l'objet
+              </button>
+            </div>
+          )}
 
           <button className="btn-fermer" type="button" onClick={closePopup}>
             <FaTimes className="close-icon" />
