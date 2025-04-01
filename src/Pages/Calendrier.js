@@ -57,7 +57,6 @@ function Calendrier() {
 
   const obtenirClasseDate = ({ date }) => {
     const dateFormatee = formatDate(date);
-    const jourSemaine = date.getDay();
     const estAujourdHui = dateFormatee === formatDate(new Date()); // Vérifie si la date est aujourd'hui
   
     const contientEvenement = elements.some(
@@ -108,7 +107,7 @@ function Calendrier() {
         tileClassName={obtenirClasseDate}
       />
 
-      <div className="ajoutE" onClick={() => setShowForm(!showForm)} > {"Ajouter un evenement"} </div>
+      <div className="ajoutE" onClick={() => setShowForm(!showForm)} > {`Ajouter un evenement le ${formatDate(dateSelectionnee)}`} </div>
 
       {/* Affichage des notifications sous le calendrier pour les événements */}
       {evenementsDuJour.length > 0 && (
