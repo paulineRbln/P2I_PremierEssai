@@ -25,10 +25,12 @@ function Connexion() {
       });
 
       if (!response.ok) throw new Error("Identifiants incorrects.");
-
+      
       const data = await response.json();
       localStorage.setItem("token", data.token);
       localStorage.setItem("personneId", data.id);  // L'ID vient de la réponse
+      localStorage.setItem("estProprio", data.estProprio);
+      console.log(data.estProprio);
       window.location.href = "/"; // Redirection vers l'accueil après connexion
 
     } catch (error) {

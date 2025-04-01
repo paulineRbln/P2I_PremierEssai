@@ -8,6 +8,7 @@ namespace tktech_bdd.Dto
         public string Prenom { get; set; } = null!;
         public string Pseudo { get; set; } = null!;
         public string PhotoProfil { get; set; } = null!;
+        public bool EstProprio { get; set; } 
 
 
 
@@ -21,6 +22,7 @@ namespace tktech_bdd.Dto
             Prenom = personne.Prenom;
             Pseudo = personne.Pseudo;
             PhotoProfil = personne.PhotoProfil;
+            EstProprio = personne.EstProprio;
         }
     }
 

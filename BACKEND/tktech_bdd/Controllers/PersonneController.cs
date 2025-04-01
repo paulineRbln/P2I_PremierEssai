@@ -183,7 +183,7 @@ public class PersonneController : ControllerBase
 
         var token = GenerateJwtToken(personne);
 
-        return Ok(new { token, id = personne.Id });    }
+        return Ok(new { token, id = personne.Id, estProprio = personne.EstProprio });    }
 
     private string GenerateJwtToken(Personne personne)
     {

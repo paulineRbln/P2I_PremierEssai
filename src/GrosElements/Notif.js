@@ -75,8 +75,7 @@ export function NotifNews({ titre, notifications, couleur, resa, refresh }) {
   if (notifications === null || notifications.length === 0) {
     return (
       <div className="notif">
-        <h3>{titre}</h3>
-        <p>Aucune news disponible.</p>
+        <h3>{titre}</h3>      
       </div>
     );
   }
@@ -147,6 +146,28 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
     return today.toISOString().split('T')[0]; // Cela renvoie la date sous le format 'yyyy-mm-dd'
   });
   const [isProblemReported, setIsProblemReported] = useState(false); // État pour savoir si un problème est signalé
+  const [notifications, setNotifications] = useState([]);
+  const [refreshForm, setRefreshForm] = useState(false);
+
+  // Fetch des notifications quand l'objetId change
+  useEffect(() => {
+    if (objetId) {
+      const fetchNotifications = async () => {
+        try {
+          const response = await fetch(`${lienAPIMachine()}/association/events/${objetId}/notifications`);
+          if (response.ok) {
+            const data = await response.json();
+            setNotifications(data.sort((a, b) => b.id - a.id)); // Tri par ID décroissant
+          } else {
+            console.error('Erreur lors de la récupération des notifications');
+          }
+        } catch (error) {
+          console.error('Erreur de connexion:', error);
+        }
+      };
+      fetchNotifications();
+    }
+  }, [objetId, refreshForm]); // Exécuter quand objetId change
 
   // Gestionnaire pour signaler un problème
   const handleSignalProblem = () => {
@@ -351,6 +372,13 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
               {descriptionDonnee}
             </p>
           )}
+
+          {type === "Mes réservations" && <NotifNews
+            titre=""
+            notifications={notifications}
+            couleur="#FFCCBC"
+            refresh={setRefreshForm}
+          />}
   
           <form onSubmit={handleSubmit}>
             {type === "Mes réservations" && !isProblemReported ? (

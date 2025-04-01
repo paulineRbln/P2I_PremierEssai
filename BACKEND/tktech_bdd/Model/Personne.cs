@@ -33,6 +33,7 @@ namespace tktech_bdd.Model
             Prenom = personneDTO.Prenom;
             Pseudo = personneDTO.Pseudo;
             PhotoProfil = personneDTO.PhotoProfil;
+            EstProprio = personneDTO.EstProprio;
         }
     }
 }
