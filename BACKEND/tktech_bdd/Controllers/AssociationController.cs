@@ -216,8 +216,7 @@ namespace tktech_bdd.Controllers
 
             // Récupérer les autres associations (inscriptions, réservations) pour les événements où la personne est inscrite
             var otherNews = await _context.Associations
-                .Where(a => (evenementsPersonne.Contains(a.ElementId) && a.Type == TypeAssociation.Inscription && a.PersonneId != personneId) // Exclure les événements où la personne est inscrite
-                            || (a.Type == TypeAssociation.Reservation && a.PersonneId != personneId)) 
+                .Where(a => evenementsPersonne.Contains(a.ElementId) && a.Type == TypeAssociation.Inscription && a.PersonneId != personneId) // Exclure les événements où la personne est inscrite
                 .Where(a => a.Date >= today)
                 .Include(a => a.Personne)  // Inclure les informations de la personne
                 .Include(a => a.Element)   // Inclure les informations de l'élément (événement)

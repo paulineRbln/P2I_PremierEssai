@@ -7,7 +7,7 @@ import Maison from './Pages/Maison'; // Votre composant Profil
 import Menu from './GrosElements/Menu'; // Menu de navigation
 import Profil from './Pages/Profil';
 import InfosEvent from './Pages/InfosEvent';
-import Proprietaire from './Pages/Proprietaire';
+import {Proprietaire} from './Pages/Proprietaire';
 import { Connexion, Inscription } from './Pages/Connexion'; // Composant de connexion
 
 function App() {
@@ -19,26 +19,26 @@ function App() {
       <div className="App">
         <Routes>
           {/* Route pour la page de connexion */}
-          <Route path="/connexion" element={!token ? <Connexion /> : <Navigate to="/" />} />
-          <Route path="/inscription" element={!token ? <Inscription /> : <Navigate to="/" />} />
+          <Route path="/connexion" element={!token ? (<Connexion />) : !estProprio ? (<Navigate to="/" />) : (<Navigate to="/proprietaire" />)}/>
+          <Route path="/inscription" element={!token ? (<Inscription />) : !estProprio ? (<Navigate to="/" />) : (<Navigate to="/proprietaire" />)} />
 
           {/* Routes protégées : si l'utilisateur n'est pas authentifié, redirection vers /connexion */}
-          <Route path="/" element={token && !estProprio ? <PageAccueil /> : <Navigate to="/proprio" />} />
-          <Route path="/calendrier" element={token && !estProprio ? <Calendrier /> : <Navigate to="/proprio" />} />
-          <Route path="/events" element={token && !estProprio ? <Events /> : <Navigate to="/proprio" />} />
-          <Route path="/maison" element={token && !estProprio ? <Maison /> : <Navigate to="/proprio" />} />
-          <Route path="/profil" element={token && !estProprio ? <Profil /> : <Navigate to="/proprio" />} />
-          <Route path="/infosEvent/:eventId" element={token && !estProprio ? <InfosEvent /> : <Navigate to="/proprio" />} />
+          <Route path="/" element={token && !estProprio ? <PageAccueil /> : <Navigate to="/connexion" />} />
+          <Route path="/calendrier" element={token && !estProprio ? <Calendrier /> : <Navigate to="/connexion" />} />
+          <Route path="/events" element={token && !estProprio ? <Events /> : <Navigate to="/connexion" />} />
+          <Route path="/maison" element={token && !estProprio ? <Maison /> : <Navigate to="/connexion" />} />
+          <Route path="/profil" element={token ? <Profil /> : <Navigate to="/connexion" />} />
+          <Route path="/infosEvent/:eventId" element={token && !estProprio ? <InfosEvent /> : <Navigate to="/connexion" />} />
 
           {/* Page réservée aux propriétaires */}
-          <Route path="/proprio" element={token && estProprio ? <Proprietaire /> : <Navigate to="/" />} />
+          <Route path="/proprietaire" element={token && estProprio ? <Proprietaire /> : <Navigate to="/connexion" />} />
           
           {/* Rediriger vers la page d'accueil si la route n'existe pas */}
-          <Route path="*" element={<Navigate to="/" />} />
+          <Route path="*" element={!estProprio ? (<Navigate to="/" />) : (<Navigate to="/proprietaire" />)} />
         </Routes>
 
         {/* Le menu de navigation, visible sur toutes les pages après la connexion */}
-        {token && !estProprio && <Menu />}
+        {token  && <Menu />}
       </div>
     </Router>
   );

@@ -1,0 +1,7 @@
+.page_proprietaire h1 {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin: 8vh 8vw 2vh 8vw;
+    color: #1A237E;
+    text-align: left; /* Assure que le texte est aligné à gauche */
+}
