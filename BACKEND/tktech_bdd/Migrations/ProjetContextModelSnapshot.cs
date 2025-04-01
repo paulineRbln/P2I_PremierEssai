@@ -43,37 +43,13 @@ namespace tktech_bdd.Migrations
                     b.ToTable("Associations");
                 });
 
-            modelBuilder.Entity("tktech_bdd.Model.AssociationElements", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Element1Id")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("Element2Id")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ElementId1")
-                        .HasColumnType("INTEGER");
-
-                    b.Property<int>("ElementId2")
-                        .HasColumnType("INTEGER");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("Element1Id");
-
-                    b.HasIndex("Element2Id");
-
-                    b.ToTable("AssociationsElements");
-                });
-
             modelBuilder.Entity("tktech_bdd.Model.Element", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("AssociationAUnElement")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("Date")
@@ -200,25 +176,6 @@ namespace tktech_bdd.Migrations
                     b.Navigation("Element");
 
                     b.Navigation("Personne");
-                });
-
-            modelBuilder.Entity("tktech_bdd.Model.AssociationElements", b =>
-                {
-                    b.HasOne("tktech_bdd.Model.Element", "Element1")
-                        .WithMany()
-                        .HasForeignKey("Element1Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("tktech_bdd.Model.Element", "Element2")
-                        .WithMany()
-                        .HasForeignKey("Element2Id")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Element1");
-
-                    b.Navigation("Element2");
                 });
 
             modelBuilder.Entity("tktech_bdd.Model.Recurrence", b =>

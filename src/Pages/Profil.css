@@ -15,12 +15,12 @@
 
 /* Bouton Modifier */
 .btn-modif {
-    width: 30%;
+    width: 50%;
     background-color: #1A237E; /* Fond bleu */
     color: #ffffff; /* Texte blanc */
     font-weight: bold;
     padding: 3vw;
-    font-size: 1rem;
+    font-size: 0.8rem;
     border-radius: 10vh; /* Bordure arrondie */
     cursor: pointer;
     margin: 10px auto; /* Centrer les boutons et ajouter un espacement */

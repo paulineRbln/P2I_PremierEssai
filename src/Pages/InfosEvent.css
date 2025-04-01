@@ -2,7 +2,12 @@
     background-color: white;
     min-height: 100vh;
     margin-bottom: 12vh;
-}
+    display: flex;
+    flex-direction: column; /* Organise les éléments en colonne */
+    align-items: center; /* Centre les éléments horizontalement */
+    justify-content: flex-start; /* Aligne les éléments au début, vous pouvez ajuster cette propriété si vous souhaitez que tout soit centré verticalement */
+  }
+  
 
 .event-info h1 {
     font-size: 1.5rem;

@@ -10,8 +10,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace tktech_bdd.Migrations
 {
     [DbContext(typeof(ProjetContext))]
-    [Migration("20250319155344_AddScoreTable")]
-    partial class AddScoreTable
+    [Migration("20250401092116_MigrationApresModifDeLaStructure")]
+    partial class MigrationApresModifDeLaStructure
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -50,6 +50,9 @@ namespace tktech_bdd.Migrations
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int?>("AssociationAUnElement")
                         .HasColumnType("INTEGER");
 
                     b.Property<DateTime?>("Date")

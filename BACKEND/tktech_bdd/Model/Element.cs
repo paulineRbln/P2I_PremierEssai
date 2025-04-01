@@ -20,6 +20,7 @@ namespace tktech_bdd.Model
         public List<Association>? ListeAssociations { get; set; }
         public bool EstFait { get; set; }
         public DateTime? Date { get; set; } // DateTime? pour la rendre nullable
+        public int? AssociationAUnElement { get; set; }  // Rendre nullable pour gérer les cas particuliers
 
         public Element() { }
 
@@ -49,24 +50,14 @@ namespace tktech_bdd.Model
             {
                 Date = null; // On assigne null si la date est vide ou nulle
             }
+
+            // Si AssociationAUnElement est spécifié dans le DTO, on l'assigne
+            if (elementDTO.AssociationAUnElement.HasValue)
+            {
+                AssociationAUnElement = elementDTO.AssociationAUnElement.Value;
+            }
         }
     }
 
-    public class AssociationElements
-    {
-        public int Id { get; set; }
-        public int ElementId1 { get; set; } // Premier élément
-        public int ElementId2 { get; set; } // Deuxième élément
-        public Element Element1 { get; set; } = null!; // Premier élément (relation)
-        public Element Element2 { get; set; } = null!; // Deuxième élément (relation)
 
-        public AssociationElements() { }
-
-        // Constructeur qui prend un AssociationElementsDTO et initialise les propriétés
-        public AssociationElements(AssociationElementsDTO associationElementsDTO)
-        {
-            ElementId1 = associationElementsDTO.ElementId1;
-            ElementId2 = associationElementsDTO.ElementId2;
-        }
-    }
 }

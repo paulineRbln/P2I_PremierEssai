@@ -255,4 +255,5 @@ public class ElementController : ControllerBase
 
         return Ok(inscrits); // Retourner la liste des inscrits
     }
+
 }

@@ -82,10 +82,10 @@ namespace tktech_bdd.Dto
             else
             {
                 Id = association.Id;
-                Titre = "Notification";
+                Titre = $"{association.Date?.ToString("yyyy-MM-dd")} : {association.Personne.Prenom} - {association.Element.Nom}";
                 PersonneId = association.PersonneId;
                 ObjetId = association.ElementId;
-                Description = "Détails de la notification non disponibles.";
+                Description = $"{association.Element.Description}";
                 Date = association.Date?.ToString("yyyy-MM-dd") ?? string.Empty;
                 Element = association.Element.Nom;
                 Type = "Notif";

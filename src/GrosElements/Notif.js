@@ -135,11 +135,13 @@ export function ChoixObjet({ listeObjets, eventOnClic, addObjet }) {
 }
 
 
-
-export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonnee, setBouton, objetId, reservations, refresh, supression, descriptionDonnee }) {
+export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonnee, setBouton, objetId, reservations, refresh, supression, descriptionDonnee, eventId }) {
   const [nom, setNom] = useState("");
   const [description, setDescription] = useState("");
-  const [date, setDate] = useState(""); 
+  const [date, setDate] = useState(() => {
+    const today = new Date();
+    return today.toISOString().split('T')[0]; // Cela renvoie la date sous le format 'yyyy-mm-dd'
+  });
 
   const handleDelete = async () => {
     if (!objetId) {
@@ -213,6 +215,68 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
       }
   
       return;
+    } else if (type === "Notif") {
+      // Création de la notification (élément de type 'Notif')
+      const nouvelleNotification = {
+        id: 0, // Géré par la BDD
+        nom,
+        description,
+        type: "Notif", // Type de l'élément, ici "Notif"
+        estFait: false, // Statut de la notification
+        date: date, // Date de la notification
+      };
+
+      // Si un eventId est fourni, ajouter l'attribut AssociationAUnElement
+      if (eventId) {
+        nouvelleNotification.AssociationAUnElement = eventId;
+      }
+
+      try {
+        // Ajout de la notification (élément) dans la base de données
+        const response = await fetch(`${lienAPIMachine()}/element`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(nouvelleNotification),
+        });
+
+        if (!response.ok) {
+          alert("Erreur lors de l'ajout de la notification");
+          return;
+        }
+
+        // Récupérer les données de la notification ajoutée
+        const notificationData = await response.json();
+
+        // Créer l'association entre la notification et la personne
+        association = {
+          personneId,  // La personne qui crée la notification
+          elementId: notificationData.id,  // L'ID de la notification créée
+          type: "EnvoiNotif",  // Type d'association entre la personne et la notification
+          date : date,
+        };
+
+        console.log(association);
+
+        // Envoi de l'association avec la notification
+        const associationResponse = await fetch(`${lienAPIMachine()}/association`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(association),
+        });
+
+        if (!associationResponse.ok) {
+          alert("Erreur lors de la création de l'association de la notification");
+        } else {
+          closePopup();
+          if (setBouton) setBouton(type);
+          if (refresh) refresh((prev) => !prev);
+        }
+      } catch (error) {
+        console.error("Erreur:", error);
+        alert("Une erreur s'est produite");
+      }
+
+      return;
     } else {
       // Création de l'élément (événement ou tâche)
       const nouvelElement = {
@@ -272,11 +336,11 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
     <div className="modal-overlay" onClick={closePopup}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="connexion-container">
-        {descriptionDonnee && (
-              <p className='petit_text'> 
-                {descriptionDonnee}
-              </p>)
-            }
+          {descriptionDonnee && (
+            <p className='petit_text'> 
+              {descriptionDonnee}
+            </p>
+          )}
           <form onSubmit={handleSubmit}>
             {type === "Mes réservations" ? (
               <>
@@ -292,10 +356,32 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
                   />
                 </div>
               </>
+            ) : type === "Notif" ? (
+              <>
+                <div>
+                  <h3>Nouvelle notification</h3>
+                  <input
+                    type="text"
+                    className="encadre"
+                    value={nom}
+                    onChange={(e) => setNom(e.target.value)}
+                    required
+                  />
+                </div>
+                <div>
+                  <h3>Description de la notification</h3>
+                  <textarea
+                    className="encadre"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    required
+                  />
+                </div>
+              </>
             ) : (
               <>
                 <div>
-                  <h3>Nouve{type === "Evenements" ? "l événement" : "Objet" ?  "l objet" : "lle tâche"}</h3>
+                  <h3>Nouve{type === "Evenements" ? "l événement" : "Objet" ? "l objet" : "lle tâche"}</h3>
                   <input
                     type="text"
                     className="encadre"

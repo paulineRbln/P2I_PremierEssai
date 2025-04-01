@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import { useParams } from 'react-router-dom'; // Pour récupérer l'ID de l'événement
 import { lienAPIMachine } from '../LienAPI/lienAPI'; // Importer la fonction lienAPIMachine
-import { Notif } from '../GrosElements/Notif'; // Importer les composants de notifications
+import { NotifNews } from '../GrosElements/Notif'; // Importer le composant NotifNews
 import { DescriptionEvent } from '../PetitsElements/RectangleAffichage'; // Importer le composant de description
 import { useNavigate } from 'react-router-dom'; // Importer useNavigate
+import { FormulaireAjoutElement } from '../GrosElements/Notif'; // Importer FormulaireAjoutElement
 import './InfosEvent.css';
 
 function InfosEvent() {
@@ -11,6 +12,7 @@ function InfosEvent() {
   const [eventData, setEventData] = useState(null);
   const [inscrits, setInscrits] = useState([]);
   const [notifications, setNotifications] = useState([]);
+  const [popupType, setPopupType] = useState(null); // To manage popup type
   const navigate = useNavigate(); // Initialiser navigate
   
   // Récupérer les données de l'événement
@@ -47,10 +49,10 @@ function InfosEvent() {
     // Récupérer les notifications associées à cet événement
     const fetchNotifications = async () => {
       try {
-        const response = await fetch(`${lienAPIMachine()}/association/event/${eventId}`);
+        const response = await fetch(`${lienAPIMachine()}/association/events/${eventId}/notifications`);
         if (response.ok) {
           const data = await response.json();
-          setNotifications(data);
+          setNotifications(data.sort((a, b) => b.id - a.id));
         } else {
           console.error("Erreur lors de la récupération des notifications.");
         }
@@ -63,7 +65,7 @@ function InfosEvent() {
     fetchEventData();
     fetchInscrits();
     fetchNotifications();
-  }, [eventId]); // Recharger les données à chaque changement de eventId
+  }, [eventId, popupType]); // Recharger les données à chaque changement de eventId
 
   if (!eventData) {
     return <p>Chargement des informations de l'événement...</p>;
@@ -89,6 +91,11 @@ function InfosEvent() {
     } 
   };
 
+  // Function to open the notification creation popup
+  const openNotificationPopup = () => {
+    setPopupType('Notif'); // Set the popup type to 'Notif' to show the notification form
+  };
+
   return (
     <div className="event-info">
       <h1>{eventData.nom}</h1>
@@ -107,11 +114,32 @@ function InfosEvent() {
         listeInscrits={inscrits}
       />
 
-      <Notif
-        titre="Notifications de l'événement"
+      {/* Button to add a new notification */}
+      <button
+        className="btn-modif"
+        type="button"
+        onClick={openNotificationPopup}
+      >
+        Ajouter une notification
+      </button>
+
+      {/* Utilisation du composant NotifNews pour afficher les notifications */}
+      <NotifNews
+        titre="Notifications de l'évènement"
         notifications={notifications}
-        couleur="#CFEFEC"
+        couleur="#FFCCBC"
       />
+
+      {/* Render the FormulaireAjoutElement popup for adding a notification */}
+      {popupType && (
+        <FormulaireAjoutElement
+          closePopup={() => setPopupType(null)} 
+          personneId={localStorage.getItem('personneId')} // Assume personneId is stored in localStorage
+          type="Notif" 
+          eventId={eventId} // Pass eventId to associate the notification with the event
+          refresh={() => {}}
+        />
+      )}
     </div>
   );
 }

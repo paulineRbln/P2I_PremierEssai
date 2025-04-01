@@ -223,5 +223,29 @@ namespace tktech_bdd.Controllers
             return Ok(newsDTO); // Retourner toutes les réservations sous forme de NewsDTO
         }
 
+        // GET: api/association/events/{eventId}/notifications
+        [HttpGet("events/{eventId}/notifications")]
+        public async Task<ActionResult<IEnumerable<NewsDTO>>> GetNotificationsByEventId(int eventId)
+        {
+            var notifications = await _context.Elements
+                .Where(e => e.Type == TypeElement.Notif && e.AssociationAUnElement == eventId)  // Filtrer par les éléments de type 'Notif'
+                .ToListAsync();
+
+            if (notifications == null || !notifications.Any())
+            {
+                return Ok(new List<NewsDTO>());
+            }
+
+            var associations = await _context.Associations
+                .Where(a => notifications.Select(n => n.Id).Contains(a.ElementId))  // Filtrer les associations où ElementId correspond aux notifications récupérées
+                .Include(a => a.Personne)  // Inclure la personne associée à l'association
+                .Include(a => a.Element)   // Inclure l'élément de l'association
+                .ToListAsync();
+
+            var newsDTO = associations.Select(a => new NewsDTO(a)).ToList();
+
+            return Ok(newsDTO);
+        }
+
     }
 }

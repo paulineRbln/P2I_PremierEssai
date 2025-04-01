@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace tktech_bdd.Migrations
 {
     /// <inheritdoc />
-    public partial class AddScoreTable : Migration
+    public partial class MigrationApresModifDeLaStructure : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -21,7 +21,8 @@ namespace tktech_bdd.Migrations
                     Description = table.Column<string>(type: "TEXT", nullable: false),
                     Type = table.Column<int>(type: "INTEGER", nullable: false),
                     EstFait = table.Column<bool>(type: "INTEGER", nullable: false),
-                    Date = table.Column<DateTime>(type: "TEXT", nullable: true)
+                    Date = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    AssociationAUnElement = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {

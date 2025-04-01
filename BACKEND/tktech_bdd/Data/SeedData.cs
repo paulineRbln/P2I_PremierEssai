@@ -90,7 +90,7 @@ namespace tktech_bdd.Data
             var tache1 = new Element
             {
                 Nom = "Nettoyage des toilettes",
-                Description = "Simon nettoie les chiottes",
+                Description = "Passer un coup d'aspirateur",
                 Type = TypeElement.Task,
                 EstFait = false,
                 Date = null
