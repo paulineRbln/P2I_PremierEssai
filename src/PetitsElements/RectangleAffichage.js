@@ -172,7 +172,7 @@ export function RectangleAffichage({
             className="checkbox"
           />
         )}
-        <div className="text-content" onClick={handleDeleteClick}>
+        <div className="text-content" onClick={isNotifNews ? null : handleDeleteClick}>
           {date && <p className="date_rect">{date}</p>}
           <h2>{textGras}</h2>
           <p className="petit_text">{textPetit}</p>

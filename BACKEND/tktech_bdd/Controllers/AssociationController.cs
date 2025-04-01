@@ -192,19 +192,49 @@ namespace tktech_bdd.Controllers
                 return Ok(new List<NewsDTO>()); // Retourner un tableau vide si aucune news n'est trouvée
             }
 
-            // Récupérer toutes les inscriptions et réservations pour ces événements, mais exclure ceux où la personne est inscrite
-            var news = await _context.Associations
-                .Where(a => (evenementsPersonne.Contains(a.ElementId) && a.Type == TypeAssociation.Inscription && a.PersonneId != personneId) // Exclure les événements où la personne est inscrite
-                            || (a.Type == TypeAssociation.Reservation && a.PersonneId != personneId)) // Exclure les réservations faites par la personne elle-même
+            // Obtenir la date du jour sans l'heure pour effectuer une comparaison (toutes les notifications de ce jour)
+            var today = DateTime.Today;
+
+            // Récupérer les éléments qui appartiennent aux événements de la personne et qui ont une notification associée pour ce jour
+            var notificationsElements = await _context.Elements
+                .Where(e => e.AssociationAUnElement.HasValue && evenementsPersonne.Contains(e.AssociationAUnElement.Value))
+                .Where(e => e.Date == today) // Filtrer les éléments de notification pour aujourd'hui
+                .Select(e => e.Id)
+                .ToListAsync();
+
+            // Récupérer toutes les associations dont l'ID de l'élément correspond aux notifications récupérées
+            var associations = await _context.Associations
+                .Where(a => notificationsElements.Contains(a.ElementId) // Filtrer les associations dont l'élément correspond aux notifications
+                            && a.PersonneId != personneId // Exclure les associations où la personne est inscrite
+                            && a.Type == TypeAssociation.EnvoiNotif) // Assurer que ce sont des notifications
                 .Include(a => a.Personne)  // Inclure les informations de la personne
                 .Include(a => a.Element)   // Inclure les informations de l'élément (événement)
                 .ToListAsync();
 
             // Mapper les résultats en NewsDTO
-            var newsDTO = news.Select(a => new NewsDTO(a)).ToList();
+            var newsDTO = associations.Select(a => new NewsDTO(a)).ToList();
 
-            return Ok(newsDTO);
+            // Récupérer les autres associations (inscriptions, réservations) pour les événements où la personne est inscrite
+            var otherNews = await _context.Associations
+                .Where(a => (evenementsPersonne.Contains(a.ElementId) && a.Type == TypeAssociation.Inscription && a.PersonneId != personneId) // Exclure les événements où la personne est inscrite
+                            || (a.Type == TypeAssociation.Reservation && a.PersonneId != personneId)) 
+                .Where(a => a.Date >= today)
+                .Include(a => a.Personne)  // Inclure les informations de la personne
+                .Include(a => a.Element)   // Inclure les informations de l'élément (événement)
+                .ToListAsync();
+
+            // Mapper les résultats en NewsDTO
+            var additionalNewsDTO = otherNews.Select(a => new NewsDTO(a)).ToList();
+
+            // Fusionner les deux résultats : notifications du jour et autres notifications/news
+            var allNews = newsDTO.Concat(additionalNewsDTO).ToList();
+
+            // Retourner les résultats
+            return Ok(allNews);
         }
+
+
+
 
         // GET: api/association/reservations
         [HttpGet("news/reservations")]
