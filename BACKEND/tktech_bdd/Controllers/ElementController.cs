@@ -146,11 +146,19 @@ public class ElementController : ControllerBase
             _context.Associations.RemoveRange(associations); // Supprimer toutes les associations
         }
 
+        // Supprimer toutes les associations liées à cet élément
+        var elementsAssocies = await _context.Elements.Where(a => a.AssociationAUnElement== id).ToListAsync();
+        if (elementsAssocies.Any())
+        {
+            _context.Elements.RemoveRange(elementsAssocies); // Supprimer toutes les associations
+        }
+
         // Supprimer l'élément
         _context.Elements.Remove(element);
 
         // Sauvegarder les changements dans la base de données
         await _context.SaveChangesAsync();
+
 
         // Retourner une réponse de succès
         return Ok(new { message = "Élément et associations supprimés avec succès" });
