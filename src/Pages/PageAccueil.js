@@ -17,6 +17,27 @@ function PageAccueil() {
     if (id) {
       setPersonneId(id);
     }
+
+    const deleteOldElements = async () => {
+      console.log("PASSE ICI");
+      try {
+        // Faire une requête DELETE vers l'API de suppression automatique
+        const response = await fetch(`${lienAPIMachine()}/element/deleteOld`, {
+          method: 'DELETE',
+        });
+
+        if (response.ok) {
+          console.log('Événements, attributions et réservations passées supprimées.');
+        } else {
+          console.error('Erreur lors de la suppression des éléments passés');
+        }
+      } catch (error) {
+        console.error('Erreur dans la requête de suppression :', error);
+      }
+    };
+
+    // Appeler la fonction de suppression
+    deleteOldElements();
   }, []); // Ce useEffect se lance une seule fois au montage du composant
 
   // Récupérer les tâches à faire de la personne

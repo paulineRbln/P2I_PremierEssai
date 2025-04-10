@@ -264,4 +264,63 @@ public class ElementController : ControllerBase
         return Ok(inscrits); // Retourner la liste des inscrits
     }
 
+    // DELETE: api/element/deleteOld
+    [SwaggerOperation(
+        Summary = "Supprimer tous les événements, attributions et réservations passés",
+        Description = "Supprime tous les événements, attributions et réservations dont la date est passée"
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Tous les éléments passés ont été supprimés")]
+    [SwaggerResponse(StatusCodes.Status500InternalServerError, "Erreur serveur lors de la suppression")]
+    [HttpDelete("deleteOld")]
+    public async Task<IActionResult> DeleteOldElements()
+    {
+        try
+        {
+            // Récupérer la date actuelle
+            var currentDate = DateTime.Now;
+
+            // Supprimer les événements passés
+            var oldEvents = await _context.Elements
+                .Where(e => e.Type == TypeElement.Event && e.Date < currentDate) // Filtrer les événements passés
+                .ToListAsync();
+
+            if (oldEvents.Any())
+            {
+                _context.Elements.RemoveRange(oldEvents);  // Supprimer les événements passés
+            }
+
+            // Supprimer les attributions passées
+            var oldAttributions = await _context.Associations
+                .Where(a => a.Type == TypeAssociation.Attribution && a.Date < currentDate) // Filtrer les attributions passées
+                .ToListAsync();
+
+            if (oldAttributions.Any())
+            {
+                _context.Associations.RemoveRange(oldAttributions);  // Supprimer les attributions passées
+            }
+
+            // Supprimer les réservations passées
+            var oldReservations = await _context.Associations
+                .Where(a => a.Type == TypeAssociation.Reservation && a.Date < currentDate) // Filtrer les réservations passées
+                .ToListAsync();
+
+            if (oldReservations.Any())
+            {
+                _context.Associations.RemoveRange(oldReservations);  // Supprimer les réservations passées
+            }
+
+            // Sauvegarder les changements dans la base de données
+            await _context.SaveChangesAsync();
+
+            return Ok(new { message = "Tous les événements, attributions et réservations passés ont été supprimés." });
+        }
+        catch (Exception ex)
+        {
+            // Log l'erreur et retourne une erreur serveur
+            Console.Error.WriteLine($"Erreur lors de la suppression des éléments passés: {ex.Message}");
+            return StatusCode(StatusCodes.Status500InternalServerError, "Erreur serveur lors de la suppression.");
+        }
+    }
+
+
 }
