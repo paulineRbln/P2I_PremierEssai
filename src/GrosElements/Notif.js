@@ -711,29 +711,41 @@ export function FormulaireChoixDate({ setDateSelectionnee, closeForm, elementId 
   const [date, setDate] = useState(''); // Stocke la date sélectionnée
   const [message, setMessage] = useState(''); // Message d'erreur ou de confirmation
   const [attributions, setAttributions] = useState([]); // Stocke les attributions récupérées
+  const [attributionsFutures, setAttributionsFutures] = useState([]); // Attributions pour aujourd'hui et après
 
-  // Fonction pour récupérer toutes les attributions
   useEffect(() => {
     fetch(`${lienAPIMachine()}/association/attributions`) // Modifiez cette URL selon votre API
       .then((response) => response.json())
       .then((dataAttributions) => {
-        setAttributions(dataAttributions); // Stockez les attributions récupérées
+        // Formater la date d'aujourd'hui en YYYY-MM-DD
+        const dateAujourdHui = new Date().toISOString().split("T")[0]; 
+  
+        // Filtrer les attributions pour n'afficher que celles de aujourd'hui et après et avec le bon elementId
+        const attributionsFutures = dataAttributions.filter(
+          (attribution) => 
+            attribution.date >= dateAujourdHui && attribution.objetId === elementId
+        );
+
+  
+        // Mettre à jour les états avec toutes les attributions et celles futures filtrées
+        setAttributions(dataAttributions); 
+        setAttributionsFutures(attributionsFutures); 
       })
       .catch((error) => {
         console.error("Erreur lors de la récupération des attributions:", error);
       });
-  }, []);
+  }, [elementId]); // Le useEffect se recharge quand elementId change
+  
 
-  // Fonction pour définir la date sélectionnée et fermer le formulaire
   const handleChoisir = () => {
     // Vérifier si une attribution existe pour cette date et cet ElementId
     const attributionExistante = attributions.find(
-      (attribution) => attribution.date === date && attribution.elementId === elementId
+      (attribution) => attribution.date === date && attribution.objetId === elementId
     );
 
     if (attributionExistante) {
-      // Si une attribution existe, affichez le message
-      setMessage(`${attributionExistante.description}`);
+      // Si une attribution existe déjà pour cette date, afficher un message d'erreur
+      setMessage("Date déjà prise");
     } else {
       // Si aucune attribution n'existe, mettre à jour la date et fermer le formulaire
       setDateSelectionnee(date); // Met à jour la date sélectionnée
@@ -745,13 +757,27 @@ export function FormulaireChoixDate({ setDateSelectionnee, closeForm, elementId 
     <div className="modal-overlay" onClick={closeForm}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="connexion-container">
-          <h3>Pour quand ?</h3>
+          <h2>Pour quand ?</h2>
+
+          {/* Affichage de la liste des attributions futures */}
           <input
             type="date"
             value={date}
             onChange={(e) => setDate(e.target.value)} // Met à jour la date sélectionnée
             className="encadre"
           />
+          {attributionsFutures.length > 0 && (
+            <div className="attributions-futures">
+              <h3>Dates déjà prises</h3>
+              <ul>
+                {attributionsFutures.map((attribution, index) => (
+                  <li key={index}>
+                    {attribution.description}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
           {message && <div className="error-message">{message}</div>} {/* Affiche le message d'erreur */}
           <button
             className="connecter"

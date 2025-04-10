@@ -253,6 +253,7 @@ export function RectangleAffichage({
         <FormulaireChoixDate
           setDateSelectionnee={handleDateSelectionnee}
           closeForm={() => setShowDateForm(false)}
+          elementId={elementId}
         />
       )}
 
