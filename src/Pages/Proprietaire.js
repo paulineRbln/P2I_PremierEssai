@@ -73,7 +73,7 @@ export function Proprietaire() {
     if (objets.length > 0) {
       fetchNotificationsForAllObjects(); // Charger les notifications pour tous les objets au démarrage
     }
-  }, [objets]); // Se déclenche lorsque les objets sont récupérés
+  }, [objets, refresh]); // Se déclenche lorsque les objets sont récupérés
 
   useEffect(() => {
     const fetchNotificationsMessagerie = async () => {
@@ -186,7 +186,7 @@ export function Proprietaire() {
                   closePopup={() => setPopupType2(null)} 
                   personneId={localStorage.getItem('personneId')} // Assume personneId is stored in localStorage
                   type="Notif" 
-                  refresh={() => {}}
+                  refresh={setRefresh}
                 />
               )}
         </>
