@@ -274,7 +274,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
       }
   
       return;
-    } else if (isProblemReported) {
+    } else if (isProblemReported || type === "Notif") {
       // Création de la notification (élément de type 'Notif')
       const nouvelleNotification = {
         id: 0, // Géré par la BDD
@@ -341,12 +341,12 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
         id: 0, // Géré par la BDD
         nom,
         description,
-        type: type === "Evenements" ? "Event" : type === "Objet" ? "Objet" : type === "Notif" ?  "Notif" : "Task",
+        type: type === "Evenements" ? "Event" : type === "Objet" ? "Objet" : type === "Notif" ? "Notif" : "Task",
         estFait: false,
         date: type === "Evenements" ? dateDonnee ? dateDonnee : date : "",
-        associationAUnElement : eventId
+        associationAUnElement: eventId
       };
-  
+    
       try {
         // Ajout de l'élément (événement ou tâche) dans la base de données
         const response = await fetch(`${lienAPIMachine()}/element`, {
@@ -354,41 +354,47 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(nouvelElement),
         });
-  
+    
         if (!response.ok) {
           alert("Erreur lors de l'ajout de l'élément");
           return;
         }
-  
+    
         // Récupérer les données de l'élément ajouté
         const elementData = await response.json();
-  
-        // Mettre à jour l'association avec l'élément créé
-        association = {
-          ...association,
-          elementId: elementData.id,
-          type: type === "Evenements" ? "Inscription" : "Attribution",
-        };
-  
-        // Envoi de l'association après l'ajout de l'élément
-        const associationResponse = await fetch(`${lienAPIMachine()}/association`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(association),
-        });
-  
-        if (!associationResponse.ok) {
-          alert("Erreur lors de la création de l'association");
-        } else {
-          closePopup();
-          if (setBouton) setBouton(type);
-          if (refresh) refresh((prev) => !prev);
+    
+        // Si `nonAssos` est vrai, on ne crée pas l'association
+        if ( type !== "Objet") {
+          // Mettre à jour l'association avec l'élément créé
+          association = {
+            ...association,
+            elementId: elementData.id,
+            type: type === "Evenements" ? "Inscription" : ("Tâches" ? "Attribution" : "EnvoiNotif"),
+          };
+    
+          // Envoi de l'association après l'ajout de l'élément
+          const associationResponse = await fetch(`${lienAPIMachine()}/association`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(association),
+          });
+    
+          if (!associationResponse.ok) {
+            alert("Erreur lors de la création de l'association");
+            return;
+          }
         }
+    
+        // Fermeture du popup et mise à jour des états
+        closePopup();
+        if (setBouton) setBouton(type);
+        if (refresh) refresh((prev) => !prev);
+    
       } catch (error) {
         console.error("Erreur:", error);
         alert("Une erreur s'est produite");
       }
-    }
+    }    
   };
 
   return (
@@ -451,12 +457,6 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
             <button className="connecter" type="submit">
               {isProblemReported ? "Signaler" : "Ajouter"}
             </button>
-  
-            {type === "Tâches" && (
-              <button className="connecter_bis" type="button" onClick={handleSubmit}>
-                J'ajoute et je m'y colle
-              </button>
-            )}
   
             {supression && !isProblemReported && (
               <button className="connecter_bis" type="button" onClick={handleDelete}>

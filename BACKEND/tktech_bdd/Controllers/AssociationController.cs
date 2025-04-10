@@ -276,5 +276,34 @@ namespace tktech_bdd.Controllers
             return Ok(newsDTO);
         }
 
+        // GET: api/association/notifications/notifs-simples
+        [HttpGet("notifications/notifs-simple")]
+        public async Task<ActionResult<IEnumerable<NewsDTO>>> GetNotificationsWithoutElementAssociation()
+        {
+            // Récupérer les éléments de type 'Notif' où 'AssociationAUnElement' est null
+            var notifications = await _context.Elements
+                .Where(e => e.Type == TypeElement.Notif && e.AssociationAUnElement == null)  // Filtrer les éléments de type 'Notif' sans association d'événement
+                .ToListAsync();
+
+            // Si aucune notification n'est trouvée, retourner une liste vide
+            if (notifications == null || !notifications.Any())
+            {
+                return Ok(new List<NewsDTO>());
+            }
+
+            // Récupérer les associations liées aux éléments de type 'Notif'
+            var associations = await _context.Associations
+                .Where(a => notifications.Select(n => n.Id).Contains(a.ElementId))  // Filtrer les associations dont l'ElementId correspond aux notifications
+                .Include(a => a.Personne)  // Inclure la personne associée à l'association
+                .Include(a => a.Element)   // Inclure l'élément (notification) dans l'association
+                .ToListAsync();
+
+            // Convertir les associations récupérées en DTO
+            var newsDTO = associations.Select(a => new NewsDTO(a)).ToList();
+
+            return Ok(newsDTO);  // Retourner les résultats sous forme de liste de NewsDTO
+        }
+
+
     }
 }

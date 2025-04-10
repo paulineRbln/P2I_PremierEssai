@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import "./Proprietaire.css";
-import { NotifNews, NotifNotif, Notif, FormulaireAjoutElement } from "../GrosElements/Notif";
+import { NotifNews, Notif, FormulaireAjoutElement } from "../GrosElements/Notif";
 import { lienAPIMachine } from '../LienAPI/lienAPI';
 import { FcApproval } from "react-icons/fc"; // Importer l'icône de validation
 import { BoutonSwipe } from '../PetitsElements/RectangleAffichage'; // Importer le BoutonSwipe
@@ -78,10 +78,10 @@ export function Proprietaire() {
   useEffect(() => {
     const fetchNotificationsMessagerie = async () => {
       try {
-        const response = await fetch(`${lienAPIMachine()}/element/notifications-simples`); // Nouvelle API backend
+        const response = await fetch(`${lienAPIMachine()}/association/notifications/notifs-simple`); // Nouvelle API backend
         if (response.ok) {
           const data = await response.json();
-          setNotificationsMessagerie(data); // Mettre à jour l'état avec les notifications filtrées
+          setNotificationsMessagerie(data.sort((a, b) => b.id - a.id)); // Mettre à jour l'état avec les notifications filtrées
         } else {
           console.error("Erreur lors de la récupération des notifications de messagerie.");
         }
@@ -174,8 +174,8 @@ export function Proprietaire() {
         Envoyer un message
       </button>
         <div>
-          <NotifNotif
-                  titre="Messagerie"
+          <NotifNews
+                  titre="Messages"
                   notifications={notificationsMessagerie}
                   couleur="#FFCCBC"
                   refresh={setRefresh}
