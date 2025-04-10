@@ -16,6 +16,7 @@ export function RectangleAffichage({
   personneId,
   elementId,
   isNotifNews,
+  pasDeBouton,
   refresh
 }) {
   const [checked, setChecked] = useState(estFait);
@@ -219,7 +220,7 @@ export function RectangleAffichage({
       )}
 
       {/* Bouton "Résolu" uniquement si typeE est "Notif" */}
-      {typeE === "Notif" &&  (
+      {typeE === "Notif"  && !pasDeBouton &&  (
         <button className="checkbox-button_2" onClick={handleResolveClick}>
           Résolu
         </button>

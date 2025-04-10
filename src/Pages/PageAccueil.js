@@ -1,4 +1,3 @@
-// PageAccueil.js
 import React, { useState, useEffect } from 'react';
 import { Notif, NotifNews } from '../GrosElements/Notif';
 import './PageAccueil.css'; // Importer le fichier CSS
@@ -8,10 +7,10 @@ function PageAccueil() {
   const [tachesAFaire, setTachesAFaire] = useState([]);
   const [evenements, setEvenements] = useState([]);
   const [news, setNews] = useState([]);
+  const [notificationsSimples, setNotificationsSimples] = useState([]); // Ajout de l'état pour les notifications simples
   const [personneId, setPersonneId] = useState(localStorage.getItem('personneId'));
   const [refresh, setRefresh] = useState(false);
 
- 
   useEffect(() => {
     // Lire directement l'ID de la personne depuis le localStorage
     const id = localStorage.getItem('personneId');
@@ -19,7 +18,7 @@ function PageAccueil() {
       setPersonneId(id);
     }
   }, []); // Ce useEffect se lance une seule fois au montage du composant
-  
+
   // Récupérer les tâches à faire de la personne
   useEffect(() => {
     if (personneId) {
@@ -67,14 +66,29 @@ function PageAccueil() {
             }
             return false;  // Ne pas inclure cette news si la date est manquante ou invalide
           });
-  
+
           // Mettre à jour l'état avec les news filtrées
           setNews(newsJour);
         })
         .catch(error => console.error('Erreur lors de la récupération des news:', error));
     }
   }, [personneId, refresh]);
-  
+
+  // Récupérer les notifications simples depuis l'API et les ajouter à la liste
+  useEffect(() => {
+    if (personneId) {
+      fetch(`${lienAPIMachine()}/association/notifications/notifs-simple`) // Utilisation de lienAPIMachine pour récupérer les notifications simples
+        .then(response => response.json())
+        .then(data => {
+          // Ajouter les notifications simples à la liste des news
+          setNotificationsSimples(data);
+        })
+        .catch(error => console.error('Erreur lors de la récupération des notifications simples:', error));
+    }
+  }, [personneId, refresh]);
+
+  // Combiner les news et notifications simples dans une seule liste
+  const combinedNotifications = [...news, ...notificationsSimples];
 
   return (
     <div className="page-accueil" style={{ backgroundColor: 'white', minHeight: '100vh', textAlign: 'center' }}>
@@ -97,12 +111,13 @@ function PageAccueil() {
         refresh={setRefresh}
       />
 
-      {/* Affichage des news */}
+      {/* Affichage des news et notifications simples */}
       <NotifNews
         titre="News du jour"
-        notifications={news}
+        notifications={combinedNotifications}  // Affichage des news combinées
         couleur="#FFCCBC"
         refresh={setRefresh}
+        pasDeBouton = {true}
       />
     </div>
   );
