@@ -100,6 +100,36 @@ export function NotifNews({ titre, notifications, couleur, resa, refresh }) {
   );
 }
 
+export function NotifNotif({ titre, notifications, couleur, refresh }) {
+  // Vérifier si la liste notifications est null ou vide
+
+  if (notifications === null || notifications.length === 0) {
+    return (
+      <div className="notif">
+        <h3>{titre}</h3>      
+      </div>
+    );
+  }
+
+  return (
+    <div className="notif">
+      <h3>{titre}</h3>
+      {notifications.map((notif, index) => (
+        <RectangleAffichage
+          key={index}
+          textGras={notif.nom} // Utilisation du titre du DTO
+          textPetit={notif.description} // Utilisation de la description du DTO
+          couleur={couleur} // Passer la couleur
+          isNotifNews={true} // C'est une NotifNews
+          typeE={notif.type}
+          elementId={notif.id}
+          refresh={refresh}
+        />
+      ))}
+    </div>
+  );
+}
+
 export function ChoixActions({choix1, choix2, titre, eventOnClic1, eventOnClic2 }) {
   
   return (
@@ -135,8 +165,6 @@ export function ChoixObjet({ listeObjets, eventOnClic, addObjet }) {
     </div>
   );
 }
-
-
 
 export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonnee, setBouton, objetId, reservations, refresh, supression, descriptionDonnee, eventId }) {
   const [nom, setNom] = useState("");

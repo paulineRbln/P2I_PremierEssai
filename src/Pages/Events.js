@@ -25,8 +25,15 @@ function Events() {
     fetch(`${lienAPIMachine()}/element`)  // Utiliser lienAPIMachine pour l'URL
       .then(response => response.json())
       .then(data => {
-        setEvenements(data.filter(item => item.type === 'Event'));
-        setTaches(data.filter(item => item.type === 'Task'));
+        const evenementsData = data.filter(item => item.type === 'Event');
+        const tachesData = data.filter(item => item.type === 'Task');
+        
+        // Trier les événements et les tâches par ID décroissant
+        evenementsData.sort((a, b) => b.id - a.id);
+        tachesData.sort((a, b) => b.id - a.id);
+        
+        setEvenements(evenementsData);
+        setTaches(tachesData);
       })
       .catch(error => console.error('Erreur lors de la récupération des éléments:', error));
   }, [popupType, pageBouton, refresh]);

@@ -256,4 +256,31 @@ public class ElementController : ControllerBase
         return Ok(inscrits); // Retourner la liste des inscrits
     }
 
+    // GET: api/element/notifications-simples
+    [SwaggerOperation(
+        Summary = "Liste des notifications simples (sans association à un élément)",
+        Description = "Retourne la liste des notifications de type 'Notif' sans association à un élément"
+    )]
+    [SwaggerResponse(StatusCodes.Status200OK, "Liste des notifications trouvée", typeof(IEnumerable<ElementDTO>))]
+    [SwaggerResponse(StatusCodes.Status404NotFound, "Aucune notification trouvée")]
+    [HttpGet("notifications-simples")]
+    public async Task<ActionResult<IEnumerable<ElementDTO>>> GetNotificationsSimples()
+    {
+        var notifications = await _context.Elements
+            .Where(e => e.Type == TypeElement.Notif && (e.AssociationAUnElement == null))
+            .OrderByDescending(e => e.Id)  // Trier par ID décroissant
+            .ToListAsync(); // Récupérer les entités sous forme de liste
+
+        if (notifications == null || !notifications.Any())
+        {
+            return Ok(new List<ElementDTO>()); // Retourner une liste vide si aucune notification n'est trouvée
+        }
+
+        // Convertir les entités en DTO après avoir récupéré les données
+        var notificationsDTO = notifications.Select(e => new ElementDTO(e)).ToList();
+
+        return Ok(notificationsDTO);
+    }
+
+
 }
