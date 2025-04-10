@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './RectangleAffichage.css'; // Importer le fichier CSS
-import { FormulaireSuppression } from '../GrosElements/Notif';
+import { FormulaireSuppression , FormulaireChoixDate} from '../GrosElements/Notif';
 import { lienAPIMachine } from '../LienAPI/lienAPI';
 import { useNavigate } from "react-router-dom";  // Pour la navigation
 
@@ -23,12 +23,51 @@ export function RectangleAffichage({
   const [associe, setAssocie] = useState(association);
   const [showDeleteForm, setShowDeleteForm] = useState(false);
   const navigate = useNavigate();  // Pour rediriger l'utilisateur
+  const [showDateForm, setShowDateForm] = useState(false); // Afficher ou non le formulaire de date
+
+  const handleJeMyColleClick = () => {
+    if (typeE === "Task") {
+      setShowDateForm(true); // Afficher le formulaire de date uniquement pour les tâches
+    } else {
+      handleCheckboxChange(); // Pour les événements, on appelle directement la fonction qui enregistre avec la date d'aujourd'hui
+    }
+  };
+  
+  const handleDateSelectionnee = (date) => {
+    handleCheckboxChangeWithDate(date); // Créer l'association avec cette date
+    setShowDateForm(false); // Fermer le formulaire après sélection
+  };
+
+  const handleCheckboxChangeWithDate = (date) => {
+    const typeAssociation ="Attribution";
+  
+    const dateToSend = date; // Utiliser la date d'aujourd'hui pour les événements
+  
+    fetch(`${lienAPIMachine()}/association`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        personneId,
+        elementId,
+        type: typeAssociation,
+        date: dateToSend, // Envoie la date sélectionnée ou la date d'aujourd'hui
+      }),
+    })
+      .then((response) => {
+        if (response.ok) {
+          setAssocie(true);
+          refresh((prev) => !prev);
+        }
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la création de l'association:", error);
+      });
+  };
 
   // Fonction pour gérer l'ajout de l'association
   const handleCheckboxChange = () => {
     const typeAssociation =
       typeE === "Event" ? "Inscription" :
-      typeE === "Task" ? "Attribution" :
       "Reservation";
 
     fetch(`${lienAPIMachine()}/association`, {
@@ -201,13 +240,20 @@ export function RectangleAffichage({
       </div>
 
       {!associe && !association && !isNotifNews && (
-        <div className="checkbox-button" onClick={handleCheckboxChange}>
-          {typeE === "Event"
-            ? "Je m'inscris"
-            : typeE === "Task"
-            ? "Je m'y colle"
-            : "Réserver"}
+        <div className="checkbox-button" onClick={handleJeMyColleClick}>
+        {typeE === "Event"
+          ? "Je m'inscris"
+          : typeE === "Task"
+          ? "Je m'y colle"
+          : "Réserver"}
         </div>
+      )}
+
+      {typeE === "Task" && showDateForm && (
+        <FormulaireChoixDate
+          setDateSelectionnee={handleDateSelectionnee}
+          closeForm={() => setShowDateForm(false)}
+        />
       )}
 
       {association && !isNotifNews && (

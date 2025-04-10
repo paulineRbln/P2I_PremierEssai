@@ -337,7 +337,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
         const elementData = await response.json();
     
         // Si `nonAssos` est vrai, on ne crée pas l'association
-        if ( type !== "Objet") {
+        if ( type !== "Objet" && type !== "Tâches") {
           // Mettre à jour l'association avec l'élément créé
           association = {
             ...association,
@@ -684,6 +684,43 @@ export function FormulaireSuppression({ elementId, closeForm, refresh, event = f
             disabled={loading} // Désactiver le bouton pendant le chargement
           >
             {loading ? "Suppression en cours..." : "Supprimer"}
+          </button>
+
+          <button className="btn-fermer" type="button" onClick={closeForm}>
+            <FaTimes className="close-icon" />
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export function FormulaireChoixDate({ setDateSelectionnee, closeForm }) {
+  const [date, setDate] = useState(''); // Stocke la date sélectionnée
+
+  // Fonction pour définir la date sélectionnée et fermer le formulaire
+  const handleChoisir = () => {
+    setDateSelectionnee(date); // Met à jour la date sélectionnée
+    closeForm(); // Ferme le formulaire
+  };
+
+  return (
+    <div className="modal-overlay" onClick={closeForm}>
+      <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+        <div className="connexion-container">
+          <h3>Quand ?</h3>
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)} // Met à jour la date sélectionnée
+            className="encadre"
+          />
+          <button
+            className="connecter"
+            onClick={handleChoisir}
+            disabled={!date} // Désactive le bouton si aucune date n'est sélectionnée
+          >
+            Confirmer
           </button>
 
           <button className="btn-fermer" type="button" onClick={closeForm}>
