@@ -25,28 +25,34 @@ function Calendrier() {
     fetch(`${lienAPIMachine()}/association/news/reservations`)
       .then((response) => response.json())
       .then((dataAssociations) => {
-        Promise.all([
-          fetch(`${lienAPIMachine()}/element`).then(res => res.json()),
-          fetch(`${lienAPIMachine()}/element/tasks/attributions/personne/${personneId}`).then(res => res.json())
-        ])
-        .then(([dataElements, dataTachesAttribuees]) => {
-          const evenements = dataElements.filter((e) => e.type === "Event");
-          const taches = dataTachesAttribuees.filter((t) => !t.estFait);
-  
-          setElements([
-            ...dataAssociations,
-            ...evenements,
-            ...taches
-          ]);
-        })
-        .catch((error) =>
-          console.error("Erreur lors de la récupération des éléments:", error)
-        );
+        fetch(`${lienAPIMachine()}/association/attributions`) // Modifier l'URL pour récupérer les attributions
+          .then((response) => response.json())
+          .then((dataAttributions) => {
+            fetch(`${lienAPIMachine()}/element`)
+              .then((response) => response.json())
+              .then((dataElements) => {
+                // Séparer les types de données
+                const evenements = dataElements.filter((e) => e.type === "Event");
+
+                // Fusionner les données récupérées : réservations, événements et attributions
+                setElements([
+                  ...dataAssociations,  // Réservations
+                  ...evenements,        // Événements
+                  ...dataAttributions,  // Attributions
+                ]);
+              })
+              .catch((error) =>
+                console.error("Erreur lors de la récupération des éléments:", error)
+              );
+          })
+          .catch((error) =>
+            console.error("Erreur lors de la récupération des attributions:", error)
+          );
       })
       .catch((error) =>
         console.error("Erreur lors de la récupération des associations:", error)
       );
-  }, [refresh, personneId]);  
+  }, [refresh, personneId, dateSelectionnee, elements]);
 
   const formatDate = (date) => {
     const year = date.getFullYear();
@@ -58,24 +64,24 @@ function Calendrier() {
   const obtenirClasseDate = ({ date }) => {
     const dateFormatee = formatDate(date);
     const estAujourdHui = dateFormatee === formatDate(new Date()); // Vérifie si la date est aujourd'hui
-  
+
     const contientEvenement = elements.some(
       (element) => element.date === dateFormatee && element.type === "Event"
     );
-    const contientTache = elements.some(
-      (element) => element.date === dateFormatee && element.type === "Task"
+    const contientAttribution = elements.some(
+      (element) => element.date === dateFormatee && element.type === "Attribution"
     );
     const contientReservation = elements.some(
       (element) => element.date === dateFormatee && element.type === "Reservation"
     );
-  
-    const multipleTypes = [contientEvenement, contientTache, contientReservation].filter(Boolean).length > 1;
-  
+
+    const multipleTypes = [contientEvenement, contientAttribution, contientReservation].filter(Boolean).length > 1;
+
     // Appliquer des classes conditionnelles
     if (estAujourdHui) return "jour-aujourdhui"; // Classe spécifique pour le jour actuel
     if (multipleTypes) return "jour-multiple-types";
     if (contientEvenement) return "jour-evenement";
-    if (contientTache) return "jour-tache";
+    if (contientAttribution) return "jour-attribution";
     if (contientReservation) return "jour-reservation";
     return null;
   };
@@ -88,8 +94,8 @@ function Calendrier() {
     (element) => formatDate(new Date(element.date)) === formatDate(dateSelectionnee) && element.type === "Reservation"
   );
 
-  const tachesDuJour = elements.filter(
-    (element) => formatDate(new Date(element.date)) === formatDate(dateSelectionnee) && element.type === "Task"
+  const attributionsDuJour = elements.filter(
+    (element) => formatDate(new Date(element.date)) === formatDate(dateSelectionnee) && element.type === "Attribution"
   );
 
   const dateAujourdhui = formatDate(new Date());
@@ -140,13 +146,13 @@ function Calendrier() {
         />
       )}
 
-      {/* Affichage des notifications sous le calendrier pour les tâches non faites */}
-      {tachesDuJour.length > 0 && (
-        <Notif
-          titre={titreNotif}
-          notifications={tachesDuJour}
-          couleur="#E8F5E9"  // Couleur spécifique pour les tâches
-          task={true}  // Assurez-vous que task est bien passé à true pour indiquer que ce sont des tâches
+      {/* Affichage des notifications sous le calendrier pour les attributions */}
+      {attributionsDuJour.length > 0 && (
+        <NotifNews
+          titre={""}
+          notifications={attributionsDuJour}
+          couleur="#E8F5E9"  // Couleur spécifique pour les attributions
+          task={true}  // Gardez 'true' ici pour signaler que ce sont des attributions
           resa={false}
           refresh={setRefresh}
         />

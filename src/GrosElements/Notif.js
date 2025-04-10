@@ -707,13 +707,38 @@ export function FormulaireSuppression({ elementId, closeForm, refresh, event = f
   );
 }
 
-export function FormulaireChoixDate({ setDateSelectionnee, closeForm }) {
+export function FormulaireChoixDate({ setDateSelectionnee, closeForm, elementId }) {
   const [date, setDate] = useState(''); // Stocke la date sélectionnée
+  const [message, setMessage] = useState(''); // Message d'erreur ou de confirmation
+  const [attributions, setAttributions] = useState([]); // Stocke les attributions récupérées
+
+  // Fonction pour récupérer toutes les attributions
+  useEffect(() => {
+    fetch(`${lienAPIMachine()}/association/attributions`) // Modifiez cette URL selon votre API
+      .then((response) => response.json())
+      .then((dataAttributions) => {
+        setAttributions(dataAttributions); // Stockez les attributions récupérées
+      })
+      .catch((error) => {
+        console.error("Erreur lors de la récupération des attributions:", error);
+      });
+  }, []);
 
   // Fonction pour définir la date sélectionnée et fermer le formulaire
   const handleChoisir = () => {
-    setDateSelectionnee(date); // Met à jour la date sélectionnée
-    closeForm(); // Ferme le formulaire
+    // Vérifier si une attribution existe pour cette date et cet ElementId
+    const attributionExistante = attributions.find(
+      (attribution) => attribution.date === date && attribution.elementId === elementId
+    );
+
+    if (attributionExistante) {
+      // Si une attribution existe, affichez le message
+      setMessage(`${attributionExistante.description}`);
+    } else {
+      // Si aucune attribution n'existe, mettre à jour la date et fermer le formulaire
+      setDateSelectionnee(date); // Met à jour la date sélectionnée
+      closeForm(); // Ferme le formulaire
+    }
   };
 
   return (
@@ -727,6 +752,7 @@ export function FormulaireChoixDate({ setDateSelectionnee, closeForm }) {
             onChange={(e) => setDate(e.target.value)} // Met à jour la date sélectionnée
             className="encadre"
           />
+          {message && <div className="error-message">{message}</div>} {/* Affiche le message d'erreur */}
           <button
             className="connecter"
             onClick={handleChoisir}

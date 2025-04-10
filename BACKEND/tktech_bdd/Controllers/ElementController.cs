@@ -256,32 +256,4 @@ public class ElementController : ControllerBase
         return Ok(inscrits); // Retourner la liste des inscrits
     }
 
-    // GET: api/element/tasks/attributions/personne/{personneId}
-    [SwaggerOperation(
-        Summary = "Liste des tâches attribuées à une personne",
-        Description = "Retourne les éléments de type tâche qui sont attribués à une personne spécifique via une association de type 'Attribution'"
-    )]
-    [SwaggerResponse(StatusCodes.Status200OK, "Liste des tâches trouvée", typeof(IEnumerable<ElementDTO>))]
-    [SwaggerResponse(StatusCodes.Status404NotFound, "Aucune tâche attribuée trouvée pour cette personne")]
-    [HttpGet("tasks/attributions/personne/{personneId}")]
-    public async Task<ActionResult<IEnumerable<ElementDTO>>> GetAttributedTasksByPersonneId(
-        [FromRoute] int personneId
-    )
-    {
-        var tasks = await _context.Associations
-            .Where(a => a.PersonneId == personneId && a.Type == TypeAssociation.Attribution)
-            .Include(a => a.Element)
-            .Where(a => a.Element.Type == TypeElement.Task) // Filtrer les éléments de type Task
-            .Select(a => new ElementDTO(a.Element))
-            .ToListAsync();
-
-        if (tasks == null || !tasks.Any())
-        {
-            return Ok(new List<ElementDTO>()); // Retourner un tableau vide si aucune tâche n’est trouvée
-        }
-
-        return Ok(tasks); // Retourner la liste des tâches attribuées sous forme de DTO
-    }
-
-
 }
