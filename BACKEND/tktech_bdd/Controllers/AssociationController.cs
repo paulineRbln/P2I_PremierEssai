@@ -304,6 +304,31 @@ namespace tktech_bdd.Controllers
             return Ok(newsDTO);  // Retourner les résultats sous forme de liste de NewsDTO
         }
 
+        // GET: api/association/attributions/personne/{personneId}
+        [HttpGet("attributions")]
+        public async Task<ActionResult<IEnumerable<NewsDTO>>> GetAttributions()
+        {
+            // Récupérer les associations de type 'Attribution' liées à la personne
+            var associations = await _context.Associations
+                .Where(a => a.Type == TypeAssociation.Attribution )
+                .Include(a => a.Element)   // Inclure l'élément lié (la tâche)
+                .Include(a => a.Personne)  // Inclure la personne (optionnel si nécessaire)
+                .ToListAsync();
+
+            if (associations == null || !associations.Any())
+            {
+                return Ok(new List<NewsDTO>());
+            }
+
+            // Convertir les associations en NewsDTO
+            var newsDTO = associations
+                .Where(a => a.Element?.Type == TypeElement.Task) // S'assurer que c'est bien une tâche
+                .Select(a => new NewsDTO(a)) // Supposant que NewsDTO a un constructeur prenant une Association
+                .ToList();
+
+            return Ok(newsDTO);
+        }
+
 
     }
 }

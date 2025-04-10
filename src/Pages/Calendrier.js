@@ -25,28 +25,28 @@ function Calendrier() {
     fetch(`${lienAPIMachine()}/association/news/reservations`)
       .then((response) => response.json())
       .then((dataAssociations) => {
-        fetch(`${lienAPIMachine()}/element`)
-          .then((response) => response.json())
-          .then((dataElements) => {
-            // Séparer les types de données
-            const evenements = dataElements.filter((e) => e.type === "Event");
-            const taches = dataElements.filter((e) => e.type === "Task" && !e.estFait); // Filtrer les tâches non faites
+        Promise.all([
+          fetch(`${lienAPIMachine()}/element`).then(res => res.json()),
+          fetch(`${lienAPIMachine()}/element/tasks/attributions/personne/${personneId}`).then(res => res.json())
+        ])
+        .then(([dataElements, dataTachesAttribuees]) => {
+          const evenements = dataElements.filter((e) => e.type === "Event");
+          const taches = dataTachesAttribuees.filter((t) => !t.estFait);
   
-            // Fusionner les données récupérées : événements, réservations, et tâches
-            setElements([
-              ...dataAssociations, // Réservations
-              ...evenements,       // Événements
-              ...taches,           // Tâches non faites
-            ]);
-          })
-          .catch((error) =>
-            console.error("Erreur lors de la récupération des éléments:", error)
-          );
+          setElements([
+            ...dataAssociations,
+            ...evenements,
+            ...taches
+          ]);
+        })
+        .catch((error) =>
+          console.error("Erreur lors de la récupération des éléments:", error)
+        );
       })
       .catch((error) =>
         console.error("Erreur lors de la récupération des associations:", error)
       );
-  }, [refresh, personneId]);
+  }, [refresh, personneId]);  
 
   const formatDate = (date) => {
     const year = date.getFullYear();

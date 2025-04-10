@@ -424,6 +424,18 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
                     required
                   />
                 </div>
+                {type === "Evenements" && !dateDonnee && (
+                  <div>
+                    <h3>Date de l'événement</h3>
+                    <input
+                      type="date"
+                      className="encadre"
+                      value={date}
+                      onChange={(e) => setDate(e.target.value)}
+                      required
+                    />
+                  </div>
+                )}
               </>
             )}
   
@@ -708,7 +720,7 @@ export function FormulaireChoixDate({ setDateSelectionnee, closeForm }) {
     <div className="modal-overlay" onClick={closeForm}>
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="connexion-container">
-          <h3>Quand ?</h3>
+          <h3>Pour quand ?</h3>
           <input
             type="date"
             value={date}

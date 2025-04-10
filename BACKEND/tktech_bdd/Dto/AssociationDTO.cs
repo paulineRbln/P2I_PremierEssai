@@ -79,6 +79,17 @@ namespace tktech_bdd.Dto
                 Element = association.Element.Nom;
                 Type = "Reservation";
             }
+            else if (association.Type == TypeAssociation.Attribution)
+            {
+                Id = association.Id;
+                Titre = "Nouvelle attribution";
+                PersonneId = association.PersonneId;
+                ObjetId = association.ElementId;
+                Description = $"{association.Personne.Prenom} se charge de {association.Element.Nom} pour le {association.Date?.ToString("yyyy-MM-dd")}";
+                Date = association.Date?.ToString("yyyy-MM-dd") ?? string.Empty;
+                Element = association.Element.Nom;
+                Type = "Attribution";
+            }
             else
             {
                 Id = association.Id;
