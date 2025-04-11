@@ -185,3 +185,44 @@
   align-items: flex-start;
   position: relative;
 }
+
+/* Style spécifique pour les événements */
+.event-rectangle {
+  padding: 4% 8%; /* Ajuste l'espacement intérieur */
+  background-color: #f0f8ff; /* Couleur de fond claire pour les événements */
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1); /* Ombre légère pour plus de visibilité */
+}
+
+/* Effet au survol des événements (bordure et ombre) */
+.event-rectangle:hover {
+  box-shadow: 0px 6px 15px rgba(0, 0, 0, 0.2); /* Augmenter l'ombre au survol */
+  transform: scale(1.02); /* Léger effet d'agrandissement au survol */
+}
+
+/* Bouton "Voir l'événement" */
+.event-info-button {
+  background-color: transparent; /* Par défaut, transparent */
+  color: #1A237E; /* Texte bleu */
+  font-weight: bold;
+  padding: 1vw 3vw;
+  border-radius: 30px;
+  cursor: pointer;
+  text-align: center;
+  margin-top: 10px;
+  border: 2px solid #1A237E; /* Bordure bleue */
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+}
+
+/* Si l'utilisateur est associé (le bouton devient bleu avec texte blanc) */
+.event-info-button.associe {
+  background-color: #1A237E; /* Fond bleu */
+  color: white; /* Texte blanc */
+  border-color: #1A237E; /* Bordure bleu foncé */
+}
+
+.event-info-button:hover {
+  background-color: #EBACAC; /* Changer la couleur au survol */
+  color: #1A237E; /* Texte bleu au survol */
+  border-color: #EBACAC; /* Bordure rouge clair au survol */
+}
+

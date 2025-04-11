@@ -45,9 +45,7 @@ function PageAccueil() {
           method: 'DELETE',
         });
 
-        if (response.ok) {
-          console.log('Événements, attributions et réservations passées supprimées.');
-        } else {
+        if (!response.ok) {
           console.error('Erreur lors de la suppression des éléments passés');
         }
       } catch (error) {

@@ -79,8 +79,6 @@ function InfosEvent() {
     fetchNotifications();
   }, [eventId, popupType, actualiser]); // Recharger les données lorsque l'ID de l'événement, popupType ou actualiser changent
 
-  console.log(notifications, eventId);
-
   // Affichage si les données de l'événement ne sont pas encore récupérées
   if (!eventData) {
     return <p>Chargement des informations de l'événement...</p>;

@@ -279,7 +279,7 @@ public class ElementController : ControllerBase
     {
         try
         {
-            var currentDate = DateTime.Now;
+            var currentDate =  DateTime.Now.AddDays(-1).Date;
 
             var oldEvents = await _context.Elements
                 .Where(e => e.Type == TypeElement.Event && e.Date < currentDate) // Filtrer les événements passés

@@ -13,6 +13,7 @@ import { useNavigate } from "react-router-dom";  // Pour la navigation
   - DescriptionEvent : Affiche la description d'un événement et la liste des inscrits
 */
 
+
 export function RectangleAffichage({
   textGras,
   textPetit,
@@ -28,27 +29,27 @@ export function RectangleAffichage({
   pasDeBouton,
   refresh
 }) {
-  const [estCoche, setEstCoche] = useState(estFait); // État de la case à cocher (tâche terminée ou non)
-  const [associe, setAssocie] = useState(association); // État de l'association de l'élément
-  const [afficherFormulaireSuppression, setAfficherFormulaireSuppression] = useState(false); // Affichage du formulaire de suppression
-  const navigate = useNavigate(); // Navigation vers d'autres pages
-  const [afficherFormulaireDate, setAfficherFormulaireDate] = useState(false); // Affichage du formulaire de sélection de date
+  const [checked, setChecked] = useState(estFait); // État de la case à cocher (tâche terminée ou non)
+  const [associe, setAssocie] = useState(association); //
+  const [showDeleteForm, setShowDeleteForm] = useState(false);
+  const navigate = useNavigate();  // Pour rediriger l'utilisateur
+  const [showDateForm, setShowDateForm] = useState(false); // Afficher ou non le formulaire de date
 
   const handleJeMyColleClick = () => {
     if (typeE === "Task") {
-      setAfficherFormulaireDate(true); // Afficher le formulaire de date uniquement pour les tâches
+      setShowDateForm(true); // Afficher le formulaire de date uniquement pour les tâches
     } else {
       handleCheckboxChange(); // Pour les événements, on appelle directement la fonction qui enregistre avec la date d'aujourd'hui
     }
   };
   
   const handleDateSelectionnee = (date) => {
-    handleCheckboxChangeAvecDate(date); // Créer l'association avec cette date
-    setAfficherFormulaireDate(false); // Fermer le formulaire après sélection
+    handleCheckboxChangeWithDate(date); // Créer l'association avec cette date
+    setShowDateForm(false); // Fermer le formulaire après sélection
   };
 
-  const handleCheckboxChangeAvecDate = (date) => {
-    const typeAssociation = "Attribution";
+  const handleCheckboxChangeWithDate = (date) => {
+    const typeAssociation ="Attribution";
   
     const dateToSend = date; // Utiliser la date d'aujourd'hui pour les événements
   
@@ -123,7 +124,7 @@ export function RectangleAffichage({
 
   // Fonction pour afficher le formulaire de suppression
   const openSuppressionForm = (eventId) => {
-    setAfficherFormulaireSuppression(true);  // Afficher le formulaire de suppression
+    setShowDeleteForm(true);  // Afficher le formulaire de suppression
   };
 
   // Fonction pour gérer la suppression de l'association
@@ -178,8 +179,8 @@ export function RectangleAffichage({
 
   // Fonction pour cocher/décocher une tâche et mettre à jour l'état dans la base de données
   const handleEstFaitChange = () => {
-    const newChecked = !estCoche;
-    setEstCoche(newChecked);
+    const newChecked = !checked;
+    setChecked(newChecked);
 
     fetch(`${lienAPIMachine()}/element/${elementId}/${newChecked}`, {
       method: "PUT",
@@ -192,12 +193,12 @@ export function RectangleAffichage({
           refresh((prev) => !prev);
         } else {
           console.error("Erreur lors de la mise à jour de estFait.");
-          setEstCoche(estCoche);
+          setChecked(checked);
         }
       })
       .catch((error) => {
         console.error("Erreur lors de la mise à jour de estFait:", error);
-        setEstCoche(estCoche);
+        setChecked(checked);
       });
   };
 
@@ -236,7 +237,7 @@ export function RectangleAffichage({
         {task && association && (
           <input
             type="checkbox"
-            checked={estCoche}
+            checked={checked}
             onChange={handleEstFaitChange}
             className="checkbox"
           />
@@ -247,25 +248,46 @@ export function RectangleAffichage({
           <p className="petit_text">{textPetit}</p>
         </div>
       </div>
-
+  
+      {/* Ajouter un bouton "Je m'inscris" pour les événements non associés */}
       {!associe && !association && !isNotifNews && (
         <div className="checkbox-button" onClick={handleJeMyColleClick}>
-        {typeE === "Event"
-          ? "Je m'inscris"
-          : typeE === "Task"
-          ? "Je m'y colle"
-          : "Réserver"}
+          {typeE === "Event"
+            ? "Je m'inscris"
+            : typeE === "Task"
+            ? "Je m'y colle"
+            : "Réserver"}
         </div>
       )}
-
-      {typeE === "Task" && afficherFormulaireDate && (
+  
+      {typeE === "Task" && showDateForm && (
         <FormulaireChoixDate
           setDateSelectionnee={handleDateSelectionnee}
-          closeForm={() => setAfficherFormulaireDate(false)}
+          closeForm={() => setShowDateForm(false)}
           elementId={elementId}
         />
       )}
+  
+      {/* Ajouter un bouton "Voir l'événement" */}
+      {typeE === "Event" && !isNotifNews && (
+        <div
+          className={`event-info-button ${associe ? "associe" : ""}`} // Ajouter la classe "associe" si l'utilisateur est associé
+          onClick={() => {
+            if (associe) {
+              // Si l'utilisateur est associé, rediriger vers l'événement
+              navigate(`/infosEvent/${elementId}`);
+            } else {
+              // Si l'utilisateur n'est pas associé, afficher le formulaire de suppression
+              openSuppressionForm(elementId);
+            }
+          }}
+        >
+          Voir l'événement
+        </div>
+      )}
 
+  
+      {/* Bouton pour annuler ou se désister d'une tâche ou réservation */}
       {association && !isNotifNews && (
         <div
           className="checkbox-button_2"
@@ -274,29 +296,28 @@ export function RectangleAffichage({
           {typeE === "Reservation" ? "Annuler" : "Je me désiste"}
         </div>
       )}
-
-      {/* Bouton "Résolu" uniquement si typeE est "Notif" */}
-      {typeE === "Notif"  && !pasDeBouton &&  (
+  
+      {/* Bouton "Résolu" pour les notifications */}
+      {typeE === "Notif" && !pasDeBouton && (
         <button className="checkbox-button_2" onClick={handleResolveClick}>
           Résolu
         </button>
       )}
-
-      {afficherFormulaireSuppression && (
+  
+      {/* Formulaire de suppression */}
+      {showDeleteForm && (
         <FormulaireSuppression
           elementId={elementId}
-          closeForm={() => setAfficherFormulaireSuppression(false)}
+          closeForm={() => setShowDeleteForm(false)}
           refresh={refresh}
           event={typeE === "Event"}
         />
       )}
     </div>
-  );
+  );  
 }
 
-// Composant RectangleAjout : 
-// Affiche un bouton avec un texte, une couleur de fond et une couleur de texte personnalisée.
-// Lorsqu'on clique sur le bouton, une fonction est exécutée (eventOnClic).
+
 export function RectangleAjout({ texte, couleur, eventOnClic, couleurTxt }) {
   return (
     <div 
@@ -309,20 +330,16 @@ export function RectangleAjout({ texte, couleur, eventOnClic, couleurTxt }) {
   );
 };
 
-// Composant BoutonSwipe : 
-// Affiche deux boutons et gère la sélection active de l'un ou l'autre.
-// Lorsqu'un bouton est cliqué, il devient actif, et la fonction setChangeBouton est appelée
-// pour notifier le changement de sélection.
 export function BoutonSwipe({ nom1, nom2, pageBouton, setChangeBouton }) {
   const [active, setActive] = useState(pageBouton);
 
   useEffect(() => {
-    setActive(pageBouton); // Met à jour l'état local en fonction de la pageBouton initiale
+    setActive(pageBouton);
   }, [pageBouton]);
 
   const handleClick = (value) => {
     setActive(value); // Met à jour l'état local
-    setChangeBouton(value); // Appelle la fonction passée en prop pour notifier le changement
+    setChangeBouton(value); // Appelle la fonction passée en prop
   };
 
   return (
@@ -344,14 +361,11 @@ export function BoutonSwipe({ nom1, nom2, pageBouton, setChangeBouton }) {
   );
 }
 
-// Composant DescriptionEvent : 
-// Affiche une description d'événement avec sa date et une liste d'inscrits.
-// Si la liste est vide, il affiche un message indiquant qu'il n'y a aucun inscrit.
 export function DescriptionEvent({ date, description, listeInscrits }) {
   return (
     <div className="description_event">
-      <h3>{date}</h3> {/* Affiche la date de l'événement */}
-      <p>{description}</p> {/* Affiche la description de l'événement */}
+      <h3>{date}</h3>
+      <p>{description}</p>
       <div className="inscrits-list">
         <h4>Liste des inscrits :</h4>
         {listeInscrits.length > 0 ? (
@@ -361,7 +375,7 @@ export function DescriptionEvent({ date, description, listeInscrits }) {
             ))}
           </ul>
         ) : (
-          <p>Aucun inscrit pour cet événement.</p> // Affiche un message si aucun inscrit
+          <p>Aucun inscrit pour cet événement.</p>
         )}
       </div>
     </div>
