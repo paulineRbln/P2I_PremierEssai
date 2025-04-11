@@ -25,6 +25,8 @@ namespace tktech_bdd.Dto
         }
     }
 
+    //DTO qui permet de voir facilement l'association entre une personne et un élement (sans les autres informations)
+
     public class EstAssocieDTO
     {
         public int PersonneId { get; set; }
@@ -41,6 +43,10 @@ namespace tktech_bdd.Dto
             ElementId = idE;
             Id = id;        }
     }
+
+    //DTO qui va permettre d'afficher les associations de manière organisée pour le front 
+    //Il permet pour chaque type d'Association de rédiger un message correspondant 
+    //Son appel permet de faire les vignettes dans le front 
 
     public class NewsDTO
     {

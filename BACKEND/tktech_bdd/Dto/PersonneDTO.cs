@@ -26,7 +26,7 @@ namespace tktech_bdd.Dto
         }
     }
 
-    // DTO pour la requête de login
+    // DTO pour la requête de login 
     public class LoginRequest
     {
         public string Pseudo { get; set; }=null!;

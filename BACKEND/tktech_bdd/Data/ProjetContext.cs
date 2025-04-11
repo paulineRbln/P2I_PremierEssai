@@ -16,11 +16,9 @@ public class ProjetContext : DbContext
     public ProjetContext(DbContextOptions<ProjetContext> options)
         : base(options)
     {
-        // Ici, tu peux conserver ou définir ton DbPath si nécessaire
-        DbPath = "tktech.db";  // C'est ici que tu spécifies ton chemin SQLite
+        DbPath = "tktech.db";  // chemin SQLite
     }
 
-    // Méthode OnConfiguring pour définir la configuration SQLite si nécessaire
     protected override void OnConfiguring(DbContextOptionsBuilder options)
     {
         if (!options.IsConfigured) // S'assurer qu'on ne configure pas si ça a déjà été fait ailleurs

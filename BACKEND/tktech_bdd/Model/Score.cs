@@ -6,7 +6,7 @@ namespace tktech_bdd.Model
         public int Id { get; set; }
         public int PersonneId { get; set; }       
         // Les différents scores
-        public int NbTaches { get; set; } // Inversi
+        public int NbTaches { get; set; } // Investi
         public int NbEvenementsCree { get; set; } // Animateur
         public int NbEvenementsParticipe { get; set; } // Festif
         public int NbReservations { get; set; } // Businessman

@@ -12,12 +12,14 @@ public class ElementController : ControllerBase
 {
     private readonly ProjetContext _context;
 
+    // Constructeur du contrôleur, injection du contexte de base de données
     public ElementController(ProjetContext context)
     {
         _context = context;
     }
 
     // GET: api/element
+    // Récupère la liste de tous les éléments
     [SwaggerOperation(
         Summary = "Liste des éléments",
         Description = "Retourne la liste de tous les éléments"
@@ -36,6 +38,7 @@ public class ElementController : ControllerBase
     }
 
     // GET: api/element/{id}
+    // Récupère un élément à partir de son identifiant
     [SwaggerOperation(
         Summary = "Élément grâce à identifiant",
         Description = "Retourne un élément à partir de son identifiant"
@@ -62,6 +65,7 @@ public class ElementController : ControllerBase
     }
 
     // POST: api/element
+    // Ajoute un nouvel élément à la base de données
     [SwaggerOperation(
         Summary = "Ajout d'un nouvel élément",
         Description = "Ajoute un nouvel élément à la base de données"
@@ -83,6 +87,7 @@ public class ElementController : ControllerBase
     }
 
     // PUT: api/element/{id}
+    // Modifie un élément à partir de son identifiant
     [SwaggerOperation(
         Summary = "Modifier un élément",
         Description = "Modifie un élément à partir de son identifiant"
@@ -118,6 +123,7 @@ public class ElementController : ControllerBase
     }
 
     // DELETE: api/element/{id}
+    // Supprime un élément ainsi que toutes ses associations
     [SwaggerOperation(
         Summary = "Supprimer un élément et toutes ses associations",
         Description = "Supprime un élément ainsi que toutes les associations qui lui sont liées"
@@ -135,8 +141,7 @@ public class ElementController : ControllerBase
 
         if (element == null)
         {
-            // Retourne un objet vide si l'élément n'est pas trouvé
-            return NotFound();
+            return NotFound(); // Retourne un 404 si l'élément n'est pas trouvé
         }
 
         // Supprimer toutes les associations liées à cet élément
@@ -147,7 +152,7 @@ public class ElementController : ControllerBase
         }
 
         // Supprimer toutes les associations liées à cet élément
-        var elementsAssocies = await _context.Elements.Where(a => a.AssociationAUnElement== id).ToListAsync();
+        var elementsAssocies = await _context.Elements.Where(a => a.AssociationAUnElement == id).ToListAsync();
         if (elementsAssocies.Any())
         {
             _context.Elements.RemoveRange(elementsAssocies); // Supprimer toutes les associations
@@ -159,13 +164,11 @@ public class ElementController : ControllerBase
         // Sauvegarder les changements dans la base de données
         await _context.SaveChangesAsync();
 
-
-        // Retourner une réponse de succès
         return Ok(new { message = "Élément et associations supprimés avec succès" });
     }
 
-
     // GET: api/element/personne/{personneId}
+    // Récupère la liste des éléments associés à une personne
     [SwaggerOperation(
         Summary = "Liste des éléments associés à une personne",
         Description = "Retourne la liste des éléments qui sont associés à une personne via les associations"
@@ -192,8 +195,8 @@ public class ElementController : ControllerBase
         return Ok(elementsDTO); // Retourner la liste des éléments sous forme de DTO
     }
 
-
     // PUT: api/element/{id}/estFait
+    // Modifie la propriété estFait d'un élément
     [SwaggerOperation(
         Summary = "Modifier la propriété estFait d'un élément",
         Description = "Modifie uniquement la propriété estFait d'un élément à partir de son identifiant"
@@ -234,12 +237,11 @@ public class ElementController : ControllerBase
             }
         }
 
-        // Retourne l'élément mis à jour sous forme de DTO
         return Ok(new ElementDTO(element));
-  }
+    }
 
-
-    // Controller pour récupérer les inscrits à un événement
+    // GET: api/element/{id}/inscrits
+    // Récupère les inscrits à un événement spécifique
     [SwaggerOperation(
         Summary = "Liste des inscrits à un événement",
         Description = "Retourne la liste des personnes inscrites à un événement spécifique"
@@ -258,13 +260,14 @@ public class ElementController : ControllerBase
 
         if (inscrits == null || !inscrits.Any())
         {
-            return Ok(new List<PersonneDTO>()); 
+            return Ok(new List<PersonneDTO>());
         }
 
         return Ok(inscrits); // Retourner la liste des inscrits
     }
 
     // DELETE: api/element/deleteOld
+    // Supprime tous les événements, attributions et réservations passés
     [SwaggerOperation(
         Summary = "Supprimer tous les événements, attributions et réservations passés",
         Description = "Supprime tous les événements, attributions et réservations dont la date est passée"
@@ -276,10 +279,8 @@ public class ElementController : ControllerBase
     {
         try
         {
-            // Récupérer la date actuelle
             var currentDate = DateTime.Now;
 
-            // Supprimer les événements passés
             var oldEvents = await _context.Elements
                 .Where(e => e.Type == TypeElement.Event && e.Date < currentDate) // Filtrer les événements passés
                 .ToListAsync();
@@ -289,7 +290,6 @@ public class ElementController : ControllerBase
                 _context.Elements.RemoveRange(oldEvents);  // Supprimer les événements passés
             }
 
-            // Supprimer les attributions passées
             var oldAttributions = await _context.Associations
                 .Where(a => a.Type == TypeAssociation.Attribution && a.Date < currentDate) // Filtrer les attributions passées
                 .ToListAsync();
@@ -299,7 +299,6 @@ public class ElementController : ControllerBase
                 _context.Associations.RemoveRange(oldAttributions);  // Supprimer les attributions passées
             }
 
-            // Supprimer les réservations passées
             var oldReservations = await _context.Associations
                 .Where(a => a.Type == TypeAssociation.Reservation && a.Date < currentDate) // Filtrer les réservations passées
                 .ToListAsync();
@@ -309,18 +308,14 @@ public class ElementController : ControllerBase
                 _context.Associations.RemoveRange(oldReservations);  // Supprimer les réservations passées
             }
 
-            // Sauvegarder les changements dans la base de données
             await _context.SaveChangesAsync();
 
             return Ok(new { message = "Tous les événements, attributions et réservations passés ont été supprimés." });
         }
         catch (Exception ex)
         {
-            // Log l'erreur et retourne une erreur serveur
             Console.Error.WriteLine($"Erreur lors de la suppression des éléments passés: {ex.Message}");
             return StatusCode(StatusCodes.Status500InternalServerError, "Erreur serveur lors de la suppression.");
         }
     }
-
-
 }

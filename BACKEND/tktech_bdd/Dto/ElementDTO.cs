@@ -26,7 +26,7 @@ namespace tktech_bdd.Dto
             EstFait = element.EstFait;
 
             // Vérifier si Date est null avant d'utiliser ToString()
-            Date = element.Date?.ToString("yyyy-MM-dd") ?? string.Empty;  // Utilise une valeur par défaut si Date est null
+            Date = element.Date?.ToString("yyyy-MM-dd") ?? string.Empty;  
 
             // Si AssociationAUnElement est null, on laisse null, sinon on l'assigne
             AssociationAUnElement = element.AssociationAUnElement;

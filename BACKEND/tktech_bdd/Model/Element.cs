@@ -32,7 +32,7 @@ namespace tktech_bdd.Model
             // Conversion inverse de string en TypeElement
             if (Enum.TryParse(elementDTO.Type, out TypeElement typeElement))
             {
-                Type = typeElement;  // On assigne le TypeElement après conversion
+                Type = typeElement;  
             }
             else
             {
@@ -44,7 +44,7 @@ namespace tktech_bdd.Model
             // Si la date est non nulle et non vide, on la convertit, sinon on laisse null
             if (!string.IsNullOrEmpty(elementDTO.Date))
             {
-                Date = DateTime.ParseExact(elementDTO.Date, "yyyy-MM-dd", null); // Conversion de string vers DateTime
+                Date = DateTime.ParseExact(elementDTO.Date, "yyyy-MM-dd", null); 
             }
             else
             {

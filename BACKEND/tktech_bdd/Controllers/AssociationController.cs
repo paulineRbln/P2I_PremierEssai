@@ -6,6 +6,7 @@ using Swashbuckle.AspNetCore.Annotations;
 
 namespace tktech_bdd.Controllers
 {
+    // [GET] /api/association - Récupère toutes les associations
     [ApiController]
     [Route("api/association")]
     public class AssociationController : ControllerBase
@@ -18,6 +19,7 @@ namespace tktech_bdd.Controllers
         }
 
         // GET: api/association
+        // Récupère la liste de toutes les associations
         [SwaggerOperation(
             Summary = "Liste des associations",
             Description = "Retourne la liste de toutes les associations"
@@ -27,16 +29,19 @@ namespace tktech_bdd.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<AssociationDTO>>> GetAssociations()
         {
+            // Récupérer toutes les associations avec leurs entités associées (Personne et Element)
             var associationsDTO = await _context.Associations
-                .Include(a => a.Personne)  // Inclure les entités associées (Personne et Element)
-                .Include(a => a.Element)
+                .Include(a => a.Personne)  // Inclure l'entité Personne liée à l'association
+                .Include(a => a.Element)   // Inclure l'entité Element liée à l'association
                 .Select(a => new AssociationDTO(a))  // Convertir en DTO
                 .ToListAsync();
 
-            return Ok(associationsDTO.Any() ? associationsDTO : new List<AssociationDTO>()); // Retourner un tableau vide si aucune association n'est trouvée
+            // Retourner la liste d'associations ou une liste vide si aucune n'est trouvée
+            return Ok(associationsDTO.Any() ? associationsDTO : new List<AssociationDTO>());
         }
 
         // GET: api/association/{id}
+        // Récupère une association par son identifiant
         [SwaggerOperation(
             Summary = "Association grâce à identifiant",
             Description = "Retourne une association à partir de son identifiant"
@@ -49,18 +54,21 @@ namespace tktech_bdd.Controllers
                 int id
         )
         {
+            // Chercher l'association par ID et inclure ses entités associées
             var associationDTO = await _context
                 .Associations
-                .Include(a => a.Personne)  // Inclure les entités associées
-                .Include(a => a.Element)
+                .Include(a => a.Personne)  // Inclure Personne associée
+                .Include(a => a.Element)   // Inclure Element associé
                 .Where(a => a.Id == id)
                 .Select(a => new AssociationDTO(a))
                 .SingleOrDefaultAsync();
 
-            return Ok(associationDTO ?? new AssociationDTO()); // Retourner un objet vide si l'association n'est pas trouvée
+            // Retourner l'association trouvée ou un objet vide si non trouvé
+            return Ok(associationDTO ?? new AssociationDTO());
         }
 
         // GET: api/association/personne/{personneId}/element/{elementId}
+        // Vérifie si une personne est associée à un élément
         [SwaggerOperation(
             Summary = "Vérifier si une personne est associée à un élément",
             Description = "Retourne une réponse indiquant si la personne est associée à l'élément spécifié"
@@ -73,12 +81,12 @@ namespace tktech_bdd.Controllers
             [FromRoute] int elementId
         )
         {
-            // Recherche de l'association entre la personne et l'élément dans la base de données
+            // Recherche de l'association entre la personne et l'élément
             var association = await _context.Associations
                 .Where(a => a.PersonneId == personneId && a.ElementId == elementId)
                 .FirstOrDefaultAsync();
 
-            // Si l'association est trouvée, renvoyer un DTO avec les informations
+            // Si l'association est trouvée, retourner un DTO avec les informations
             if (association != null)
             {
                 var estAssocieDTO = new EstAssocieDTO(
@@ -89,12 +97,13 @@ namespace tktech_bdd.Controllers
                 return Ok(estAssocieDTO);
             }
 
-            // Si aucune association n'est trouvée, renvoyer un DTO avec `estAssocie` à false
+            // Si l'association n'est pas trouvée, retourner un DTO avec "estAssocie" à false
             var estAssocieDTONotFound = new EstAssocieDTO(personneId, elementId, 0);
             return Ok(estAssocieDTONotFound);
         }
 
         // POST: api/association
+        // Ajoute une nouvelle association
         [SwaggerOperation(
             Summary = "Ajout d'une nouvelle association",
             Description = "Ajoute une nouvelle association à la base de données"
@@ -104,11 +113,12 @@ namespace tktech_bdd.Controllers
         [HttpPost]
         public async Task<ActionResult<AssociationDTO>> PostAssociation(AssociationDTO associationDTO)
         {
-            // Créer une nouvelle instance d'Association en utilisant le DTO
+            // Créer une nouvelle instance d'Association à partir du DTO
             Association association = new Association(associationDTO);
-            _context.Associations.Add(association);
-            await _context.SaveChangesAsync();
+            _context.Associations.Add(association);  // Ajouter l'association à la base
+            await _context.SaveChangesAsync();  // Sauvegarder les changements
 
+            // Retourner l'association ajoutée avec son ID
             return CreatedAtAction(
                 nameof(GetAssociationById),
                 new { id = association.Id },
@@ -117,6 +127,7 @@ namespace tktech_bdd.Controllers
         }
 
         // PUT: api/association/{id}
+        // Modifie une association existante
         [SwaggerOperation(
             Summary = "Modifier une association",
             Description = "Modifie une association à partir de son identifiant"
@@ -130,21 +141,22 @@ namespace tktech_bdd.Controllers
             AssociationDTO associationDTO
         )
         {
+            // Vérification que l'ID de l'association correspond à celui de la DTO
             if (id != associationDTO.Id)
                 return BadRequest();
 
-            // Mettre à jour l'association
+            // Mettre à jour l'association en utilisant le DTO
             Association association = new Association(associationDTO);
             _context.Entry(association).State = EntityState.Modified;
 
             try
             {
-                await _context.SaveChangesAsync();
+                await _context.SaveChangesAsync();  // Sauvegarder les modifications
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!_context.Associations.Any(a => a.Id == id))
-                    return Ok(new AssociationDTO()); // Retourner un objet vide si l'association n'existe pas
+                if (!_context.Associations.Any(a => a.Id == id))  // Vérifier si l'association existe toujours
+                    return Ok(new AssociationDTO());  // Retourner un objet vide si l'association n'existe pas
                 else
                     throw;
             }
@@ -153,6 +165,7 @@ namespace tktech_bdd.Controllers
         }
 
         // DELETE: api/association/{id}
+        // Supprime une association par son identifiant
         [SwaggerOperation(
             Summary = "Supprimer une association",
             Description = "Supprime une association définitivement"
@@ -165,99 +178,94 @@ namespace tktech_bdd.Controllers
                 int id
         )
         {
+            // Chercher l'association dans la base de données par son ID
             var association = await _context.Associations.FindAsync(id);
 
+            // Si l'association n'est pas trouvée, retourner un objet vide
             if (association == null)
-                return Ok(new AssociationDTO()); // Retourner un objet vide si l'association n'est pas trouvée
+                return Ok(new AssociationDTO());
 
+            // Supprimer l'association et sauvegarder les changements
             _context.Associations.Remove(association);
             await _context.SaveChangesAsync();
 
-            return Ok();
+            return Ok();  // Retourner une réponse OK après suppression
         }
 
         // GET: api/association/news/{personneId}
+        // Récupère les notifications liées aux événements pour une personne donnée
         [HttpGet("news/{personneId}")]
         public async Task<ActionResult<IEnumerable<NewsDTO>>> GetNews(int personneId)
         {
             // Récupérer les événements auxquels la personne est inscrite
             var evenementsPersonne = await _context.Associations
-                .Where(a => a.PersonneId == personneId && a.Type == TypeAssociation.Inscription)  // Filtrer les inscriptions
-                .Select(a => a.ElementId)  // On récupère les éléments (événements) où cette personne est inscrite
+                .Where(a => a.PersonneId == personneId && a.Type == TypeAssociation.Inscription)
+                .Select(a => a.ElementId)
                 .Distinct()
                 .ToListAsync();
 
             if (evenementsPersonne == null || !evenementsPersonne.Any())
             {
-                return Ok(new List<NewsDTO>()); // Retourner un tableau vide si aucune news n'est trouvée
+                return Ok(new List<NewsDTO>());
             }
 
-            // Obtenir la date du jour sans l'heure pour effectuer une comparaison (toutes les notifications de ce jour)
             var today = DateTime.Today;
 
-            // Récupérer les éléments qui appartiennent aux événements de la personne et qui ont une notification associée pour ce jour
+            // Récupérer les notifications pour les événements de la personne
             var notificationsElements = await _context.Elements
                 .Where(e => e.AssociationAUnElement.HasValue && evenementsPersonne.Contains(e.AssociationAUnElement.Value))
-                .Where(e => e.Date == today) // Filtrer les éléments de notification pour aujourd'hui
+                .Where(e => e.Date == today)
                 .Select(e => e.Id)
                 .ToListAsync();
 
-            // Récupérer toutes les associations dont l'ID de l'élément correspond aux notifications récupérées
+            // Récupérer les associations liées aux notifications
             var associations = await _context.Associations
-                .Where(a => notificationsElements.Contains(a.ElementId) // Filtrer les associations dont l'élément correspond aux notifications
-                            && a.PersonneId != personneId // Exclure les associations où la personne est inscrite
-                            && a.Type == TypeAssociation.EnvoiNotif) // Assurer que ce sont des notifications
-                .Include(a => a.Personne)  // Inclure les informations de la personne
-                .Include(a => a.Element)   // Inclure les informations de l'élément (événement)
+                .Where(a => notificationsElements.Contains(a.ElementId) && a.PersonneId != personneId)
+                .Include(a => a.Personne)
+                .Include(a => a.Element)
                 .ToListAsync();
 
             // Mapper les résultats en NewsDTO
             var newsDTO = associations.Select(a => new NewsDTO(a)).ToList();
 
-            // Récupérer les autres associations (inscriptions, réservations) pour les événements où la personne est inscrite
+            // Récupérer d'autres événements où la personne est inscrite
             var otherNews = await _context.Associations
-                .Where(a => evenementsPersonne.Contains(a.ElementId) && a.Type == TypeAssociation.Inscription && a.PersonneId != personneId) // Exclure les événements où la personne est inscrite
+                .Where(a => evenementsPersonne.Contains(a.ElementId) && a.Type == TypeAssociation.Inscription && a.PersonneId != personneId)
                 .Where(a => a.Date >= today)
-                .Include(a => a.Personne)  // Inclure les informations de la personne
-                .Include(a => a.Element)   // Inclure les informations de l'élément (événement)
+                .Include(a => a.Personne)
+                .Include(a => a.Element)
                 .ToListAsync();
 
-            // Mapper les résultats en NewsDTO
             var additionalNewsDTO = otherNews.Select(a => new NewsDTO(a)).ToList();
 
-            // Fusionner les deux résultats : notifications du jour et autres notifications/news
+            // Fusionner les notifications et autres événements
             var allNews = newsDTO.Concat(additionalNewsDTO).ToList();
 
-            // Retourner les résultats
             return Ok(allNews);
         }
 
-
-
-
         // GET: api/association/reservations
+        // Récupère toutes les réservations sous forme de NewsDTO
         [HttpGet("news/reservations")]
         public async Task<ActionResult<IEnumerable<NewsDTO>>> GetResa()
         {
-            // Récupérer toutes les réservations, sans tenir compte de la personne (toutes les réservations)
             var news = await _context.Associations
-                .Where(a => a.Type == TypeAssociation.Reservation) // Récupérer uniquement les réservations
-                .Include(a => a.Personne)  // Inclure les informations de la personne liée à la réservation
-                .Include(a => a.Element)   // Inclure les informations de l'élément (événement ou objet réservé)
+                .Where(a => a.Type == TypeAssociation.Reservation)
+                .Include(a => a.Personne)
+                .Include(a => a.Element)
                 .ToListAsync();
 
-            // Mapper les résultats en NewsDTO
             var newsDTO = news.Select(a => new NewsDTO(a)).ToList();
-
-            return Ok(newsDTO); // Retourner toutes les réservations sous forme de NewsDTO
+            return Ok(newsDTO);
         }
 
         // GET: api/association/events/{eventId}/notifications
+        // Récupère les notifications associées à un événement spécifique
         [HttpGet("events/{eventId}/notifications")]
         public async Task<ActionResult<IEnumerable<NewsDTO>>> GetNotificationsByEventId(int eventId)
         {
             var notifications = await _context.Elements
-                .Where(e => e.Type == TypeElement.Notif && e.AssociationAUnElement == eventId)  // Filtrer par les éléments de type 'Notif'
+                .Where(e => e.Type == TypeElement.Notif && e.AssociationAUnElement == eventId)
                 .ToListAsync();
 
             if (notifications == null || !notifications.Any())
@@ -266,53 +274,48 @@ namespace tktech_bdd.Controllers
             }
 
             var associations = await _context.Associations
-                .Where(a => notifications.Select(n => n.Id).Contains(a.ElementId))  // Filtrer les associations où ElementId correspond aux notifications récupérées
-                .Include(a => a.Personne)  // Inclure la personne associée à l'association
-                .Include(a => a.Element)   // Inclure l'élément de l'association
+                .Where(a => notifications.Select(n => n.Id).Contains(a.ElementId))
+                .Include(a => a.Personne)
+                .Include(a => a.Element)
                 .ToListAsync();
 
             var newsDTO = associations.Select(a => new NewsDTO(a)).ToList();
-
             return Ok(newsDTO);
         }
 
         // GET: api/association/notifications/notifs-simples
+        // Récupère les notifications simples (sans élément associé)
         [HttpGet("notifications/notifs-simple")]
         public async Task<ActionResult<IEnumerable<NewsDTO>>> GetNotificationsWithoutElementAssociation()
         {
-            // Récupérer les éléments de type 'Notif' où 'AssociationAUnElement' est null
             var notifications = await _context.Elements
-                .Where(e => e.Type == TypeElement.Notif && e.AssociationAUnElement == null)  // Filtrer les éléments de type 'Notif' sans association d'événement
+                .Where(e => e.Type == TypeElement.Notif && e.AssociationAUnElement == null)
                 .ToListAsync();
 
-            // Si aucune notification n'est trouvée, retourner une liste vide
             if (notifications == null || !notifications.Any())
             {
                 return Ok(new List<NewsDTO>());
             }
 
-            // Récupérer les associations liées aux éléments de type 'Notif'
             var associations = await _context.Associations
-                .Where(a => notifications.Select(n => n.Id).Contains(a.ElementId))  // Filtrer les associations dont l'ElementId correspond aux notifications
-                .Include(a => a.Personne)  // Inclure la personne associée à l'association
-                .Include(a => a.Element)   // Inclure l'élément (notification) dans l'association
+                .Where(a => notifications.Select(n => n.Id).Contains(a.ElementId))
+                .Include(a => a.Personne)
+                .Include(a => a.Element)
                 .ToListAsync();
 
-            // Convertir les associations récupérées en DTO
             var newsDTO = associations.Select(a => new NewsDTO(a)).ToList();
-
-            return Ok(newsDTO);  // Retourner les résultats sous forme de liste de NewsDTO
+            return Ok(newsDTO);
         }
 
         // GET: api/association/attributions/personne/{personneId}
+        // Récupère les attributions pour une personne
         [HttpGet("attributions")]
         public async Task<ActionResult<IEnumerable<NewsDTO>>> GetAttributions()
         {
-            // Récupérer les associations de type 'Attribution' liées à la personne
             var associations = await _context.Associations
-                .Where(a => a.Type == TypeAssociation.Attribution )
-                .Include(a => a.Element)   // Inclure l'élément lié (la tâche)
-                .Include(a => a.Personne)  // Inclure la personne (optionnel si nécessaire)
+                .Where(a => a.Type == TypeAssociation.Attribution)
+                .Include(a => a.Element)
+                .Include(a => a.Personne)
                 .ToListAsync();
 
             if (associations == null || !associations.Any())
@@ -320,15 +323,12 @@ namespace tktech_bdd.Controllers
                 return Ok(new List<NewsDTO>());
             }
 
-            // Convertir les associations en NewsDTO
             var newsDTO = associations
-                .Where(a => a.Element?.Type == TypeElement.Task) // S'assurer que c'est bien une tâche
-                .Select(a => new NewsDTO(a)) // Supposant que NewsDTO a un constructeur prenant une Association
+                .Where(a => a.Element?.Type == TypeElement.Task)
+                .Select(a => new NewsDTO(a))
                 .ToList();
 
             return Ok(newsDTO);
         }
-
-
     }
 }
