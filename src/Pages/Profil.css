@@ -1,43 +1,43 @@
-/* Bouton Déconnexion */
+/* Style pour le bouton de déconnexion : couleur de fond blanche, texte bleu, bordure bleue et bord arrondi */
 .btn-deconnexion {
     width: 50%;
-    background-color: #ffffff; /* Fond blanc */
-    color: #1A237E; /* Texte bleu */
+    background-color: #ffffff;
+    color: #1A237E;
     font-weight: bold;
     padding: 3vw;
     font-size: 1rem;
-    border: 2px solid #1A237E; /* Bordure bleue */
-    border-radius: 10vh; /* Bordure arrondie */
+    border: 2px solid #1A237E;
+    border-radius: 10vh;
     cursor: pointer;
-    margin: 10px auto; /* Centrer les boutons et ajouter un espacement */
-    display: block; /* S'assurer que le bouton prend toute la largeur disponible */
+    margin: 10px auto;
+    display: block;
 }
 
-/* Bouton Modifier */
+/* Style pour le bouton de modification : fond bleu, texte blanc, bord arrondi */
 .btn-modif {
     width: 50%;
-    background-color: #1A237E; /* Fond bleu */
-    color: #ffffff; /* Texte blanc */
+    background-color: #1A237E;
+    color: #ffffff;
     font-weight: bold;
     padding: 3vw;
     font-size: 0.8rem;
-    border-radius: 10vh; /* Bordure arrondie */
+    border-radius: 10vh;
     cursor: pointer;
-    margin: 10px auto; /* Centrer les boutons et ajouter un espacement */
-    display: block; /* S'assurer que le bouton prend toute la largeur disponible */
+    margin: 10px auto;
+    display: block;
 }
 
-/* Bouton Supprimer le profil */
+/* Style pour le bouton de suppression du profil : fond blanc, texte et bordure rouge, bord arrondi */
 .btn-suppr_profil {
     width: 50%;
-    background-color: #ffffff; /* Fond blanc */
-    color: red; /* Texte rouge */
+    background-color: #ffffff;
+    color: red;
     font-weight: bold;
     padding: 1.5vw;
     font-size: 0.8rem;
-    border: 2px solid red; /* Bordure rouge */
-    border-radius: 10vh; /* Bordure arrondie */
+    border: 2px solid red;
+    border-radius: 10vh;
     cursor: pointer;
-    margin: 10px auto; /* Centrer les boutons et ajouter un espacement */
-    display: block; /* S'assurer que le bouton prend toute la largeur disponible */
+    margin: 10px auto;
+    display: block;
 }

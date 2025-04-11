@@ -3,25 +3,44 @@ import { Notif, NotifNews } from '../GrosElements/Notif';
 import './PageAccueil.css'; // Importer le fichier CSS
 import { lienAPIMachine } from '../LienAPI/lienAPI'; // Importer la fonction lienAPIMachine
 
+/*
+  Ce fichier contient le composant principal pour la gestion de la page d'accueil.
+  Il permet d'afficher les tâches à faire, les événements à venir, les actualités du jour et les notifications simples.
+  Les fonctionnalités principales sont :
+  - Affichage des tâches à faire : Permet de visualiser les tâches à accomplir par l'utilisateur.
+  - Affichage des événements : Permet de voir les événements à venir.
+  - Affichage des actualités : Affiche les nouvelles actualités en fonction de la date.
+  - Notifications simples : Permet de récupérer et d'afficher les notifications simples.
+*/
+/*
+  Ce fichier contient le composant principal pour la gestion de la page d'accueil.
+  Il permet d'afficher les tâches à faire, les événements à venir, les actualités du jour et les notifications simples.
+  Les fonctionnalités principales sont :
+  - Affichage des tâches à faire : Permet de visualiser les tâches à accomplir par l'utilisateur.
+  - Affichage des événements : Permet de voir les événements à venir.
+  - Affichage des actualités : Affiche les nouvelles actualités en fonction de la date.
+  - Notifications simples : Permet de récupérer et d'afficher les notifications simples.
+*/
+
 function PageAccueil() {
+  // États internes pour gérer les différentes données
   const [tachesAFaire, setTachesAFaire] = useState([]);
   const [evenements, setEvenements] = useState([]);
-  const [news, setNews] = useState([]);
-  const [notificationsSimples, setNotificationsSimples] = useState([]); // Ajout de l'état pour les notifications simples
-  const [personneId, setPersonneId] = useState(localStorage.getItem('personneId'));
-  const [refresh, setRefresh] = useState(false);
+  const [actualites, setActualites] = useState([]);
+  const [notificationsSimples, setNotificationsSimples] = useState([]); 
+  const [personneId, setPersonneId] = useState(localStorage.getItem('personneId')); // ID de la personne récupéré du localStorage
+  const [rafraichir, setRafraichir] = useState(false);
 
+  // useEffect pour récupérer l'ID de la personne à partir du localStorage et lancer la suppression des anciens éléments
   useEffect(() => {
-    // Lire directement l'ID de la personne depuis le localStorage
     const id = localStorage.getItem('personneId');
     if (id) {
       setPersonneId(id);
     }
 
-    const deleteOldElements = async () => {
-      console.log("PASSE ICI");
+    // Fonction pour supprimer les éléments anciens automatiquement via l'API
+    const supprimerAnciennesDonnees = async () => { 
       try {
-        // Faire une requête DELETE vers l'API de suppression automatique
         const response = await fetch(`${lienAPIMachine()}/element/deleteOld`, {
           method: 'DELETE',
         });
@@ -36,80 +55,74 @@ function PageAccueil() {
       }
     };
 
-    // Appeler la fonction de suppression
-    deleteOldElements();
-  }, []); // Ce useEffect se lance une seule fois au montage du composant
+    supprimerAnciennesDonnees(); // Appeler la fonction de suppression
+  }, []); 
 
-  // Récupérer les tâches à faire de la personne
+  // useEffect pour récupérer les tâches à faire de la personne
   useEffect(() => {
     if (personneId) {
-      fetch(`${lienAPIMachine()}/element/personne/${personneId}`) // Utilisation de lienAPIMachine
+      fetch(`${lienAPIMachine()}/element/personne/${personneId}`)
         .then(response => response.json())
         .then(data => {
-          const tachesFiltrees = data.filter(item => item.type === 'Task' && !item.estFait);
+          const tachesFiltrees = data.filter(item => item.type === 'Task' && !item.estFait); // Filtrer les tâches non faites
           setTachesAFaire(tachesFiltrees);
         })
         .catch(error => console.error('Erreur lors de la récupération des tâches:', error));
     }
-  }, [personneId, refresh]);
+  }, [personneId, rafraichir]); 
 
-  // Récupérer les événements depuis l'API
+  // useEffect pour récupérer les événements
   useEffect(() => {
-    fetch(`${lienAPIMachine()}/element/personne/${personneId}`) // Utilisation de lienAPIMachine
+    fetch(`${lienAPIMachine()}/element/personne/${personneId}`)
       .then(response => response.json())
       .then(data => {
-        const evenementsFiltrees = data.filter(item => item.type === 'Event');
+        const evenementsFiltrees = data.filter(item => item.type === 'Event'); // Filtrer les événements
         setEvenements(evenementsFiltrees);
       })
       .catch(error => console.error('Erreur lors de la récupération des événements:', error));
   }, [personneId]);
 
-  // Récupérer les news du jour depuis l'API
+  // useEffect pour récupérer les actualités du jour
   useEffect(() => {
     if (personneId) {
-      fetch(`${lienAPIMachine()}/association/news/${personneId}`) // Utilisation de lienAPIMachine
+      fetch(`${lienAPIMachine()}/association/news/${personneId}`)
         .then(response => response.json())
         .then(data => {
-          // Récupérer la date d'aujourd'hui au format 'YYYY-MM-DD'
-          const today = new Date().toISOString().split('T')[0];
+          const aujourdHui = new Date().toISOString().split('T')[0]; 
           
-          // Filtrer les news dont la date est celle d'aujourd'hui
-          const newsJour = data.filter(news => {
-            // Vérifier si la date existe et n'est pas vide
-            if (news.date && news.date !== "") {
-              const newsDate = new Date(news.date);
+          // Filtrer les actualités pour n'afficher que celles du jour
+          const actualitesDuJour = data.filter(actualite => {
+            if (actualite.date && actualite.date !== "") {
+              const dateActualite = new Date(actualite.date);
               
-              // Vérifier si la date est valide
-              if (!isNaN(newsDate)) {
-                const formattedNewsDate = newsDate.toISOString().split('T')[0]; // Formater la date de la news en 'YYYY-MM-DD'
-                return formattedNewsDate === today || news.titre === "Nouvelle réservation"; // Comparer avec la date d'aujourd'hui
+              if (!isNaN(dateActualite)) {
+                const formattedDateActualite = dateActualite.toISOString().split('T')[0];
+                return formattedDateActualite === aujourdHui || actualite.titre === "Nouvelle réservation"; 
               }
             }
-            return false;  // Ne pas inclure cette news si la date est manquante ou invalide
+            return false;  
           });
 
-          // Mettre à jour l'état avec les news filtrées
-          setNews(newsJour);
+          setActualites(actualitesDuJour);
         })
-        .catch(error => console.error('Erreur lors de la récupération des news:', error));
+        .catch(error => console.error('Erreur lors de la récupération des actualités:', error));
     }
-  }, [personneId, refresh]);
+  }, [personneId, rafraichir]);
 
-  // Récupérer les notifications simples depuis l'API et les ajouter à la liste
+  // useEffect pour récupérer les notifications simples
   useEffect(() => {
     if (personneId) {
-      fetch(`${lienAPIMachine()}/association/notifications/notifs-simple`) // Utilisation de lienAPIMachine pour récupérer les notifications simples
+      fetch(`${lienAPIMachine()}/association/notifications/notifs-simple`)
         .then(response => response.json())
         .then(data => {
-          // Ajouter les notifications simples à la liste des news
           setNotificationsSimples(data);
         })
         .catch(error => console.error('Erreur lors de la récupération des notifications simples:', error));
     }
-  }, [personneId, refresh]);
+  }, [personneId, rafraichir]);
 
-  // Combiner les news et notifications simples dans une seule liste
-  const combinedNotifications = [...news, ...notificationsSimples];
+  // Combinaison des actualités et notifications simples pour l'affichage
+  const notificationsCombinees = [...actualites, ...notificationsSimples];
 
   return (
     <div className="page-accueil" style={{ backgroundColor: 'white', minHeight: '100vh', textAlign: 'center' }}>
@@ -121,7 +134,7 @@ function PageAccueil() {
         notifications={tachesAFaire}
         couleur="#E8F5E9"
         task={true}
-        refresh={setRefresh}
+        refresh={setRafraichir}
       />
 
       {/* Affichage des événements */}
@@ -129,16 +142,16 @@ function PageAccueil() {
         titre="Vos événements à venir"
         notifications={evenements}
         couleur="#CFEFEC"
-        refresh={setRefresh}
+        refresh={setRafraichir}
       />
 
       {/* Affichage des news et notifications simples */}
       <NotifNews
         titre="News du jour"
-        notifications={combinedNotifications}  // Affichage des news combinées
+        notifications={notificationsCombinees} 
         couleur="#FFCCBC"
-        refresh={setRefresh}
-        pasDeBouton = {true}
+        refresh={setRafraichir}
+        pasDeBouton={true}
       />
     </div>
   );

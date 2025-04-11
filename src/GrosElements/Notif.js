@@ -4,28 +4,35 @@ import './Notif.css'; // Si tu as des styles supplémentaires
 import {FaTimes} from  'react-icons/fa';
 import { lienAPIMachine } from '../LienAPI/lienAPI';
 
+/*
+  Ce fichier contient un ensemble de composants utilisés dans les pages pour gérer les notifications et les choix d'actions dans l'application.
+  Les fonctionnalités principales sont :
+  - Affichage des notifications : Permet d'afficher les notifications liées aux éléments associés à l'utilisateur.
+  - Affichage des choix d'actions : Permet à l'utilisateur de choisir entre différentes actions disponibles.
+  - Affichage des objets : Permet de choisir et ajouter des objets à l'application.
+*/
+
 export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
-  const personneId = localStorage.getItem("personneId");  // Récupérer l'ID de la personne connectée
+  const personneId = localStorage.getItem("personneId");  // Récupère l'ID de la personne connectée
   const [elementsAssocies, setElementsAssocies] = useState([]);  // Liste des éléments associés à la personne
 
   // Utiliser useEffect pour récupérer les éléments associés dès que le composant est monté
   useEffect(() => {
-    const fetchElementsAssocies = () => {
+    const recupererElementsAssocies = () => {
       fetch(`${lienAPIMachine()}/element/personne/${personneId}`)
         .then((response) => response.json())
         .then((data) => setElementsAssocies(data))  // Mettre à jour l'état avec la liste des éléments associés
         .catch((error) => console.error('Erreur lors de la récupération des éléments associés', error));
     };
-    fetchElementsAssocies(); 
-  }, [personneId,elementsAssocies, refresh]);
-
+    recupererElementsAssocies(); 
+  }, [personneId, elementsAssocies, refresh]);  // Déclenche la récupération des éléments associés lorsqu'un de ces paramètres change
 
   // Vérifier si un élément de la notification est dans la liste des éléments associés
-  const checkElementAssocie = (elementId) => {
-    return elementsAssocies.some((element) => element.id === elementId); // Vérifier si l'élément est dans la liste des associés
+  const verifierElementAssocie = (elementId) => {
+    return elementsAssocies.some((element) => element.id === elementId);  // Vérifie si l'élément est dans la liste des éléments associés
   };
 
-  // Vérifier si la liste notifications est null ou vide
+  // Vérifier si la liste notifications est vide ou null
   if (notifications === null || notifications.length === 0) {
     return (
       <div className="notif">
@@ -35,15 +42,13 @@ export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
     );
   }
 
-
-
   return (
     <div className="notif">
       <h3>{titre}</h3>
 
       {notifications.map((notif) => {
         // Vérifier si cet élément est associé à la personne
-        const isAssocie = checkElementAssocie(notif.id);
+        const estAssocie = verifierElementAssocie(notif.id);
         return (
           <RectangleAffichage
             key={notif.id}
@@ -53,25 +58,21 @@ export function Notif({ titre, notifications, couleur, task, resa, refresh }) {
             task={task}
             date={!resa ? notif.date : ""}
             estFait={notif.estFait}
-            association={resa ? true : isAssocie} 
+            association={resa ? true : estAssocie} 
             typeE={resa ? "Reservation" : notif.type}
             personneId={personneId}
             elementId={notif.type === "Notif" ? notif.objetId : notif.id}
             isNotifNews={false}
             refresh={refresh}
           />
-
         );
       })}
     </div>
   );
 }
 
-
-
 export function NotifNews({ titre, notifications, couleur, resa, refresh, pasDeBouton }) {
-  // Vérifier si la liste notifications est null ou vide
-
+  // Vérifier si la liste notifications est vide ou null
   if (notifications === null || notifications.length === 0) {
     return (
       <div className="notif">
@@ -94,17 +95,14 @@ export function NotifNews({ titre, notifications, couleur, resa, refresh, pasDeB
           typeE={notif.type}
           elementId={notif.type === "Notif" ? notif.objetId : notif.id}
           refresh={refresh}
-          pasDeBouton = {pasDeBouton}
+          pasDeBouton={pasDeBouton}
         />
       ))}
     </div>
   );
 }
 
-
-
 export function ChoixActions({choix1, choix2, titre, eventOnClic1, eventOnClic2 }) {
-  
   return (
     <div className="choix_actions">
       <h2 className='titre'>{titre}</h2>
@@ -139,43 +137,68 @@ export function ChoixObjet({ listeObjets, eventOnClic, addObjet }) {
   );
 }
 
-export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonnee, setBouton, objetId, reservations, refresh, supression, descriptionDonnee, eventId }) {
-  const [nom, setNom] = useState("");
-  const [description, setDescription] = useState("");
+/*
+  Contient un formulaire permettant d'ajouter ou de gérer des éléments comme des réservations, des notifications, ou des événements.
+  Les fonctionnalités principales sont :
+  - Gestion des réservations : Permet d'ajouter des réservations et de vérifier si une réservation existe déjà à une date donnée.
+  - Création de notifications : Permet de créer des notifications pour un événement ou un problème signalé par l'utilisateur.
+  - Gestion des événements et des tâches : Permet d'ajouter des événements ou des tâches à la base de données.
+  - Suppression d'éléments : Permet de supprimer un objet ou une entrée spécifique.
+*/
+
+export function FormulaireAjoutElement({
+  closePopup,
+  personneId,
+  type,
+  dateDonnee,
+  setBouton,
+  objetId,
+  reservations,
+  refresh,
+  supression,
+  descriptionDonnee,
+  eventId,
+}) {
+  // Définition des états locaux
+  const [nom, setNom] = useState(""); // État pour le nom de l'élément
+  const [description, setDescription] = useState(""); // État pour la description de l'élément
   const [date, setDate] = useState(() => {
     const today = new Date();
-    return today.toISOString().split('T')[0]; // Cela renvoie la date sous le format 'yyyy-mm-dd'
+    return today.toISOString().split("T")[0]; // Formatage de la date au format 'yyyy-mm-dd'
   });
-  const [isProblemReported, setIsProblemReported] = useState(false); // État pour savoir si un problème est signalé
-  const [notifications, setNotifications] = useState([]);
-  const [refreshForm, setRefreshForm] = useState(false);
+  const [problèmeSignale, setProblèmeSignale] = useState(false); // État pour savoir si un problème est signalé
+  const [notifications, setNotifications] = useState([]); // État pour stocker les notifications
+  const [rafraîchirFormulaire, setRafraîchirFormulaire] = useState(false); // État pour déclencher le rafraîchissement du formulaire
 
-  // Fetch des notifications quand l'objetId change
+  // Récupération des notifications lorsque l'objetId change
   useEffect(() => {
     if (objetId) {
       const fetchNotifications = async () => {
         try {
-          const response = await fetch(`${lienAPIMachine()}/association/events/${objetId}/notifications`);
+          const response = await fetch(
+            `${lienAPIMachine()}/association/events/${objetId}/notifications`
+          );
           if (response.ok) {
             const data = await response.json();
-            setNotifications(data.sort((a, b) => b.id - a.id)); // Tri par ID décroissant
+            setNotifications(data.sort((a, b) => b.id - a.id)); // Tri des notifications par ID décroissant
           } else {
-            console.error('Erreur lors de la récupération des notifications');
+            console.error("Erreur lors de la récupération des notifications");
           }
         } catch (error) {
-          console.error('Erreur de connexion:', error);
+          console.error("Erreur de connexion:", error);
         }
       };
       fetchNotifications();
     }
-  }, [objetId, refreshForm]); // Exécuter quand objetId change
+  }, [objetId, rafraîchirFormulaire]); // Exécution du fetch lorsqu'objetId ou rafraîchirFormulaire changent
 
   // Gestionnaire pour signaler un problème
-  const handleSignalProblem = () => {
-    setIsProblemReported(true); // Affiche les champs nécessaires pour la notification
+  const handleSignalerProblème = () => {
+    setProblèmeSignale(true); // Affiche les champs nécessaires pour la notification de problème
   };
 
-  const handleDelete = async () => {
+  // Fonction pour supprimer un objet
+  const handleSupprimer = async () => {
     if (!objetId) {
       alert("Impossible de supprimer : aucun objetId fourni.");
       return;
@@ -191,7 +214,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
         alert("Erreur lors de la suppression de l'objet.");
       } else {
         closePopup();
-        refresh((prev) => !prev);
+        refresh((prev) => !prev); // Rafraîchit la liste après suppression
       }
     } catch (error) {
       console.error("Erreur lors de la suppression :", error);
@@ -199,55 +222,56 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
     }
   };
 
+  // Fonction de soumission du formulaire
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
+
     let association = {
       personneId,
       date,
       type: "",
     };
-  
-    if (type === "Mes réservations" && !isProblemReported) {
+
+    if (type === "Mes réservations" && !problèmeSignale) {
       // Vérifie si une réservation existe déjà pour cet objet à cette date
       const reservationExistante = reservations.some(
         (resa) => resa.objetId === objetId && resa.date === date
       );
-  
+
       if (reservationExistante) {
         alert("Cet objet est déjà réservé à cette date.");
         return;
       }
-  
+
       // Création de l'association pour la réservation
       association = {
         personneId,
         elementId: objetId,
         date,
-        type: "Reservation",
+        type: "Reservation", // Type de l'association pour une réservation
       };
-  
+
       try {
         const response = await fetch(`${lienAPIMachine()}/association`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(association),
         });
-  
+
         if (!response.ok) {
           alert("Erreur lors de la réservation");
         } else {
           closePopup();
-          if (setBouton) setBouton(type);
-          if (refresh) refresh((prev) => !prev);
+          if (setBouton) setBouton(type); // Change le bouton si nécessaire
+          if (refresh) refresh((prev) => !prev); // Rafraîchit les données
         }
       } catch (error) {
         console.error("Erreur:", error);
         alert("Une erreur s'est produite");
       }
-  
+
       return;
-    } else if (isProblemReported || type === "Notif") {
+    } else if (problèmeSignale || type === "Notif") {
       // Création de la notification (élément de type 'Notif')
       const nouvelleNotification = {
         id: 0, // Géré par la BDD
@@ -256,7 +280,7 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
         type: "Notif", // Type de l'élément, ici "Notif"
         estFait: false, // Statut de la notification
         date: date, // Date de la notification
-        associationAUnElement : objetId,
+        associationAUnElement: objetId,
       };
 
       // Si un eventId est fourni, ajouter l'attribut AssociationAUnElement
@@ -282,9 +306,9 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
 
         // Créer l'association entre la notification et la personne
         association = {
-          personneId,  // La personne qui crée la notification
-          elementId: notificationData.id,  // L'ID de la notification créée
-          type: "EnvoiNotif",  // Type d'association entre la personne et la notification
+          personneId, // La personne qui crée la notification
+          elementId: notificationData.id, // L'ID de la notification créée
+          type: "EnvoiNotif", // Type d'association entre la personne et la notification
           date: date,
         };
 
@@ -314,12 +338,19 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
         id: 0, // Géré par la BDD
         nom,
         description,
-        type: type === "Evenements" ? "Event" : type === "Objet" ? "Objet" : type === "Notif" ? "Notif" : "Task",
+        type:
+          type === "Evenements"
+            ? "Event"
+            : type === "Objet"
+            ? "Objet"
+            : type === "Notif"
+            ? "Notif"
+            : "Task", // Déterminer le type de l'élément
         estFait: false,
-        date: type === "Evenements" ? dateDonnee ? dateDonnee : date : "",
-        associationAUnElement: eventId
+        date: type === "Evenements" ? (dateDonnee ? dateDonnee : date) : "",
+        associationAUnElement: eventId,
       };
-    
+
       try {
         // Ajout de l'élément (événement ou tâche) dans la base de données
         const response = await fetch(`${lienAPIMachine()}/element`, {
@@ -327,47 +358,51 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(nouvelElement),
         });
-    
+
         if (!response.ok) {
           alert("Erreur lors de l'ajout de l'élément");
           return;
         }
-    
+
         // Récupérer les données de l'élément ajouté
         const elementData = await response.json();
-    
+
         // Si `nonAssos` est vrai, on ne crée pas l'association
-        if ( type !== "Objet" && type !== "Tâches") {
+        if (type !== "Objet" && type !== "Tâches") {
           // Mettre à jour l'association avec l'élément créé
           association = {
             ...association,
             elementId: elementData.id,
-            type: type === "Evenements" ? "Inscription" : ("Tâches" ? "Attribution" : "EnvoiNotif"),
+            type:
+              type === "Evenements"
+                ? "Inscription"
+                : type === "Tâches"
+                ? "Attribution"
+                : "EnvoiNotif",
           };
-    
+
           // Envoi de l'association après l'ajout de l'élément
           const associationResponse = await fetch(`${lienAPIMachine()}/association`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(association),
           });
-    
+
           if (!associationResponse.ok) {
             alert("Erreur lors de la création de l'association");
             return;
           }
         }
-    
+
         // Fermeture du popup et mise à jour des états
         closePopup();
         if (setBouton) setBouton(type);
         if (refresh) refresh((prev) => !prev);
-    
       } catch (error) {
         console.error("Erreur:", error);
         alert("Une erreur s'est produite");
       }
-    }    
+    }
   };
 
   return (
@@ -375,20 +410,20 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
       <div className="modal-content" onClick={(e) => e.stopPropagation()}>
         <div className="connexion-container">
           {descriptionDonnee && (
-            <p className="petit_text">
-              {descriptionDonnee}
-            </p>
+            <p className="petit_text">{descriptionDonnee}</p>
           )}
 
-          {type === "Mes réservations" && <NotifNews
-            titre=""
-            notifications={notifications}
-            couleur="#FFCCBC"
-            refresh={setRefreshForm}
-          />}
-  
+          {type === "Mes réservations" && (
+            <NotifNews
+              titre=""
+              notifications={notifications}
+              couleur="#FFCCBC"
+              refresh={setRafraîchirFormulaire}
+            />
+          )}
+
           <form onSubmit={handleSubmit}>
-            {type === "Mes réservations" && !isProblemReported ? (
+            {type === "Mes réservations" && !problèmeSignale ? (
               <>
                 <h3>Nouvelle réservation</h3>
                 <div>
@@ -405,7 +440,13 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
             ) : (
               <>
                 <div>
-                  <h3>{isProblemReported ? "Type de problème" : type === "Notif" ? "Titre de la notification" : `Nouvel${type==="Evenements" ? " évenement" : type==="Objet" ? " objet" : "le tâche"}`}</h3>
+                  <h3>
+                    {problèmeSignale
+                      ? "Type de problème"
+                      : type === "Notif"
+                      ? "Titre de la notification"
+                      : `Nouvel${type === "Evenements" ? " évenement" : type === "Objet" ? " objet" : "le tâche"}`}
+                  </h3>
                   <input
                     type="text"
                     className="encadre"
@@ -414,9 +455,15 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
                     required
                   />
                 </div>
-  
+
                 <div>
-                  <h3>{isProblemReported ? "Description du problème" :  type === "Notif" ? "Message" : "Description"}</h3>
+                  <h3>
+                    {problèmeSignale
+                      ? "Description du problème"
+                      : type === "Notif"
+                      ? "Message"
+                      : "Description"}
+                  </h3>
                   <textarea
                     className="encadre"
                     value={description}
@@ -438,39 +485,38 @@ export function FormulaireAjoutElement({ closePopup, personneId, type, dateDonne
                 )}
               </>
             )}
-  
+
             <button className="connecter" type="submit">
-              {isProblemReported ? "Signaler" : "Ajouter"}
+              {problèmeSignale ? "Signaler" : "Ajouter"}
             </button>
-  
-            {supression && !isProblemReported && (
-              <button className="connecter_bis" type="button" onClick={handleDelete}>
+
+            {supression && !problèmeSignale && (
+              <button className="connecter_bis" type="button" onClick={handleSupprimer}>
                 Supprimer
               </button>
             )}
           </form>
-  
-          {type === "Mes réservations" && !isProblemReported && (
+
+          {type === "Mes réservations" && !problèmeSignale && (
             <div>
               <button
                 className="btn-signal_pb"
                 type="button"
-                onClick={handleSignalProblem}
+                onClick={handleSignalerProblème}
               >
                 Signaler un problème sur l'objet
               </button>
             </div>
           )}
-  
+
           <button className="btn-fermer" type="button" onClick={closePopup}>
             <FaTimes className="close-icon" />
           </button>
         </div>
       </div>
     </div>
-  );  
+  );
 }
-
 
 export function FormulaireModifProfil({ closePopup, personneId, refresh }) {
   const [nom, setNom] = useState("");

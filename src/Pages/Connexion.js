@@ -3,6 +3,16 @@ import { useNavigate } from "react-router-dom";
 import { lienAPIMachine } from "../LienAPI/lienAPI"; // Importer la fonction lienAPIMachine
 import "./Connexion.css"; // Importation du style
 
+/*
+  Ce fichier contient les composants de la page de connexion et d'inscription.
+  - Le composant "Connexion" permet aux utilisateurs de se connecter en utilisant un pseudo et un mot de passe.
+  - Le composant "Inscription" permet aux utilisateurs de créer un nouveau compte avec un nom, prénom, pseudo, mot de passe, et un choix de statut (propriétaire ou non).
+  Les fonctionnalités principales sont :
+  - Connexion : Vérification des identifiants de l'utilisateur et redirection vers la page d'accueil en cas de succès.
+  - Inscription : Création d'un nouvel utilisateur avec les informations fournies, suivi d'une redirection vers la page de connexion.
+*/
+
+
 // Composant Connexion
 function Connexion() {
   const [pseudo, setPseudo] = useState("");
@@ -18,7 +28,7 @@ function Connexion() {
     const credentials = { pseudo, motDePasse };
 
     try {
-      const response = await fetch(`${lienAPIMachine()}/personne/login`, { // Utiliser lienAPIMachine pour l'URL
+      const response = await fetch(`${lienAPIMachine()}/personne/login`, { 
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(credentials),
@@ -27,11 +37,11 @@ function Connexion() {
       if (!response.ok) throw new Error("Identifiants incorrects.");
       
       const data = await response.json();
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("personneId", data.id);  // L'ID vient de la réponse
-      localStorage.setItem("estProprio", data.estProprio);
+      localStorage.setItem("token", data.token); // Sauvegarder le token dans le localStorage
+      localStorage.setItem("personneId", data.id);  // Sauvegarder l'ID de l'utilisateur
+      localStorage.setItem("estProprio", data.estProprio); // Sauvegarder le statut de propriétaire
       console.log(data.estProprio);
-      window.location.href = "/"; // Redirection vers l'accueil après connexion
+      window.location.href = "/"; // Redirection vers la page d'accueil après connexion
 
     } catch (error) {
       setErreur(error.message);
@@ -94,7 +104,7 @@ function Inscription() {
     const nouvellePersonne = { id: 0, nom, prenom, pseudo, photoProfil, motDePasse, estProprio };
 
     try {
-      const response = await fetch(`${lienAPIMachine()}/personne`, {  // Utiliser lienAPIMachine pour l'URL
+      const response = await fetch(`${lienAPIMachine()}/personne`, {  
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(nouvellePersonne),

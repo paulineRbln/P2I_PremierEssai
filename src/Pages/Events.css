@@ -1,14 +1,15 @@
+/* Style principal pour la page des événements */
 .page_event {
     background-color: white;
     min-height: 100vh;
     margin-bottom: 12vh;
 }
 
+/* Style pour le titre principal de la page */
 .page_event h1 {
     font-size: 1.5rem;
     font-weight: bold;
     margin: 8vh 8vw 2vh 8vw;
     color: #1A237E;
-    text-align: left; /* Assure que le texte est aligné à gauche */
+    text-align: left;
 }
-

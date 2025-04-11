@@ -1,8 +1,17 @@
 import React, { useState, useEffect } from 'react';
-import './RectangleAffichage.css'; // Importer le fichier CSS
+import './RectangleAffichage.css'; 
 import { FormulaireSuppression , FormulaireChoixDate} from '../GrosElements/Notif';
 import { lienAPIMachine } from '../LienAPI/lienAPI';
 import { useNavigate } from "react-router-dom";  // Pour la navigation
+
+/*
+  Ce fichier contient des composants réutilisables pour l'affichage des éléments liés à l'API
+  (notifications, événements, inscriptions, etc.). Les composants principaux sont :
+  - RectangleAffichage : Affichage des informations d'une notification ou tâche
+  - RectangleAjout : Permet l'ajout d'un nouvel élément
+  - BoutonSwipe : Permet de gérer des boutons pour une action spécifique
+  - DescriptionEvent : Affiche la description d'un événement et la liste des inscrits
+*/
 
 export function RectangleAffichage({
   textGras,
@@ -19,27 +28,27 @@ export function RectangleAffichage({
   pasDeBouton,
   refresh
 }) {
-  const [checked, setChecked] = useState(estFait);
-  const [associe, setAssocie] = useState(association);
-  const [showDeleteForm, setShowDeleteForm] = useState(false);
-  const navigate = useNavigate();  // Pour rediriger l'utilisateur
-  const [showDateForm, setShowDateForm] = useState(false); // Afficher ou non le formulaire de date
+  const [estCoche, setEstCoche] = useState(estFait); // État de la case à cocher (tâche terminée ou non)
+  const [associe, setAssocie] = useState(association); // État de l'association de l'élément
+  const [afficherFormulaireSuppression, setAfficherFormulaireSuppression] = useState(false); // Affichage du formulaire de suppression
+  const navigate = useNavigate(); // Navigation vers d'autres pages
+  const [afficherFormulaireDate, setAfficherFormulaireDate] = useState(false); // Affichage du formulaire de sélection de date
 
   const handleJeMyColleClick = () => {
     if (typeE === "Task") {
-      setShowDateForm(true); // Afficher le formulaire de date uniquement pour les tâches
+      setAfficherFormulaireDate(true); // Afficher le formulaire de date uniquement pour les tâches
     } else {
       handleCheckboxChange(); // Pour les événements, on appelle directement la fonction qui enregistre avec la date d'aujourd'hui
     }
   };
   
   const handleDateSelectionnee = (date) => {
-    handleCheckboxChangeWithDate(date); // Créer l'association avec cette date
-    setShowDateForm(false); // Fermer le formulaire après sélection
+    handleCheckboxChangeAvecDate(date); // Créer l'association avec cette date
+    setAfficherFormulaireDate(false); // Fermer le formulaire après sélection
   };
 
-  const handleCheckboxChangeWithDate = (date) => {
-    const typeAssociation ="Attribution";
+  const handleCheckboxChangeAvecDate = (date) => {
+    const typeAssociation = "Attribution";
   
     const dateToSend = date; // Utiliser la date d'aujourd'hui pour les événements
   
@@ -114,7 +123,7 @@ export function RectangleAffichage({
 
   // Fonction pour afficher le formulaire de suppression
   const openSuppressionForm = (eventId) => {
-    setShowDeleteForm(true);  // Afficher le formulaire de suppression
+    setAfficherFormulaireSuppression(true);  // Afficher le formulaire de suppression
   };
 
   // Fonction pour gérer la suppression de l'association
@@ -169,8 +178,8 @@ export function RectangleAffichage({
 
   // Fonction pour cocher/décocher une tâche et mettre à jour l'état dans la base de données
   const handleEstFaitChange = () => {
-    const newChecked = !checked;
-    setChecked(newChecked);
+    const newChecked = !estCoche;
+    setEstCoche(newChecked);
 
     fetch(`${lienAPIMachine()}/element/${elementId}/${newChecked}`, {
       method: "PUT",
@@ -183,12 +192,12 @@ export function RectangleAffichage({
           refresh((prev) => !prev);
         } else {
           console.error("Erreur lors de la mise à jour de estFait.");
-          setChecked(checked);
+          setEstCoche(estCoche);
         }
       })
       .catch((error) => {
         console.error("Erreur lors de la mise à jour de estFait:", error);
-        setChecked(checked);
+        setEstCoche(estCoche);
       });
   };
 
@@ -227,7 +236,7 @@ export function RectangleAffichage({
         {task && association && (
           <input
             type="checkbox"
-            checked={checked}
+            checked={estCoche}
             onChange={handleEstFaitChange}
             className="checkbox"
           />
@@ -249,10 +258,10 @@ export function RectangleAffichage({
         </div>
       )}
 
-      {typeE === "Task" && showDateForm && (
+      {typeE === "Task" && afficherFormulaireDate && (
         <FormulaireChoixDate
           setDateSelectionnee={handleDateSelectionnee}
-          closeForm={() => setShowDateForm(false)}
+          closeForm={() => setAfficherFormulaireDate(false)}
           elementId={elementId}
         />
       )}
@@ -273,10 +282,10 @@ export function RectangleAffichage({
         </button>
       )}
 
-      {showDeleteForm && (
+      {afficherFormulaireSuppression && (
         <FormulaireSuppression
           elementId={elementId}
-          closeForm={() => setShowDeleteForm(false)}
+          closeForm={() => setAfficherFormulaireSuppression(false)}
           refresh={refresh}
           event={typeE === "Event"}
         />
@@ -285,7 +294,9 @@ export function RectangleAffichage({
   );
 }
 
-
+// Composant RectangleAjout : 
+// Affiche un bouton avec un texte, une couleur de fond et une couleur de texte personnalisée.
+// Lorsqu'on clique sur le bouton, une fonction est exécutée (eventOnClic).
 export function RectangleAjout({ texte, couleur, eventOnClic, couleurTxt }) {
   return (
     <div 
@@ -298,16 +309,20 @@ export function RectangleAjout({ texte, couleur, eventOnClic, couleurTxt }) {
   );
 };
 
+// Composant BoutonSwipe : 
+// Affiche deux boutons et gère la sélection active de l'un ou l'autre.
+// Lorsqu'un bouton est cliqué, il devient actif, et la fonction setChangeBouton est appelée
+// pour notifier le changement de sélection.
 export function BoutonSwipe({ nom1, nom2, pageBouton, setChangeBouton }) {
   const [active, setActive] = useState(pageBouton);
 
   useEffect(() => {
-    setActive(pageBouton);
+    setActive(pageBouton); // Met à jour l'état local en fonction de la pageBouton initiale
   }, [pageBouton]);
 
   const handleClick = (value) => {
     setActive(value); // Met à jour l'état local
-    setChangeBouton(value); // Appelle la fonction passée en prop
+    setChangeBouton(value); // Appelle la fonction passée en prop pour notifier le changement
   };
 
   return (
@@ -329,11 +344,14 @@ export function BoutonSwipe({ nom1, nom2, pageBouton, setChangeBouton }) {
   );
 }
 
+// Composant DescriptionEvent : 
+// Affiche une description d'événement avec sa date et une liste d'inscrits.
+// Si la liste est vide, il affiche un message indiquant qu'il n'y a aucun inscrit.
 export function DescriptionEvent({ date, description, listeInscrits }) {
   return (
     <div className="description_event">
-      <h3>{date}</h3>
-      <p>{description}</p>
+      <h3>{date}</h3> {/* Affiche la date de l'événement */}
+      <p>{description}</p> {/* Affiche la description de l'événement */}
       <div className="inscrits-list">
         <h4>Liste des inscrits :</h4>
         {listeInscrits.length > 0 ? (
@@ -343,7 +361,7 @@ export function DescriptionEvent({ date, description, listeInscrits }) {
             ))}
           </ul>
         ) : (
-          <p>Aucun inscrit pour cet événement.</p>
+          <p>Aucun inscrit pour cet événement.</p> // Affiche un message si aucun inscrit
         )}
       </div>
     </div>

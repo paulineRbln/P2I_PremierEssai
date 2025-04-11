@@ -1,9 +1,11 @@
+/* Style général de la page d'accueil */
 .page-accueil {
     background-color: white;
     min-height: 100vh;
     margin-bottom: 12vh;
 }
 
+/* Style du titre de la page d'accueil */
 .page-accueil h1 {
     font-size: 1.5rem;
     font-weight: bold;
@@ -11,4 +13,3 @@
     color: #1A237E;
     text-align: left; /* Assure que le texte est aligné à gauche */
 }
-

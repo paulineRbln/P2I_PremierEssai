@@ -15,6 +15,4 @@ root.render(
 // Activer le service worker pour transformer l'app en PWA
 serviceWorkerRegistration.register();
 
-// Si vous souhaitez commencer à mesurer la performance de votre app, passez une fonction à reportWebVitals.
-// Par exemple : reportWebVitals(console.log)
 reportWebVitals();

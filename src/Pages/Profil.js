@@ -4,33 +4,43 @@ import './Profil.css'; // Importer le fichier CSS
 import { NotifNews, FormulaireModifProfil } from '../GrosElements/Notif';
 import { lienAPIMachine } from '../LienAPI/lienAPI'; // Importer la fonction lienAPIMachine
 
+/*
+  Ce fichier contient le composant Profil pour gérer les actions liées au profil utilisateur.
+  Il permet à l'utilisateur de :
+  - Voir et modifier ses informations de profil.
+  - Se déconnecter de la session.
+  - Supprimer son compte.
+  - Afficher les notifications liées au profil.
+*/
+
 function Profil() {
-    const [personneId, setPersonneId] = useState(localStorage.getItem('personneId'));
-    const [refresh, setRefresh] = useState(false);
-    const [infoUser, setInfoUser] = useState(null);
-    const [showForm, setShowForm] = useState(false);
+    const [personneId, setPersonneId] = useState(localStorage.getItem('personneId')); 
+    const [rafraichir, setRafraichir] = useState(false); 
+    const [infosUtilisateur, setInfosUtilisateur] = useState(null); 
+    const [afficherFormulaire, setAfficherFormulaire] = useState(false); 
 
     useEffect(() => {
         // Lire directement l'ID de la personne depuis le localStorage
         const id = localStorage.getItem('personneId');
         if (id) {
-            setPersonneId(id);
+            setPersonneId(id); // Mise à jour de l'état avec l'ID de la personne
         }
     }, []); 
 
     useEffect(() => {
+        // Récupérer les informations du profil de la personne via l'API
         fetch(`${lienAPIMachine()}/personne/${personneId}`) // Utilisation de lienAPIMachine
             .then(response => response.json())
             .then(data => {
-                setInfoUser([{
+                setInfosUtilisateur([{
                     titre: `${data.nom} ${data.prenom}`, // titre devient "Nom Prénom"
                     description: data.pseudo // description devient "pseudo"
                 }]);
             })
             .catch(error => console.error('Erreur lors de la récupération du profil:', error));
-    }, [personneId, refresh]);
+    }, [personneId, rafraichir]); // Dépend de 'personneId' et 'rafraichir'
 
-    const handleLogout = () => {
+    const handleDeconnexion = () => { // Renommé 'handleLogout' en 'handleDeconnexion'
         // Supprimer le token du localStorage
         localStorage.removeItem('token');
         localStorage.removeItem('personneId');
@@ -40,10 +50,10 @@ function Profil() {
     };
 
     const handleModifier = () => {
-        setShowForm(true);
+        setAfficherFormulaire(true); // Afficher le formulaire de modification du profil
     };
 
-    const handleSupprCompte = () => {
+    const handleSupprimerCompte = () => { // Renommé 'handleSupprCompte' en 'handleSupprimerCompte'
         if (window.confirm("Êtes-vous sûr de vouloir supprimer votre compte ? Cette action est irréversible.")) {
             // Appeler l'API pour supprimer le compte
             fetch(`${lienAPIMachine()}/personne/${personneId}`, { // Utilisation de lienAPIMachine
@@ -71,17 +81,17 @@ function Profil() {
 
     return (
         <div className="page-accueil" style={{ backgroundColor: 'white', minHeight: '100vh', textAlign: 'center' }}>
-            <h1>{infoUser && infoUser[0].description}</h1>
-            <button onClick={handleLogout} className="btn-deconnexion">
+            <h1>{infosUtilisateur && infosUtilisateur[0].description}</h1>
+            <button onClick={handleDeconnexion} className="btn-deconnexion">
                 Se déconnecter
             </button>
             <p> SCORE LABEL</p>
-            {showForm && <FormulaireModifProfil personneId={personneId} closePopup={() => setShowForm(false)} refresh={setRefresh}/>}
-            <NotifNews titre={"A propos de vous"} notifications={infoUser} couleur={"#ffffff"} />
+            {afficherFormulaire && <FormulaireModifProfil personneId={personneId} closePopup={() => setAfficherFormulaire(false)} refresh={setRafraichir}/> }
+            <NotifNews titre={"A propos de vous"} notifications={infosUtilisateur} couleur={"#ffffff"} />
             <button onClick={handleModifier} className="btn-modif">
                 Modifier
             </button>
-            <button onClick={handleSupprCompte} className="btn-suppr_profil">
+            <button onClick={handleSupprimerCompte} className="btn-suppr_profil">
                 Supprimer mon compte
             </button>
         </div>

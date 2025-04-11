@@ -1,20 +1,31 @@
 import React, { useState, useEffect } from 'react';
-import { useParams } from 'react-router-dom'; // Pour récupérer l'ID de l'événement
-import { lienAPIMachine } from '../LienAPI/lienAPI'; // Importer la fonction lienAPIMachine
-import { NotifNews } from '../GrosElements/Notif'; // Importer le composant NotifNews
-import { DescriptionEvent } from '../PetitsElements/RectangleAffichage'; // Importer le composant de description
-import { useNavigate } from 'react-router-dom'; // Importer useNavigate
-import { FormulaireAjoutElement } from '../GrosElements/Notif'; // Importer FormulaireAjoutElement
+import { useParams } from 'react-router-dom'; 
+import { lienAPIMachine } from '../LienAPI/lienAPI'; 
+import { NotifNews } from '../GrosElements/Notif'; 
+import { DescriptionEvent } from '../PetitsElements/RectangleAffichage'; 
+import { useNavigate } from 'react-router-dom'; 
+import { FormulaireAjoutElement } from '../GrosElements/Notif'; 
 import './InfosEvent.css';
+
+/*
+  Ce fichier contient le composant principal pour la gestion des informations d'un événement.
+  Il permet de récupérer et afficher les informations d'un événement spécifique, y compris les inscrits et les notifications.
+  Les fonctionnalités principales sont :
+  - Affichage des informations de l'événement : Permet de visualiser le nom, la date et la description de l'événement.
+  - Gestion des inscriptions : Permet de récupérer et afficher la liste des inscrits à l'événement.
+  - Gestion des notifications : Permet d'afficher les notifications liées à l'événement et d'envoyer de nouvelles notifications.
+  - Suppression d'événement : Permet de supprimer l'événement de la base de données.
+  - Gestion de popup : Permet d'ouvrir un formulaire pour ajouter des notifications.
+*/
 
 function InfosEvent() {
   const { eventId } = useParams(); // Utilise useParams pour obtenir l'ID de l'événement depuis l'URL
-  const [eventData, setEventData] = useState(null);
-  const [inscrits, setInscrits] = useState([]);
-  const [notifications, setNotifications] = useState([]);
-  const [popupType, setPopupType] = useState(null); // To manage popup type
-  const navigate = useNavigate(); // Initialiser navigate
-  const [refresh, setRefresh] = useState(false);
+  const [eventData, setEventData] = useState(null); 
+  const [inscrits, setInscrits] = useState([]); 
+  const [notifications, setNotifications] = useState([]); // Liste des notifications associées à l'événement
+  const [popupType, setPopupType] = useState(null); // Gérer l'affichage des popups
+  const navigate = useNavigate(); 
+  const [actualiser, setActualiser] = useState(false); 
   
   // Récupérer les données de l'événement
   useEffect(() => {
@@ -23,7 +34,7 @@ function InfosEvent() {
         const response = await fetch(`${lienAPIMachine()}/element/${eventId}`);
         if (response.ok) {
           const data = await response.json();
-          setEventData(data); // Mets à jour les données de l'événement
+          setEventData(data); // Mettre à jour les données de l'événement
         } else {
           console.error("Erreur lors de la récupération des informations de l'événement.");
         }
@@ -38,7 +49,7 @@ function InfosEvent() {
         const response = await fetch(`${lienAPIMachine()}/element/${eventId}/inscrits`);
         if (response.ok) {
           const data = await response.json();
-          setInscrits(data);
+          setInscrits(data); // Mettre à jour la liste des inscrits
         } else {
           console.error("Erreur lors de la récupération des inscrits.");
         }
@@ -53,7 +64,7 @@ function InfosEvent() {
         const response = await fetch(`${lienAPIMachine()}/association/events/${eventId}/notifications`);
         if (response.ok) {
           const data = await response.json();
-          setNotifications(data.sort((a, b) => b.id - a.id));
+          setNotifications(data.sort((a, b) => b.id - a.id)); // Trier les notifications par ID décroissant
         } else {
           console.error("Erreur lors de la récupération des notifications.");
         }
@@ -66,14 +77,16 @@ function InfosEvent() {
     fetchEventData();
     fetchInscrits();
     fetchNotifications();
-  }, [eventId, popupType, refresh]); // Recharger les données à chaque changement de eventId
+  }, [eventId, popupType, actualiser]); // Recharger les données lorsque l'ID de l'événement, popupType ou actualiser changent
 
   console.log(notifications, eventId);
 
+  // Affichage si les données de l'événement ne sont pas encore récupérées
   if (!eventData) {
     return <p>Chargement des informations de l'événement...</p>;
   }
 
+  // Fonction de suppression de l'événement
   const handleDelete = async () => {
     try {
       const response = await fetch(`${lienAPIMachine()}/element/${eventId}`, {
@@ -94,9 +107,9 @@ function InfosEvent() {
     } 
   };
 
-  // Function to open the notification creation popup
+  // Fonction pour ouvrir le popup de création de notification
   const openNotificationPopup = () => {
-    setPopupType('Notif'); // Set the popup type to 'Notif' to show the notification form
+    setPopupType('Notif'); // Définir le type de popup à 'Notif' pour afficher le formulaire de notification
   };
 
   return (
@@ -106,42 +119,42 @@ function InfosEvent() {
       <button
         className="suppr_event"
         type="button"
-        onClick={handleDelete}
+        onClick={handleDelete} // Appeler la fonction de suppression lorsque le bouton est cliqué
       >
         Supprimer
       </button>
 
       <DescriptionEvent
-        date={eventData.date}
-        description={eventData.description}
-        listeInscrits={inscrits}
+        date={eventData.date} 
+        description={eventData.description} 
+        listeInscrits={inscrits} 
       />
 
-      {/* Button to add a new notification */}
+      {/* Bouton pour ajouter une nouvelle notification */}
       <button
         className="btn-modif"
         type="button"
-        onClick={openNotificationPopup}
+        onClick={openNotificationPopup} // Ouvrir le formulaire de notification lorsque le bouton est cliqué
       >
         Envoyer un message
       </button>
 
-      {/* Utilisation du composant NotifNews pour afficher les notifications */}
+      {/* Affichage des notifications associées à l'événement */}
       <NotifNews
         titre="Notifications de l'évènement"
-        notifications={notifications}
+        notifications={notifications} 
         couleur="#FFCCBC"
-        refresh={setRefresh}
+        refresh={setActualiser} 
       />
 
-      {/* Render the FormulaireAjoutElement popup for adding a notification */}
+      {/* Affichage du formulaire de notification si le popup est ouvert */}
       {popupType && (
         <FormulaireAjoutElement
-          closePopup={() => setPopupType(null)} 
-          personneId={localStorage.getItem('personneId')} // Assume personneId is stored in localStorage
+          closePopup={() => setPopupType(null)} // Fermer le popup lorsque l'on clique pour fermer
+          personneId={localStorage.getItem('personneId')} 
           type="Notif" 
-          eventId={eventId} // Pass eventId to associate the notification with the event
-          refresh={() => {}}
+          eventId={eventId} 
+          refresh={() => {}} 
         />
       )}
     </div>

@@ -1,110 +1,119 @@
+/* Style pour le titre dans la section de notification */
 .notif h3 {
-    font-size: 1rem;
-    font-weight: bold;
-    margin: 3vh 8vw 0 8vw;
-    color: #1A237E;
-    text-align: left; /* Assure que le texte est aligné à gauche */
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 3vh 8vw 0 8vw;
+  color: #1A237E;
+  text-align: left;
 }
 
+/* Style pour le bloc des choix d'actions */
 .choix_actions {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    width: 100%;
-    margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+  margin-top: 20px;
 }
 
+/* Style pour le titre dans le bloc des choix d'actions */
 .choix_actions .titre {
-    font-size: 1rem;
-    font-weight: bold;
-    margin: 0 8vw 0 8vw;
-    color: #1A237E;
-    text-align: left;
+  font-size: 1rem;
+  font-weight: bold;
+  margin: 0 8vw 0 8vw;
+  color: #1A237E;
+  text-align: left;
 }
 
+/* Style pour le bloc contenant les rectangles */
 .bloc_rectangles {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 80%;
 }
 
-
+/* Style pour la superposition de la fenêtre modale */
 .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(26, 35, 126, 0.2); /* Fond semi-transparent */
-    backdrop-filter: blur(8px); /* Flou */
-    display: flex;
-    justify-content: center;  /* Centrer horizontalement */
-    align-items: flex-start;  /* Aligner le contenu vers le haut */
-    padding-top: 3vh;  /* Décaler le contenu un peu vers le bas */
-    z-index: 1000; 
-  }
-  
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(26, 35, 126, 0.2); /* Fond semi-transparent */
+  backdrop-filter: blur(8px); /* Flou */
+  display: flex;
+  justify-content: center;  /* Centrer horizontalement */
+  align-items: flex-start;  /* Aligner le contenu vers le haut */
+  padding-top: 3vh;  /* Décaler le contenu un peu vers le bas */
+  z-index: 1000; 
+}
 
+/* Style pour le contenu de la fenêtre modale */
 .modal-content {
-    background: white;
-    padding: 3vw;
-    border-radius: 20px;
-    width: 70vw;
-    text-align: left;
-    position: relative;
-  }
+  background: white;
+  padding: 3vw;
+  border-radius: 20px;
+  width: 70vw;
+  text-align: left;
+  position: relative;
+}
 
-  .btn-fermer {
-    bottom: 10px;  /* Positionner le bouton en bas de la fenêtre modale */
-    width: 8vw;  /* Taille responsive */
-    height: 8vw;  /* Hauteur équivalente */
-    border-radius: 100px;  /* Bordures arrondies */
-    background-color: #ccc;  /* Fond gris clair */
-    color:white;
-    border: none;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 1rem;  /* Taille de l'icône croix */
-    margin-top: 2vh;
-  }
-  
-  .btn-signal_pb{
-    width: 70%;
-    background-color: #ffffff; /* Fond blanc */
-    color: red; /* Texte rouge */
-    font-weight: bold;
-    padding: 1.6vw;
-    font-size: 0.8rem;
-    border: 2px solid red; /* Bordure rouge */
-    border-radius: 10vh; /* Bordure arrondie */
-    cursor: pointer;
-    margin: 10px auto; /* Centrer les boutons et ajouter un espacement */
-    display: block; /* S'assurer que le bouton prend toute la largeur disponible */
-  }
+/* Style pour le bouton de fermeture dans la fenêtre modale */
+.btn-fermer {
+  bottom: 10px;  /* Positionner le bouton en bas de la fenêtre modale */
+  width: 8vw;  /* Taille responsive */
+  height: 8vw;  /* Hauteur équivalente */
+  border-radius: 100px;  /* Bordures arrondies */
+  background-color: #ccc;  /* Fond gris clair */
+  color:white;
+  border: none;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 1rem;  /* Taille de l'icône croix */
+  margin-top: 2vh;
+}
 
-  .connecter_bis{
-    width: 100%;
-    background-color: #f0e0e0;
-    color: #1A237E;
-    font-weight: bold;
-    padding: 14px;
-    font-size: 1.1rem;
-    border: none;
-    border-radius: 10vh;
-    cursor: pointer;
-    margin-top: 10px;
-  }
-  
-  .bloc_rectangles_objet {
-    display: flex; 
-    flex-wrap: wrap; 
-    justify-content: center; 
-    width: 90%;
-  }
+/* Style pour le bouton de signalement d'un problème */
+.btn-signal_pb {
+  width: 70%;
+  background-color: #ffffff; /* Fond blanc */
+  color: red; /* Texte rouge */
+  font-weight: bold;
+  padding: 1.6vw;
+  font-size: 0.8rem;
+  border: 2px solid red; /* Bordure rouge */
+  border-radius: 10vh; /* Bordure arrondie */
+  cursor: pointer;
+  margin: 10px auto; /* Centrer les boutons et ajouter un espacement */
+  display: block; /* S'assurer que le bouton prend toute la largeur disponible */
+}
 
-  .message_vide {
-    margin: 3vh 8vw 0 8vw;
-    text-align: left; /* Assure que le texte est aligné à gauche */
-  }
+/* Style pour un bouton secondaire (connecter_bis) */
+.connecter_bis {
+  width: 100%;
+  background-color: #f0e0e0;
+  color: #1A237E;
+  font-weight: bold;
+  padding: 14px;
+  font-size: 1.1rem;
+  border: none;
+  border-radius: 10vh;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+/* Style pour le bloc des rectangles d'objet */
+.bloc_rectangles_objet {
+  display: flex; 
+  flex-wrap: wrap; 
+  justify-content: center; 
+  width: 90%;
+}
+
+/* Style pour les messages vides */
+.message_vide {
+  margin: 3vh 8vw 0 8vw;
+  text-align: left;
+}

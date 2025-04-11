@@ -1,9 +1,11 @@
+/* Style général de la page des objets */
 .page_objets {
     background-color: white;
     min-height: 100vh;
     margin-bottom: 12vh;
 }
 
+/* Style du titre dans la page des objets */
 .page_objets h1 {
     font-size: 1.5rem;
     font-weight: bold;
@@ -11,4 +13,3 @@
     color: #1A237E;
     text-align: left; /* Assure que le texte est aligné à gauche */
 }
-

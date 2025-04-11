@@ -1,65 +1,71 @@
-
+/* Style du titre du calendrier */
 .calendrier-container h1 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 8vh 8vw 2vh 8vw;
-    color: #1A237E;
-    text-align: left; /* Assure que le texte est aligné à gauche */
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 8vh 8vw 2vh 8vw;
+  color: #1A237E;
+  text-align: left; /* Assure que le texte est aligné à gauche */
 }
 
+/* Style général du container du calendrier */
 .calendrier-container {
-        background-color: white;
-        min-height: 100vh;
-        margin-bottom: 12vh;
-    }
-    
-  
-  .react-calendar {
-    width: 100%;
-    max-width: 90vw;
-    margin: 0 auto;
-    border: none;
-    border-radius: 10px;
-    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
-  }
-  
-  /* Couleurs des jours selon le type d'élément */
-  .jour-evenement {
-    background-color: #CFEFEC !important; /* Bleu */
-    border-radius: 100%;
-  }
+  background-color: white;
+  min-height: 100vh;
+  margin-bottom: 12vh;
+}
 
-  .jour-attribution {
-    background-color: #E8F5E9 !important; /* Vert */
-    border-radius: 100%;
-  }
+/* Style du calendrier réactif */
+.react-calendar {
+  width: 100%;
+  max-width: 90vw;
+  margin: 0 auto;
+  border: none;
+  border-radius: 10px;
+  box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+}
 
-  .jour-reservation {
-    background-color: #FFCCBC !important; /* Orange */
-    border-radius: 100%;
-  }
+/* Style des jours marqués comme événements */
+.jour-evenement {
+  background-color: #CFEFEC !important; /* Bleu */
+  border-radius: 100%;
+}
 
-  .jour-multiple-types {
-    background-color: #ddcbfd !important; /* Violet lila */
-    border-radius: 100%;
-  }
+/* Style des jours marqués comme attributions */
+.jour-attribution {
+  background-color: #E8F5E9 !important; /* Vert */
+  border-radius: 100%;
+}
 
-  .jour-aujourdhui {
-    background-color: #b8b8b8 !important; /* Jaune doux ou une autre couleur que vous préférez */
-    border-radius: 100%;
-    font-weight: bold;
-    color: black; /* Pour s'assurer que le texte reste lisible */
-  }
-  
-  .ajoutE {
-    width: 40%;
-    background-color: #1A237E;
-    color: white;
-    font-weight: bold;
-    text-align: center;
-    padding: 1.8vw;
-    font-size: 0.8rem;
-    border-radius: 10vh;
-    margin-top: 10px;
-    margin-left: 30vw;
-    }
+/* Style des jours marqués comme réservations */
+.jour-reservation {
+  background-color: #FFCCBC !important; /* Orange */
+  border-radius: 100%;
+}
+
+/* Style des jours ayant plusieurs types d'éléments */
+.jour-multiple-types {
+  background-color: #ddcbfd !important; /* Violet lila */
+  border-radius: 100%;
+}
+
+/* Style du jour actuel */
+.jour-aujourdhui {
+  background-color: #b8b8b8 !important; /* Jaune doux ou une autre couleur que vous préférez */
+  border-radius: 100%;
+  font-weight: bold;
+  color: black; /* Pour s'assurer que le texte reste lisible */
+}
+
+/* Style du bouton pour ajouter un événement */
+.ajoutE {
+  width: 40%;
+  background-color: #1A237E;
+  color: white;
+  font-weight: bold;
+  text-align: center;
+  padding: 1.8vw;
+  font-size: 0.8rem;
+  border-radius: 10vh;
+  margin-top: 10px;
+  margin-left: 30vw;
+}

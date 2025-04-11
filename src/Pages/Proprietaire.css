@@ -1,43 +1,48 @@
+/* Style pour le titre principal de la page */
 .page_proprietaire h1 {
-    font-size: 1.5rem;
-    font-weight: bold;
-    margin: 8vh 8vw 2vh 8vw;
-    color: #1A237E;
-    text-align: left; /* Assure que le texte est aligné à gauche */
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin: 8vh 8vw 2vh 8vw;
+  color: #1A237E;
+  text-align: left;
 }
 
-.page_proprietaire{
-    margin-bottom: 12vh;
+/* Style général pour la page du propriétaire */
+.page_proprietaire {
+  margin-bottom: 12vh;
 }
 
-.contener_objets{
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    padding : 1vw 5vw;
-    justify-content: center;
+/* Agencement des objets sur la page, avec un affichage flexible */
+.contener_objets {
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  padding : 1vw 5vw;
+  justify-content: center;
 }
+
+/* Style des blocs individuels d'objets */
 .div_objet {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: column;
-    align-items: center;
-    gap: 1vw;
-    justify-content: flex-start;
-    margin: 2vw;
-    border-radius: 8px;
-    padding: 1vw;
-  }
-  
-  .div_objet h3 {
-    margin: 0;
-    font-weight: bold;
-    flex-shrink: 0;
-  }
-  
-  .checkmark {
-    font-size: 24px;
-    color: green;
-  }
-  
-  
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: column;
+  align-items: center;
+  gap: 1vw;
+  justify-content: flex-start;
+  margin: 2vw;
+  border-radius: 8px;
+  padding: 1vw;
+}
+
+/* Style spécifique pour les titres des objets */
+.div_objet h3 {
+  margin: 0;
+  font-weight: bold;
+  flex-shrink: 0;
+}
+
+/* Style pour l'icône de validation */
+.checkmark {
+  font-size: 24px;
+  color: green;
+}
