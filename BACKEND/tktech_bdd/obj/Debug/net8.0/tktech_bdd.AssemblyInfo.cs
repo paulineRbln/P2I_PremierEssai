@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("tktech_bdd")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+2105e2d0c34494c4e79af6c098afbd98842580dc")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+6a75320f9770ab8869ed711980382b601175a45b")]
 [assembly: System.Reflection.AssemblyProductAttribute("tktech_bdd")]
 [assembly: System.Reflection.AssemblyTitleAttribute("tktech_bdd")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
